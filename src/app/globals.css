@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Candal&display=swap');
+@import "tailwindcss";
+/* You can add custom CSS variables or base layer styles here later if needed */
+body {
+  background-color: #f8fafc; /* A very light slate background */
+}
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+/* Hide number input arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
