@@ -13,38 +13,38 @@ import { ArrowRight, Check } from "lucide-react";
 const showcaseItems = [
   {
     id: 1,
-    title: "Modern Living Room",
+    title: "Interior Essentials",
     image:
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1400&auto=format&fit=crop",
-    alt: "Modern luxury living room furniture and interior design",
+    alt: "Modern interior with premium home and building essentials",
   },
   {
     id: 2,
-    title: "Contemporary Bedroom",
+    title: "Home Solutions",
     image:
       "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1400&auto=format&fit=crop",
-    alt: "Contemporary bedroom furniture and interior design",
+    alt: "Modern home interior with quality products and finishes",
   },
   {
     id: 3,
-    title: "Designer Kitchen",
+    title: "Kitchen Essentials",
     image:
       "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=1400&auto=format&fit=crop",
-    alt: "Modern designer kitchen interior",
+    alt: "Modern kitchen with contemporary interior solutions",
   },
   {
     id: 4,
-    title: "Premium Home Office",
+    title: "Building Solutions",
     image:
       "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1400&auto=format&fit=crop",
-    alt: "Premium modern home office interior",
+    alt: "Modern space with building and interior solutions",
   },
   {
     id: 5,
-    title: "Luxury Dining Space",
+    title: "Interior Finishes",
     image:
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1400&auto=format&fit=crop",
-    alt: "Luxury modern dining room interior",
+    alt: "Elegant interior with premium finishes and materials",
   },
 ];
 
@@ -86,18 +86,6 @@ export default function InteriorShowcase() {
 
     let position = index - activeIndex;
 
-    /*
-     * Because we have exactly 5 cards,
-     * normalize the position so every card
-     * gets one of:
-
-     * -2
-     * -1
-     *  0
-     * +1
-     * +2
-     */
-
     if (position > total / 2) {
       position -= total;
     }
@@ -136,317 +124,285 @@ export default function InteriorShowcase() {
           xl:gap-16
         "
       >
-
         {/* ==================================================
             LEFT — IMAGE STACK
         ================================================== */}
 
         <div className="relative w-full">
-
           {/* ==================================================
-    5 IMAGE STACK
-================================================== */}
+              5 IMAGE STACK
+          ================================================== */}
 
-<div
-  className="
-    relative
-    h-[350px]
-    w-full
-    sm:h-[375px]
-    lg:h-[400px]
-  "
->
-  {showcaseItems.map((item, index) => {
-    const position = getPosition(index);
-
-    if (position < -2 || position > 2) {
-      return null;
-    }
-
-    const isActive = position === 0;
-    const isNearTop = position === -1;
-    const isFarTop = position === -2;
-    const isNearBottom = position === 1;
-    const isFarBottom = position === 2;
-
-    /* ==================================================
-       VERTICAL POSITION
-
-       MUCH CLOSER THAN BEFORE
-
-       -2 = -92px
-       -1 = -52px
-        0 = 0
-       +1 = +52px
-       +2 = +92px
-    ================================================== */
-
-    let translateY = 0;
-
-    if (position === -2) {
-      translateY = -92;
-    }
-
-    if (position === -1) {
-      translateY = -52;
-    }
-
-    if (position === 1) {
-      translateY = 52;
-    }
-
-    if (position === 2) {
-      translateY = 92;
-    }
-
-    /* ==================================================
-       SCALE
-
-       Keep background cards slightly smaller.
-    ================================================== */
-
-    let scale = 1;
-
-    if (position === -1 || position === 1) {
-      scale = 0.97;
-    }
-
-    if (position === -2 || position === 2) {
-      scale = 0.94;
-    }
-
-    /* ==================================================
-       OPACITY
-
-       Much softer background cards.
-
-       Active  = 1
-       Near    = 0.30
-       Far     = 0.12
-    ================================================== */
-
-    let opacity = 1;
-
-    if (position === -1 || position === 1) {
-      opacity = 0.30;
-    }
-
-    if (position === -2 || position === 2) {
-      opacity = 0.12;
-    }
-
-    /* ==================================================
-       Z INDEX
-    ================================================== */
-
-    let zIndex = 10;
-
-    if (position === -2 || position === 2) {
-      zIndex = 10;
-    }
-
-    if (position === -1 || position === 1) {
-      zIndex = 20;
-    }
-
-    if (isActive) {
-      zIndex = 50;
-    }
-
-    /* ==================================================
-       FADE MASK
-
-       Near cards stay visible around their exposed
-       edges but disappear toward the active card.
-
-       Far cards are much softer.
-    ================================================== */
-
-    let maskImage = "none";
-
-    if (isNearTop) {
-      maskImage =
-        "linear-gradient(to bottom, black 0%, black 45%, transparent 100%)";
-    }
-
-    if (isFarTop) {
-      maskImage =
-        "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 45%, transparent 100%)";
-    }
-
-    if (isNearBottom) {
-      maskImage =
-        "linear-gradient(to top, black 0%, black 45%, transparent 100%)";
-    }
-
-    if (isFarBottom) {
-      maskImage =
-        "linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 45%, transparent 100%)";
-    }
-
-    return (
-      <div
-        key={item.id}
-        className="
-          absolute
-          left-0
-          top-1/2
-          w-full
-          will-change-transform
-          transition-all
-          duration-[1100ms]
-          ease-[cubic-bezier(0.22,1,0.36,1)]
-        "
-        style={{
-          transform: `
-            translate3d(
-              0,
-              calc(-50% + ${translateY}px),
-              0
-            )
-            scale(${scale})
-          `,
-
-          opacity,
-
-          zIndex,
-
-          pointerEvents: isActive ? "auto" : "none",
-
-          ...(maskImage !== "none"
-            ? {
-                WebkitMaskImage: maskImage,
-                maskImage: maskImage,
-
-                WebkitMaskSize: "100% 100%",
-                maskSize: "100% 100%",
-
-                WebkitMaskRepeat: "no-repeat",
-                maskRepeat: "no-repeat",
-              }
-            : {}),
-        }}
-      >
-        {/* ==================================================
-            IMAGE CARD
-        ================================================== */}
-
-        <div
-          className="
-            relative
-            aspect-[1.9/1]
-            w-full
-            overflow-hidden
-            rounded-[24px]
-            bg-gray-200
-            shadow-xl
-            sm:rounded-[28px]
-          "
-        >
-          <Image
-            src={item.image}
-            alt={item.alt}
-            fill
-            priority={index === 0}
-            sizes="
-              (max-width: 640px) 100vw,
-              (max-width: 1024px) 90vw,
-              50vw
+          <div
+            className="
+              relative
+              h-[350px]
+              w-full
+              sm:h-[375px]
+              lg:h-[400px]
             "
-            className={`
-              object-cover
-              transition-transform
-              duration-[5000ms]
-              ease-out
-              ${isActive ? "scale-105" : "scale-100"}
-            `}
-          />
+          >
+            {showcaseItems.map((item, index) => {
+              const position = getPosition(index);
 
-          {/* ==================================================
-              ACTIVE IMAGE GRADIENT
-          ================================================== */}
+              if (position < -2 || position > 2) {
+                return null;
+              }
 
-          {isActive && (
-            <div
-              className="
-                pointer-events-none
-                absolute
-                inset-0
-                rounded-[24px]
-                bg-gradient-to-t
-                from-black/75
-                via-black/15
-                to-transparent
-                sm:rounded-[28px]
-              "
-            />
-          )}
+              const isActive = position === 0;
+              const isNearTop = position === -1;
+              const isFarTop = position === -2;
+              const isNearBottom = position === 1;
+              const isFarBottom = position === 2;
 
-          {/* ==================================================
-              BACKGROUND IMAGE SOFTENING
-          ================================================== */}
+              /* ==================================================
+                 VERTICAL POSITION
+              ================================================== */
 
-          {!isActive && (
-            <div
-              className="
-                pointer-events-none
-                absolute
-                inset-0
-                bg-[rgb(255,245,245)]/20
-              "
-            />
-          )}
+              let translateY = 0;
 
-          {/* ==================================================
-              ACTIVE CONTENT
-          ================================================== */}
+              if (position === -2) {
+                translateY = -92;
+              }
 
-          {isActive && (
-            <div
-              className="
-                absolute
-                bottom-5
-                left-5
-                right-5
-                sm:bottom-6
-                sm:left-7
-                sm:right-7
-              "
-            >
-              <p
-                className="
-                  text-[9px]
-                  font-bold
-                  uppercase
-                  tracking-[0.2em]
-                  text-[rgb(255,170,0)]
-                  sm:text-[10px]
-                "
-              >
-                Featured Interior
-              </p>
+              if (position === -1) {
+                translateY = -52;
+              }
 
-              <h3
-                className="
-                  mt-1
-                  text-xl
-                  font-black
-                  leading-tight
-                  tracking-tight
-                  text-white
-                  sm:text-2xl
-                  lg:text-3xl
-                "
-              >
-                {item.title}
-              </h3>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  })}
-</div>
+              if (position === 1) {
+                translateY = 52;
+              }
+
+              if (position === 2) {
+                translateY = 92;
+              }
+
+              /* ==================================================
+                 SCALE
+              ================================================== */
+
+              let scale = 1;
+
+              if (position === -1 || position === 1) {
+                scale = 0.97;
+              }
+
+              if (position === -2 || position === 2) {
+                scale = 0.94;
+              }
+
+              /* ==================================================
+                 OPACITY
+              ================================================== */
+
+              let opacity = 1;
+
+              if (position === -1 || position === 1) {
+                opacity = 0.3;
+              }
+
+              if (position === -2 || position === 2) {
+                opacity = 0.12;
+              }
+
+              /* ==================================================
+                 Z INDEX
+              ================================================== */
+
+              let zIndex = 10;
+
+              if (position === -1 || position === 1) {
+                zIndex = 20;
+              }
+
+              if (isActive) {
+                zIndex = 50;
+              }
+
+              /* ==================================================
+                 FADE MASK
+              ================================================== */
+
+              let maskImage = "none";
+
+              if (isNearTop) {
+                maskImage =
+                  "linear-gradient(to bottom, black 0%, black 45%, transparent 100%)";
+              }
+
+              if (isFarTop) {
+                maskImage =
+                  "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 45%, transparent 100%)";
+              }
+
+              if (isNearBottom) {
+                maskImage =
+                  "linear-gradient(to top, black 0%, black 45%, transparent 100%)";
+              }
+
+              if (isFarBottom) {
+                maskImage =
+                  "linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 45%, transparent 100%)";
+              }
+
+              return (
+                <div
+                  key={item.id}
+                  className="
+                    absolute
+                    left-0
+                    top-1/2
+                    w-full
+                    will-change-transform
+                    transition-all
+                    duration-[1100ms]
+                    ease-[cubic-bezier(0.22,1,0.36,1)]
+                  "
+                  style={{
+                    transform: `
+                      translate3d(
+                        0,
+                        calc(-50% + ${translateY}px),
+                        0
+                      )
+                      scale(${scale})
+                    `,
+                    opacity,
+                    zIndex,
+                    pointerEvents: isActive ? "auto" : "none",
+
+                    ...(maskImage !== "none"
+                      ? {
+                          WebkitMaskImage: maskImage,
+                          maskImage: maskImage,
+                          WebkitMaskSize: "100% 100%",
+                          maskSize: "100% 100%",
+                          WebkitMaskRepeat: "no-repeat",
+                          maskRepeat: "no-repeat",
+                        }
+                      : {}),
+                  }}
+                >
+                  {/* ==================================================
+                      IMAGE CARD
+                  ================================================== */}
+
+                  <div
+                    className="
+                      relative
+                      aspect-[1.9/1]
+                      w-full
+                      overflow-hidden
+                      rounded-[24px]
+                      bg-gray-200
+                      shadow-xl
+                      sm:rounded-[28px]
+                    "
+                  >
+                    <Image
+                      src={item.image}
+                      alt={item.alt}
+                      fill
+                      priority={index === 0}
+                      sizes="
+                        (max-width: 640px) 100vw,
+                        (max-width: 1024px) 90vw,
+                        50vw
+                      "
+                      className={`
+                        object-cover
+                        transition-transform
+                        duration-[5000ms]
+                        ease-out
+                        ${isActive ? "scale-105" : "scale-100"}
+                      `}
+                    />
+
+                    {/* ==================================================
+                        ACTIVE IMAGE GRADIENT
+                    ================================================== */}
+
+                    {isActive && (
+                      <div
+                        className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          rounded-[24px]
+                          bg-gradient-to-t
+                          from-black/75
+                          via-black/15
+                          to-transparent
+                          sm:rounded-[28px]
+                        "
+                      />
+                    )}
+
+                    {/* ==================================================
+                        BACKGROUND IMAGE SOFTENING
+                    ================================================== */}
+
+                    {!isActive && (
+                      <div
+                        className="
+                          pointer-events-none
+                          absolute
+                          inset-0
+                          bg-[rgb(255,245,245)]/20
+                        "
+                      />
+                    )}
+
+                    {/* ==================================================
+                        ACTIVE CONTENT
+                    ================================================== */}
+
+                    {isActive && (
+                      <div
+                        className="
+                          absolute
+                          bottom-5
+                          left-5
+                          right-5
+                          sm:bottom-6
+                          sm:left-7
+                          sm:right-7
+                        "
+                      >
+                        <p
+                          className="
+                            text-[9px]
+                            font-bold
+                            uppercase
+                            tracking-[0.2em]
+                            text-[rgb(255,170,0)]
+                            sm:text-[10px]
+                          "
+                        >
+                          Featured Collection
+                        </p>
+
+                        <h3
+                          className="
+                            mt-1
+                            text-xl
+                            font-black
+                            leading-tight
+                            tracking-tight
+                            text-white
+                            sm:text-2xl
+                            lg:text-3xl
+                          "
+                        >
+                          {item.title}
+                        </h3>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           {/* ==================================================
               PROGRESS INDICATORS
@@ -484,7 +440,6 @@ export default function InteriorShowcase() {
               />
             ))}
           </div>
-
         </div>
 
         {/* ==================================================
@@ -492,7 +447,6 @@ export default function InteriorShowcase() {
         ================================================== */}
 
         <div className="max-w-xl">
-
           {/* ==================================================
               EYEBROW
           ================================================== */}
@@ -516,7 +470,7 @@ export default function InteriorShowcase() {
                 sm:text-[11px]
               "
             >
-              Designed For Modern Living
+              Explore Home & Interior Essentials
             </span>
           </div>
 
@@ -536,7 +490,7 @@ export default function InteriorShowcase() {
               lg:text-5xl
             "
           >
-            Thoughtfully Designed Interiors for Every Space
+            Everything You Need to Build Better Spaces
           </h2>
 
           {/* ==================================================
@@ -555,9 +509,8 @@ export default function InteriorShowcase() {
               sm:leading-7
             "
           >
-            Explore carefully selected furniture and interior
-            essentials designed to make your living spaces more
-            comfortable, functional and beautifully refined.
+            Discover tiles, electricals, hardware, lighting, paints
+            and more for modern homes and interiors.
           </p>
 
           {/* ==================================================
@@ -573,10 +526,10 @@ export default function InteriorShowcase() {
             "
           >
             {[
-              "Premium furniture for modern homes",
-              "Curated designs for every room",
-              "Quality materials and refined finishes",
-              "Contemporary styles made for everyday living",
+              "Quality products for every space",
+              "Tiles, electricals and building essentials",
+              "Modern designs and reliable materials",
+              "Everything for your home and interior projects",
             ].map((feature) => (
               <div
                 key={feature}
@@ -647,7 +600,7 @@ export default function InteriorShowcase() {
               sm:mt-8
             "
           >
-            Explore Furniture
+            Explore Products
 
             <ArrowRight
               size={17}
@@ -658,7 +611,6 @@ export default function InteriorShowcase() {
               "
             />
           </Link>
-
         </div>
       </div>
     </section>

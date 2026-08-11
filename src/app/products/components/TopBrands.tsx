@@ -3,31 +3,21 @@
 /* ==========================================================
    Top Brands
    ----------------------------------------------------------
-   Premium furniture and interior brand carousel.
+   Displays trusted brands across the store categories.
 
    Brand logos are stored locally inside:
    public/brands/
 
-   The slider uses React refs for reliable custom navigation.
+   The logos scroll automatically.
+   Brand cards are display-only and are not clickable.
 ========================================================== */
 
 import Image from "next/image";
-import Link from "next/link";
-import { useRef } from "react";
-
-import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
-
-import type { Swiper as SwiperType } from "swiper";
+import { Autoplay } from "swiper/modules";
 
 import "swiper/css";
-import "swiper/css/navigation";
 
 /* ==========================================================
    Brand Data
@@ -36,50 +26,50 @@ import "swiper/css/navigation";
 const brands = [
   {
     id: 1,
-    name: "Havells",
-    logo: "/brands/havells.png",
-    offer: "Up to 40% OFF",
-    slug: "havells",
+    name: "Amulia Mica",
+    logo: "/brands/amulia.png",
   },
 
   {
     id: 2,
-    name: "Bosch",
-    logo: "/brands/bosch.png",
-    offer: "Up to 40% OFF",
-    slug: "bosch",
+    name: "Build Associates",
+    logo: "/brands/buildassociates.jpeg",
   },
 
   {
     id: 3,
-    name: "Taparia",
-    logo: "/brands/taparia.png",
-    offer: "Up to 15% OFF",
-    slug: "taparia",
+    name: "CenturyPly",
+    logo: "/brands/century.jpg",
   },
 
   {
     id: 4,
-    name: "Anchor",
-    logo: "/brands/anchor.png",
-    offer: "Up to 50% OFF",
-    slug: "anchor",
+    name: "Ebco",
+    logo: "/brands/ebco.jpeg",
   },
 
   {
     id: 5,
-    name: "Greenply",
-    logo: "/brands/greenply.png",
-    offer: "Extra 2% OFF",
-    slug: "greenply",
+    name: "Fevicol",
+    logo: "/brands/fevicol.jpg",
   },
 
   {
     id: 6,
-    name: "Hettich",
-    logo: "/brands/hettich.png",
-    offer: "Up to 20% OFF",
-    slug: "hettich",
+    name: "Finolex",
+    logo: "/brands/finolex.png",
+  },
+
+  {
+    id: 7,
+    name: "Max",
+    logo: "/brands/max.jpeg",
+  },
+
+  {
+    id: 8,
+    name: "Vir Laminates",
+    logo: "/brands/vir.png",
   },
 ];
 
@@ -88,20 +78,6 @@ const brands = [
 ========================================================== */
 
 export default function TopBrands() {
-  /* ==========================================================
-     Navigation References
-  ========================================================== */
-
-  const prevButtonRef = useRef<HTMLButtonElement | null>(null);
-
-  const nextButtonRef = useRef<HTMLButtonElement | null>(null);
-
-  /* ==========================================================
-     Swiper Instance
-  ========================================================== */
-
-  const swiperRef = useRef<SwiperType | null>(null);
-
   return (
     <section
       className="
@@ -127,236 +103,101 @@ export default function TopBrands() {
         "
       >
         {/* ======================================================
-            HEADER
+            SECTION HEADER
         ====================================================== */}
 
         <div
           className="
             mb-7
-            flex
-            flex-col
-            gap-6
+            max-w-3xl
             sm:mb-9
-            md:flex-row
-            md:items-end
-            md:justify-between
           "
         >
           {/* ====================================================
-              TEXT CONTENT
+              EYEBROW
           ==================================================== */}
 
-          <div className="max-w-3xl">
-            {/* EYEBROW */}
-
-            <div className="mb-3 flex items-center gap-3">
-              <span
-                className="
-                  h-px
-                  w-8
-                  bg-[rgb(255,170,0)]
-                "
-              />
-
-              <span
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.24em]
-                  text-[rgb(255,170,0)]
-                  sm:text-[11px]
-                "
-              >
-                Premium Brands
-              </span>
-            </div>
-
-            {/* SEO HEADING */}
-
-            <h2
+          <div className="mb-3 flex items-center gap-3">
+            <span
               className="
-                max-w-3xl
-                text-3xl
-                font-black
-                leading-[0.98]
-                tracking-[-0.035em]
-                text-[rgb(207,0,6)]
-                sm:text-4xl
+                h-px
+                w-8
+                bg-[rgb(255,170,0)]
+              "
+            />
+
+            <span
+              className="
+                text-[10px]
+                font-bold
+                uppercase
+                tracking-[0.24em]
+                text-[rgb(255,170,0)]
+                sm:text-[11px]
               "
             >
-              Trusted Furniture &amp; Interior Brands
-            </h2>
-
-            {/* SEO DESCRIPTION */}
-
-            <p
-              className="
-                mt-4
-                max-w-2xl
-                text-sm
-                leading-6
-                text-[rgb(120,90,0)]
-                sm:text-lg
-                sm:leading-7
-              "
-            >
-              Explore leading furniture, lighting, kitchen, hardware
-              and home interior brands selected for quality, style
-              and lasting performance.
-            </p>
+              Trusted Brands
+            </span>
           </div>
 
           {/* ====================================================
-              HEADER CONTROLS
+              HEADING
           ==================================================== */}
 
-          <div
+          <h2
             className="
-              flex
-              w-full
-              items-center
-              justify-end
-              gap-3
-              md:w-auto
+              max-w-2xl
+              text-3xl
+              font-black
+              leading-[1]
+              tracking-[-0.035em]
+              text-[rgb(207,0,6)]
+              sm:text-4xl
             "
           >
-            {/* ==================================================
-                VIEW ALL
-            ================================================== */}
+            Trusted Brands for Every Project
+          </h2>
 
-            <Link
-              href="/brands"
-              className="
-                group
-                flex
-                items-center
-                gap-2
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                px-5
-                py-3
-                text-sm
-                font-semibold
-                text-gray-900
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-[rgb(207,0,6)]
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-              "
-            >
-              View All
+          {/* ====================================================
+              DESCRIPTION
+          ==================================================== */}
 
-              <ArrowRight
-                size={17}
-                className="
-                  transition-transform
-                  duration-300
-                  group-hover:translate-x-1
-                "
-              />
-            </Link>
-
-            {/* ==================================================
-                PREVIOUS
-            ================================================== */}
-
-            <button
-              ref={prevButtonRef}
-              type="button"
-              aria-label="Previous brands"
-              onClick={() => {
-                swiperRef.current?.slidePrev();
-              }}
-              className="
-                flex
-                h-11
-                w-11
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                text-gray-900
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-[rgb(207,0,6)]
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-              "
-            >
-              <ChevronLeft size={20} />
-            </button>
-
-            {/* ==================================================
-                NEXT
-            ================================================== */}
-
-            <button
-              ref={nextButtonRef}
-              type="button"
-              aria-label="Next brands"
-              onClick={() => {
-                swiperRef.current?.slideNext();
-              }}
-              className="
-                flex
-                h-11
-                w-11
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                text-gray-900
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-[rgb(207,0,6)]
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-              "
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+          <p
+            className="
+              mt-3
+              max-w-2xl
+              text-sm
+              leading-6
+              text-[rgb(120,90,0)]
+              sm:text-base
+              sm:leading-7
+            "
+          >
+            Shop quality products from trusted brands across
+            electricals, hardware, laminates, panels and more.
+          </p>
         </div>
 
         {/* ======================================================
             BRAND SLIDER
         ====================================================== */}
 
-        <div className="w-full overflow-hidden">
+        <div
+          className="
+            w-full
+            overflow-hidden
+          "
+        >
           <Swiper
-            modules={[Navigation, Autoplay]}
-            onSwiper={(swiper) => {
-              swiperRef.current = swiper;
-            }}
-            navigation={{
-              prevEl: prevButtonRef.current,
-              nextEl: nextButtonRef.current,
-            }}
+            modules={[Autoplay]}
             autoplay={{
-              delay: 3500,
+              delay: 1200,
               disableOnInteraction: false,
-              pauseOnMouseEnter: true,
+              pauseOnMouseEnter: false,
             }}
             loop={true}
-            speed={700}
-            spaceBetween={12}
+            speed={1600}
+            spaceBetween={10}
             slidesPerView={2}
             breakpoints={{
               /* ==================================================
@@ -399,6 +240,11 @@ export default function TopBrands() {
                 slidesPerView: 5,
                 spaceBetween: 18,
               },
+
+              1280: {
+                slidesPerView: 6,
+                spaceBetween: 18,
+              },
             }}
             className="!overflow-hidden"
           >
@@ -406,77 +252,31 @@ export default function TopBrands() {
               <SwiperSlide key={brand.id}>
                 {/* ==================================================
                     BRAND CARD
+                    --------------------------------------------------
+                    Display only.
+                    No link.
+                    No hover animation.
                 ================================================== */}
 
-                <Link
-                  href={`/brands/${brand.slug}`}
+                <div
                   className="
-                    group
-                    relative
                     flex
-                    min-h-[190px]
+                    min-h-[150px]
                     flex-col
                     items-center
                     justify-center
-                    overflow-hidden
                     rounded-2xl
                     border
-                    border-white
+                    border-gray-100
                     bg-white
                     px-4
-                    py-6
+                    py-5
                     text-center
                     shadow-sm
-                    transition-all
-                    duration-500
-                    hover:-translate-y-1
-                    hover:shadow-xl
-                    sm:min-h-[205px]
+                    sm:min-h-[165px]
                     sm:rounded-3xl
                   "
                 >
-                  {/* ==================================================
-                      DECORATIVE GOLD LINE
-                  ================================================== */}
-
-                  <div
-                    className="
-                      absolute
-                      left-1/2
-                      top-0
-                      h-1
-                      w-0
-                      -translate-x-1/2
-                      rounded-full
-                      bg-[rgb(255,170,0)]
-                      transition-all
-                      duration-500
-                      group-hover:w-16
-                    "
-                  />
-
-                  {/* ==================================================
-                      SOFT HOVER GLOW
-                  ================================================== */}
-
-                  <div
-                    className="
-                      pointer-events-none
-                      absolute
-                      -right-10
-                      -top-10
-                      h-24
-                      w-24
-                      rounded-full
-                      bg-[rgb(255,170,0)]/10
-                      opacity-0
-                      blur-2xl
-                      transition-opacity
-                      duration-500
-                      group-hover:opacity-100
-                    "
-                  />
-
                   {/* ==================================================
                       BRAND LOGO
                   ================================================== */}
@@ -484,10 +284,10 @@ export default function TopBrands() {
                   <div
                     className="
                       relative
-                      h-20
-                      w-36
-                      sm:h-24
-                      sm:w-44
+                      h-16
+                      w-32
+                      sm:h-20
+                      sm:w-36
                     "
                   >
                     <Image
@@ -495,14 +295,11 @@ export default function TopBrands() {
                       alt={`${brand.name} logo`}
                       fill
                       sizes="
-                        (max-width: 640px) 144px,
-                        176px
+                        (max-width: 640px) 128px,
+                        144px
                       "
                       className="
                         object-contain
-                        transition-all
-                        duration-500
-                        group-hover:scale-110
                       "
                     />
                   </div>
@@ -514,59 +311,15 @@ export default function TopBrands() {
                   <h3
                     className="
                       mt-3
-                      text-sm
-                      font-bold
-                      text-[rgb(207,0,6)]
-                      transition-colors
-                      duration-300
-                      group-hover:text-[rgb(255,170,0)]
+                      text-xs
+                      font-semibold
+                      text-gray-800
+                      sm:text-sm
                     "
                   >
                     {brand.name}
                   </h3>
-
-                  {/* ==================================================
-                      OFFER
-                  ================================================== */}
-
-                  <p
-                    className="
-                      mt-1.5
-                      text-xs
-                      font-medium
-                      text-[rgb(120,90,0)]
-                    "
-                  >
-                    {brand.offer}
-                  </p>
-
-                  {/* ==================================================
-                      EXPLORE
-                  ================================================== */}
-
-                  <span
-                    className="
-                      mt-3
-                      flex
-                      items-center
-                      gap-1
-                      text-[9px]
-                      font-bold
-                      uppercase
-                      tracking-[0.14em]
-                      text-[rgb(255,170,0)]
-                      opacity-0
-                      transition-all
-                      duration-300
-                      group-hover:translate-y-0
-                      group-hover:opacity-100
-                    "
-                  >
-                    Explore
-
-                    <ChevronRight size={12} />
-                  </span>
-                </Link>
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>

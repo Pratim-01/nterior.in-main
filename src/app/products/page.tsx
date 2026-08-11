@@ -1,7 +1,10 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Categories from "./components/Categories";
-import EditorsPicks from "./components/EditorsPicks";
+// import ExpressDelivery from "./components/ExpressDelivery";
+import Categories from "./components/BuildingMaterials";
+import EditorsPicks from "./components/Tiles";
+import PlywoodLaminates from "./components/PlywoodLaminates";
+import Paints from "./components/Paints";
 import TopBrands from "./components/TopBrands";
 import NewArrivals from "./components/NewArrivals";
 import FeaturedCollections from "./components/FeaturedCollections";
@@ -17,8 +20,11 @@ export default function ProductsPage() {
     <main className="bg-white overflow-x-hidden">
       <Navbar />
       <Hero />
+      {/* <ExpressDelivery /> */}
       <Categories />
       <EditorsPicks />
+      <PlywoodLaminates />
+      <Paints />
       <TopBrands />
       <NewArrivals />
       <FeaturedCollections />

@@ -35,8 +35,6 @@ type Category = {
 const categoryGroups: Category[][] = [
   /* ==========================================================
      SLIDE 1
-     LARGE: LEFT
-     SMALL: RIGHT
   ========================================================== */
 
   [
@@ -80,8 +78,6 @@ const categoryGroups: Category[][] = [
 
   /* ==========================================================
      SLIDE 2
-     LARGE: CENTER
-     SMALL: LEFT + RIGHT
   ========================================================== */
 
   [
@@ -125,8 +121,6 @@ const categoryGroups: Category[][] = [
 
   /* ==========================================================
      SLIDE 3
-     LARGE: RIGHT
-     SMALL: LEFT
   ========================================================== */
 
   [
@@ -255,10 +249,9 @@ function CategoryCard({
             tracking-tight
             text-white
 
-            ${
-              featured
-                ? "text-xl sm:text-2xl lg:text-4xl"
-                : "text-sm sm:text-lg lg:text-xl"
+            ${featured
+              ? "text-xl sm:text-2xl lg:text-4xl"
+              : "text-sm sm:text-lg lg:text-xl"
             }
           `}
         >
@@ -271,10 +264,9 @@ function CategoryCard({
             overflow-hidden
             text-white/75
 
-            ${
-              featured
-                ? "mt-1 max-h-10 text-[10px] leading-4 sm:mt-2 sm:max-h-12 sm:text-sm sm:leading-5"
-                : "hidden sm:mt-2 sm:max-h-12 sm:text-xs sm:leading-5 sm:opacity-0 sm:transition-all sm:duration-500 sm:group-hover:max-h-12 sm:group-hover:opacity-100"
+            ${featured
+              ? "mt-1 max-h-10 text-[10px] leading-4 sm:mt-2 sm:max-h-12 sm:text-sm sm:leading-5"
+              : "hidden sm:mt-2 sm:max-h-12 sm:text-xs sm:leading-5 sm:opacity-0 sm:transition-all sm:duration-500 sm:group-hover:max-h-12 sm:group-hover:opacity-100"
             }
           `}
         >
@@ -335,20 +327,7 @@ function CategoryCard({
 /* ==========================================================
    SLIDE 1
    LARGE LEFT
-   3 SMALL STACKED RIGHT
-
-   DESKTOP:
-
-   ┌──────────────────┬──────────────┐
-   │                  │              │
-   │                  │    SMALL 2   │
-   │                  ├──────────────┤
-   │     LARGE 1      │              │
-   │                  │    SMALL 3   │
-   │                  ├──────────────┤
-   │                  │              │
-   │                  │    SMALL 4   │
-   └──────────────────┴──────────────┘
+   3 SUPPORTING CARDS RIGHT
 ========================================================== */
 
 function SlideOne({
@@ -368,37 +347,18 @@ function SlideOne({
 
         lg:h-[430px]
         lg:grid-cols-4
-        lg:grid-rows-3
+        lg:grid-rows-[1fr_1fr]
         lg:gap-4
       "
     >
-      {/* LARGE LEFT */}
+      {/* ELECTRICALS */}
 
       <div
         className="
-          col-span-2
-          h-[170px]
-
-          sm:h-[220px]
-
-          lg:col-span-2
-          lg:row-span-3
-          lg:h-auto
-        "
-      >
-        <CategoryCard
-          category={categories[0]}
-          featured
-        />
-      </div>
-
-      {/* SMALL RIGHT TOP */}
-
-      <div
-        className="
+          order-1
           h-[105px]
 
-          sm:h-[135px]
+          sm:h-[125px]
 
           lg:col-start-3
           lg:row-start-1
@@ -408,13 +368,14 @@ function SlideOne({
         <CategoryCard category={categories[1]} />
       </div>
 
-      {/* SMALL RIGHT MIDDLE */}
+      {/* PANELS & BOARDS */}
 
       <div
         className="
+          order-2
           h-[105px]
 
-          sm:h-[135px]
+          sm:h-[125px]
 
           lg:col-start-4
           lg:row-start-1
@@ -424,19 +385,42 @@ function SlideOne({
         <CategoryCard category={categories[2]} />
       </div>
 
-      {/* SMALL RIGHT BOTTOM */}
+      {/* TILES */}
 
       <div
         className="
+          order-3
           col-span-2
-          h-[105px]
+          h-[205px]
+
+          sm:h-[240px]
+
+          lg:col-start-1
+          lg:col-span-2
+          lg:row-start-1
+          lg:row-span-2
+          lg:h-auto
+        "
+      >
+        <CategoryCard
+          category={categories[0]}
+          featured
+        />
+      </div>
+
+      {/* PLYWOOD */}
+
+      <div
+        className="
+          order-4
+          col-span-2
+          h-[110px]
 
           sm:h-[135px]
 
           lg:col-start-3
           lg:col-span-2
           lg:row-start-2
-          lg:row-span-2
           lg:h-auto
         "
       >
@@ -449,17 +433,20 @@ function SlideOne({
 /* ==========================================================
    SLIDE 2
    LARGE CENTER
-   SMALL LEFT + RIGHT
+   LEFT STACK
+   RIGHT FULL HEIGHT
 
    DESKTOP:
 
-   ┌──────────┬────────────────┬──────────┐
-   │          │                │          │
-   │ SMALL 1  │                │          │
-   ├──────────┤     LARGE 2    │ SMALL 4  │
-   │          │                │          │
-   │ SMALL 2  │                │          │
-   └──────────┴────────────────┴──────────┘
+   ┌───────────┬───────────────┬───────────┐
+   │           │               │           │
+   │   PAINTS  │               │           │
+   ├───────────┤   HARDWARE    │ LIGHTING  │
+   │ BATHROOM  │               │     &     │
+   │           │               │   FANS    │
+   └───────────┴───────────────┴───────────┘
+
+   NO EMPTY GRID AREA
 ========================================================== */
 
 function SlideTwo({
@@ -483,13 +470,14 @@ function SlideTwo({
         lg:gap-4
       "
     >
-      {/* SMALL LEFT TOP */}
+      {/* PAINTS */}
 
       <div
         className="
+          order-1
           h-[105px]
 
-          sm:h-[135px]
+          sm:h-[125px]
 
           lg:col-start-1
           lg:row-start-1
@@ -499,37 +487,41 @@ function SlideTwo({
         <CategoryCard category={categories[1]} />
       </div>
 
-      {/* SMALL LEFT BOTTOM */}
+      {/* LIGHTING & FANS
+          FIXED:
+          SPANS BOTH DESKTOP ROWS
+      */}
 
       <div
         className="
+          order-2
           h-[105px]
 
-          sm:h-[135px]
+          sm:h-[125px]
 
-          lg:col-start-1
-          lg:row-start-2
+          lg:col-start-4
+          lg:row-start-1
+          lg:row-span-2
           lg:h-auto
         "
       >
         <CategoryCard category={categories[2]} />
       </div>
 
-      {/* LARGE CENTER */}
+      {/* HARDWARE */}
 
       <div
         className="
-          col-span-2
           order-3
-          h-[170px]
+          col-span-2
+          h-[205px]
 
-          sm:h-[220px]
+          sm:h-[240px]
 
           lg:col-start-2
           lg:col-span-2
-          lg:row-span-2
           lg:row-start-1
-          lg:order-none
+          lg:row-span-2
           lg:h-auto
         "
       >
@@ -539,21 +531,19 @@ function SlideTwo({
         />
       </div>
 
-      {/* SMALL RIGHT */}
+      {/* BATHROOM */}
 
       <div
         className="
-          col-span-2
           order-4
-          h-[105px]
+          col-span-2
+          h-[110px]
 
           sm:h-[135px]
 
-          lg:col-start-4
+          lg:col-start-1
           lg:col-span-1
-          lg:row-start-1
-          lg:row-span-2
-          lg:order-none
+          lg:row-start-2
           lg:h-auto
         "
       >
@@ -565,19 +555,8 @@ function SlideTwo({
 
 /* ==========================================================
    SLIDE 3
-   3 SMALL LEFT
    LARGE RIGHT
-
-   DESKTOP:
-
-   ┌──────────────┬──────────────────┐
-   │              │                  │
-   │   SMALL 2    │                  │
-   ├──────────────┤     LARGE 1      │
-   │   SMALL 3    │                  │
-   ├──────────────┤                  │
-   │   SMALL 4    │                  │
-   └──────────────┴──────────────────┘
+   SMALL LEFT
 ========================================================== */
 
 function SlideThree({
@@ -597,19 +576,21 @@ function SlideThree({
 
         lg:h-[430px]
         lg:grid-cols-4
-        lg:grid-rows-3
+        lg:grid-rows-2
         lg:gap-4
       "
     >
-      {/* SMALL LEFT TOP */}
+      {/* KITCHEN */}
 
       <div
         className="
+          order-1
           h-[105px]
 
-          sm:h-[135px]
+          sm:h-[125px]
 
           lg:col-start-1
+          lg:col-span-1
           lg:row-start-1
           lg:h-auto
         "
@@ -617,15 +598,17 @@ function SlideThree({
         <CategoryCard category={categories[1]} />
       </div>
 
-      {/* SMALL LEFT TOP RIGHT */}
+      {/* APPLIANCES */}
 
       <div
         className="
+          order-2
           h-[105px]
 
-          sm:h-[135px]
+          sm:h-[125px]
 
           lg:col-start-2
+          lg:col-span-1
           lg:row-start-1
           lg:h-auto
         "
@@ -633,40 +616,20 @@ function SlideThree({
         <CategoryCard category={categories[2]} />
       </div>
 
-      {/* SMALL LEFT BOTTOM */}
+      {/* SOFA & DINING */}
 
       <div
         className="
+          order-3
           col-span-2
-          h-[105px]
+          h-[205px]
 
-          sm:h-[135px]
-
-          lg:col-start-1
-          lg:col-span-2
-          lg:row-start-2
-          lg:row-span-2
-          lg:h-auto
-        "
-      >
-        <CategoryCard category={categories[3]} />
-      </div>
-
-      {/* LARGE RIGHT */}
-
-      <div
-        className="
-          col-span-2
-          order-4
-          h-[170px]
-
-          sm:h-[220px]
+          sm:h-[240px]
 
           lg:col-start-3
           lg:col-span-2
           lg:row-start-1
-          lg:row-span-3
-          lg:order-none
+          lg:row-span-2
           lg:h-auto
         "
       >
@@ -674,6 +637,25 @@ function SlideThree({
           category={categories[0]}
           featured
         />
+      </div>
+
+      {/* RUGS & CURTAINS */}
+
+      <div
+        className="
+          order-4
+          col-span-2
+          h-[110px]
+
+          sm:h-[135px]
+
+          lg:col-start-1
+          lg:col-span-2
+          lg:row-start-2
+          lg:h-auto
+        "
+      >
+        <CategoryCard category={categories[3]} />
       </div>
     </div>
   );
@@ -706,9 +688,9 @@ export default function Categories() {
           sm:px-6
         "
       >
-        {/* ======================================================
+        {/* ====================================================
             HEADER
-        ====================================================== */}
+        ==================================================== */}
 
         <div
           className="
@@ -746,50 +728,45 @@ export default function Categories() {
               </span>
             </div>
 
-            {/* SEO TITLE */}
+            {/* HEADING */}
 
             <h2
               className="
-                text-3xl
-                font-black
-                leading-none
-                tracking-tight
-                text-[rgb(207,0,6)]
-                sm:text-4xl
-                lg:text-5xl
-              "
+    text-3xl
+    font-black
+    leading-none
+    tracking-tight
+    text-[rgb(207,0,6)]
+    sm:text-4xl
+    lg:text-5xl
+  "
             >
-              Furniture &amp; Interior
-              <br className="hidden sm:block" />
-              Collections for Every Space
+              Building Materials &amp; Essentials
+      
             </h2>
 
-            {/* SEO DESCRIPTION */}
+            {/* PARAGRAPH */}
 
             <p
               className="
-                mt-2
-                max-w-2xl
-                text-xs
-                leading-5
-                text-[rgb(120,90,0)]
-                sm:text-lg
-                sm:leading-6
-              "
+    mt-2
+    max-w-3xl
+    text-xs
+    leading-5
+    text-[rgb(120,90,0)]
+    sm:text-lg
+    sm:leading-6
+  "
             >
-              Discover premium furniture, lighting, home decor
-              and interior essentials thoughtfully selected for
-              modern living.
+              Discover quality products for building, interiors, and everyday living.
             </p>
           </div>
 
-          {/* ====================================================
+          {/* ==================================================
               DESKTOP CONTROLS
-          ==================================================== */}
+          ================================================== */}
 
           <div className="hidden shrink-0 items-center gap-3 sm:flex">
-            {/* VIEW ALL */}
-
             <Link
               href="/categories"
               className="
@@ -828,8 +805,6 @@ export default function Categories() {
               />
             </Link>
 
-            {/* PREVIOUS */}
-
             <button
               type="button"
               aria-label="Previous category slide"
@@ -859,8 +834,6 @@ export default function Categories() {
             >
               <ChevronLeft size={20} />
             </button>
-
-            {/* NEXT */}
 
             <button
               type="button"
@@ -894,9 +867,9 @@ export default function Categories() {
           </div>
         </div>
 
-        {/* ======================================================
+        {/* ====================================================
             SWIPER
-        ====================================================== */}
+        ==================================================== */}
 
         <div className="w-full overflow-hidden">
           <Swiper
@@ -916,25 +889,13 @@ export default function Categories() {
             }}
             className="w-full"
           >
-            {/* ==================================================
-                SLIDE 1
-            ================================================== */}
-
             <SwiperSlide className="!w-full">
               <SlideOne categories={categoryGroups[0]} />
             </SwiperSlide>
 
-            {/* ==================================================
-                SLIDE 2
-            ================================================== */}
-
             <SwiperSlide className="!w-full">
               <SlideTwo categories={categoryGroups[1]} />
             </SwiperSlide>
-
-            {/* ==================================================
-                SLIDE 3
-            ================================================== */}
 
             <SwiperSlide className="!w-full">
               <SlideThree categories={categoryGroups[2]} />
@@ -942,9 +903,9 @@ export default function Categories() {
           </Swiper>
         </div>
 
-        {/* ======================================================
+        {/* ====================================================
             MOBILE CONTROLS
-        ====================================================== */}
+        ==================================================== */}
 
         <div
           className="
@@ -957,8 +918,6 @@ export default function Categories() {
             sm:hidden
           "
         >
-          {/* VIEW ALL */}
-
           <Link
             href="/categories"
             className="
@@ -993,8 +952,6 @@ export default function Categories() {
               "
             />
           </Link>
-
-          {/* MOBILE ARROWS */}
 
           <div className="flex items-center gap-2">
             <button

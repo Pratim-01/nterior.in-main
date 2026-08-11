@@ -1,495 +1,759 @@
 "use client";
 
-/* ==========================================================
-   Hero Section
-   ----------------------------------------------------------
-   Premium Marketplace Hero
-   Inspired by Amazon + Flipkart + IKEA + Apple
-   ========================================================== */
-
 import Image from "next/image";
-import Link from "next/link";
-
+import { useEffect, useState } from "react";
 import {
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
+  Clock3,
+  MapPin,
+  Truck,
+  Zap,
 } from "lucide-react";
 
-import { Swiper, SwiperSlide } from "swiper/react";
+const banners = [
+  {
+    src: "/header/laminate.jpg",
+    alt: "Modern laminate interior materials",
+  },
+  {
+    src: "/header/light.jpg",
+    alt: "Modern lighting and interior design",
+  },
+  {
+    src: "/header/ply.jpg",
+    alt: "Premium plywood and interior materials",
+  },
+  {
+    src: "/header/rug.jpg",
+    alt: "Modern rugs and interior decor",
+  },
+];
 
-import {
-  Navigation,
-  Pagination,
-  Autoplay,
-  EffectFade,
-} from "swiper/modules";
+const AUTO_SLIDE_TIME = 1500;
 
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/effect-fade";
+/*
+ * Desktop:
+ * 2 images per slide
+ *
+ * Slide 1:
+ * laminate + light
+ *
+ * Slide 2:
+ * ply + rug
+ */
+const desktopSlides = [
+  [banners[0], banners[1]],
+  [banners[2], banners[3]],
+];
 
 export default function Hero() {
-  /* ==========================================================
-      Hero Slides
-      Later these can come from an API.
-  ========================================================== */
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const heroSlides = [
-    {
-      id: 1,
+  /* =========================================================
+     DETECT MOBILE SCREEN
+  ========================================================= */
 
-      title: "Luxury Furniture",
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
-      subtitle: "For Modern Living",
+    checkScreenSize();
 
-      description:
-        "Discover premium furniture, modular kitchens, wardrobes, lighting, décor, and complete interior solutions crafted for elegant homes.",
+    window.addEventListener("resize", checkScreenSize);
 
-      image:
-        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=2000&auto=format&fit=crop",
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+    };
+  }, []);
 
-      buttonOne: {
-        title: "Shop Collection",
-        link: "/products",
-      },
+  /*
+   * Mobile = 4 slides
+   * Desktop = 2 slides
+   */
+  const totalSlides = isMobile
+    ? banners.length
+    : desktopSlides.length;
 
-      buttonTwo: {
-        title: "Book Consultation",
-        link: "/contact",
-      },
-    },
+  /* =========================================================
+     RESET SLIDE WHEN SCREEN SIZE CHANGES
+  ========================================================= */
 
-    {
-      id: 2,
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [isMobile]);
 
-      title: "Beautiful Interiors",
+  /* =========================================================
+     AUTOMATIC SLIDER
+  ========================================================= */
 
-      subtitle: "Designed Around You",
+  useEffect(() => {
+    if (isPaused) {
+      return;
+    }
 
-      description:
-        "Create timeless living spaces with curated furniture collections, premium décor, and bespoke interior solutions.",
+    const interval = window.setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, AUTO_SLIDE_TIME);
 
-      image:
-        "https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=2000&auto=format&fit=crop",
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [isPaused, totalSlides]);
 
-      buttonOne: {
-        title: "Explore Collection",
-        link: "/collections",
-      },
+  /* =========================================================
+     NEXT SLIDE
+  ========================================================= */
 
-      buttonTwo: {
-        title: "Talk To Designer",
-        link: "/contact",
-      },
-    },
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
 
-    {
-      id: 3,
+  /* =========================================================
+     PREVIOUS SLIDE
+  ========================================================= */
 
-      title: "Premium Home Décor",
-
-      subtitle: "Made For Every Space",
-
-      description:
-        "From luxurious sofas to elegant lighting and décor, discover everything your dream home deserves.",
-
-      image:
-        "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2000&auto=format&fit=crop",
-
-      buttonOne: {
-        title: "Discover More",
-        link: "/products",
-      },
-
-      buttonTwo: {
-        title: "View Designs",
-        link: "/collections",
-      },
-    },
-  ];
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + totalSlides) % totalSlides
+    );
+  };
 
   return (
-    <section className="relative w-full">
+    <section
+      aria-label="Featured interior design banners"
+      className="w-full bg-white"
+    >
+      {/* =====================================================
+          MAIN CONTAINER
+      ===================================================== */}
 
-      {/* ==========================================================
-          Hero Slider
-      ========================================================== */}
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1400px]
 
-      <Swiper
-        modules={[
-          Navigation,
-          Pagination,
-          Autoplay,
-          EffectFade,
-        ]}
-        slidesPerView={1}
-        loop={true}
-        effect="fade"
-        speed={900}
-        navigation={{
-          prevEl: ".hero-prev",
-          nextEl: ".hero-next",
-        }}
-        pagination={{
-          clickable: true,
-        }}
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-        }}
-        className="h-[82vh] md:h-[88vh]"
+          px-3
+          pt-[84px]
+
+          sm:px-6 
+          sm:pt-[88px]
+
+          lg:px-8
+          lg:pt-[136px]
+
+          xl:px-0
+        "
       >
-        {heroSlides.map((slide) => (
-          <SwiperSlide key={slide.id}>
+        {/* ===================================================
+            HERO AREA
+        =================================================== */}
 
-            {/* ==========================================================
-                Slide Wrapper
-            ========================================================== */}
+        <div
+  className="relative mt-14 w-full md:mt-0"
+  onMouseEnter={() => setIsPaused(true)}
+  onMouseLeave={() => setIsPaused(false)}
+>
+          {/* =================================================
+              IMAGE CONTAINER
+          ================================================= */}
 
-            <div className="relative h-full w-full overflow-hidden">
+          <div
+            className="
+              relative
+              h-[215px]
+              w-full
+              overflow-hidden
+              rounded-xl
 
-              {/* ==========================================================
-                  Background Image
-              ========================================================== */}
+              sm:h-[300px]
+              sm:rounded-2xl
+              
 
-              <Image
-                src={slide.image}
-                alt={slide.title}
-                fill
-                priority={slide.id === 1}
-                className="object-cover"
-              />
+              md:h-[360px]
 
-              {/* ==========================================================
-                  Dark Overlay
-              ========================================================== */}
+              lg:h-[400px]
+              lg:rounded-3xl
 
-              <div className="absolute inset-0 bg-black/55" />
+              xl:h-[420px]
+            "
+          >
+            {/* =================================================
+                MOBILE SLIDES
+                ONE IMAGE
+            ================================================= */}
 
-              {/* ==========================================================
-                  Decorative Gradient
-              ========================================================== */}
+            {isMobile &&
+              banners.map((banner, index) => {
+                const isActive = currentSlide === index;
 
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-
-              {/* ==========================================================
-                  Hero Content
-              ========================================================== */}
-
-              <div className="relative z-20 flex h-full items-center">
-
-                <div className="mx-auto w-full max-w-7xl px-6">
-
-                  <div className="max-w-2xl">
-
-                    {/* Premium Badge */}
-
-                    <div className="mb-8 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-5 py-2 backdrop-blur-lg">
-
-                      <span className="text-sm font-semibold tracking-wide text-white">
-
-                        PREMIUM INTERIOR MARKETPLACE
-
-                      </span>
-
-                    </div>
-
-                    {/* Heading */}
-
-                    <h1 className="text-5xl font-black leading-tight text-white md:text-6xl lg:text-7xl">
-
-                      {slide.title}
-
-                      <span className="mt-2 block bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-
-                        {slide.subtitle}
-
-                      </span>
-
-                    </h1>
-
-                    {/* Description */}
-
-                    <p className="mt-8 max-w-xl text-lg leading-8 text-white/90 md:text-xl">
-
-                      {slide.description}
-
-                    </p>
-
-                    {/* ==========================================================
-                        CTA Buttons
-                    ========================================================== */}
-
-                    <div className="mt-10 flex flex-wrap gap-5">
-
-                      <Link
-                        href={slide.buttonOne.link}
-                        className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-lg font-semibold text-black transition-all duration-300 hover:scale-105 hover:bg-yellow-400"
-                      >
-                        {slide.buttonOne.title}
-
-                        <ArrowRight size={20} />
-                      </Link>
-
-                      <Link
-                        href={slide.buttonTwo.link}
-                        className="rounded-xl border border-white/30 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all duration-300 hover:bg-white hover:text-black"
-                      >
-                        {slide.buttonTwo.title}
-                      </Link>
-
-                    </div>
-                    {/* ==========================================
-                        Trust Stats
-                    ========================================== */}
-
-                    <div className="mt-14 flex flex-wrap items-center gap-10">
-
-                      <div>
-                        <h3 className="text-3xl font-bold text-white">
-                          5000+
-                        </h3>
-
-                        <p className="mt-1 text-sm text-white/70">
-                          Premium Products
-                        </p>
-                      </div>
-
-                      <div>
-                        <h3 className="text-3xl font-bold text-white">
-                          1200+
-                        </h3>
-
-                        <p className="mt-1 text-sm text-white/70">
-                          Happy Customers
-                        </p>
-                      </div>
-
-                      <div>
-                        <h3 className="text-3xl font-bold text-white">
-                          25+
-                        </h3>
-
-                        <p className="mt-1 text-sm text-white/70">
-                          Cities Served
-                        </p>
-                      </div>
-
-                    </div>
-
+                return (
+                  <div
+                    key={banner.src}
+                    className={`
+                      absolute
+                      inset-0
+                      overflow-hidden
+                      transition-opacity
+                      duration-700
+                      ease-in-out
+                      ${isActive
+                        ? "z-10 opacity-100"
+                        : "pointer-events-none z-0 opacity-0"
+                      }
+                    `}
+                  >
+                    <Image
+                      src={banner.src}
+                      alt={banner.alt}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="
+                        select-none
+                        object-cover
+                        object-center
+                      "
+                      draggable={false}
+                    />
                   </div>
+                );
+              })}
 
-                </div>
+            {/* =================================================
+                DESKTOP SLIDES
+                TWO IMAGES PER SLIDE
+            ================================================= */}
 
-              </div>
+            {!isMobile &&
+              desktopSlides.map((slide, slideIndex) => {
+                const isActive = currentSlide === slideIndex;
 
-            </div>
+                return (
+                  <div
+                    key={slideIndex}
+                    className={`
+                      absolute
+                      inset-0
+                      flex
+                      gap-2
+                      p-2
 
-          </SwiperSlide>
-        ))}
+                      transition-opacity
+                      duration-700
+                      ease-in-out
 
-        {/* ==========================================
-            Navigation Buttons
-        ========================================== */}
+                      sm:gap-3
+                      sm:p-3
 
-        <button
-          className="
-            hero-prev
-            absolute
-            left-6
-            top-1/2
-            z-30
-            flex
-            h-14
-            w-14
-            -translate-y-1/2
-            items-center
-            justify-center
-            rounded-full
-            border
-            border-white/20
-            bg-white/10
-            text-white
-            backdrop-blur-lg
-            transition-all
-            duration-300
-            hover:bg-white
-            hover:text-black
-          "
-        >
-          <ChevronLeft size={28} />
-        </button>
+                      ${isActive
+                        ? "z-10 opacity-100"
+                        : "pointer-events-none z-0 opacity-0"
+                      }
+                    `}
+                  >
+                    {/* FIRST IMAGE */}
 
-        <button
-          className="
-            hero-next
-            absolute
-            right-6
-            top-1/2
-            z-30
-            flex
-            h-14
-            w-14
-            -translate-y-1/2
-            items-center
-            justify-center
-            rounded-full
-            border
-            border-white/20
-            bg-white/10
-            text-white
-            backdrop-blur-lg
-            transition-all
-            duration-300
-            hover:bg-white
-            hover:text-black
-          "
-        >
-          <ChevronRight size={28} />
-        </button>
+                    <div
+                      className="
+                        relative
+                        h-full
+                        min-w-0
+                        flex-1
+                        overflow-hidden
+                        rounded-xl
 
-      </Swiper>
+                        sm:rounded-2xl
+                      "
+                    >
+                      <Image
+                        src={slide[0].src}
+                        alt={slide[0].alt}
+                        fill
+                        priority={slideIndex === 0}
+                        sizes="
+                          (max-width: 1024px) 50vw,
+                          700px
+                        "
+                        className="
+                          select-none
+                          object-cover
+                          object-center
+                        "
+                        draggable={false}
+                      />
+                    </div>
 
-      {/* ==========================================
-          Category Navigation
-      ========================================== */}
+                    {/* SECOND IMAGE */}
 
-      <div className="relative z-30 -mt-12 mx-auto max-w-7xl px-6">
+                    <div
+                      className="
+                        relative
+                        h-full
+                        min-w-0
+                        flex-1
+                        overflow-hidden
+                        rounded-xl
 
-        <div className="grid grid-cols-2 gap-4 rounded-3xl bg-white p-6 shadow-2xl sm:grid-cols-4 lg:grid-cols-8">
+                        sm:rounded-2xl
+                      "
+                    >
+                      <Image
+                        src={slide[1].src}
+                        alt={slide[1].alt}
+                        fill
+                        priority={slideIndex === 0}
+                        sizes="
+                          (max-width: 1024px) 50vw,
+                          700px
+                        "
+                        className="
+                          select-none
+                          object-cover
+                          object-center
+                        "
+                        draggable={false}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
 
-          {[
-            "Sofa",
-            "Bedroom",
-            "Dining",
-            "Kitchen",
-            "Wardrobe",
-            "Lighting",
-            "Decor",
-            "Office",
-          ].map((category) => (
+            {/* =================================================
+                LEFT ARROW
+            ================================================= */}
 
-            <Link
-              href={`/category/${category.toLowerCase()}`}
-              key={category}
+            <button
+              type="button"
+              onClick={prevSlide}
+              aria-label="Previous banner"
               className="
+                absolute
+                left-2
+                top-1/2
+                z-30
                 flex
-                flex-col
+                h-8
+                w-8
+                -translate-y-1/2
                 items-center
                 justify-center
-                rounded-2xl
-                p-5
+                rounded-full
+                border
+                border-white/50
+                bg-black/35
+                text-white
+                shadow-md
+                backdrop-blur-md
                 transition-all
-                duration-300
-                hover:bg-gray-100
-                hover:-translate-y-1
+                duration-200
+                hover:bg-[rgb(207,0,6)]
+                active:scale-95
+
+                sm:left-4
+                sm:h-10
+                sm:w-10
+
+                md:left-5
+                md:h-11
+                md:w-11
+
+                lg:left-6
+                lg:h-12
+                lg:w-12
               "
             >
+              <ChevronLeft
+                size={17}
+                strokeWidth={2.2}
+                className="sm:h-5 sm:w-5"
+              />
+            </button>
 
-              <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 text-2xl">
+            {/* =================================================
+                RIGHT ARROW
+            ================================================= */}
 
-                🪑
+            <button
+              type="button"
+              onClick={nextSlide}
+              aria-label="Next banner"
+              className="
+                absolute
+                right-2
+                top-1/2
+                z-30
+                flex
+                h-8
+                w-8
+                -translate-y-1/2
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/50
+                bg-black/35
+                text-white
+                shadow-md
+                backdrop-blur-md
+                transition-all
+                duration-200
+                hover:bg-[rgb(207,0,6)]
+                active:scale-95
 
+                sm:right-4
+                sm:h-10
+                sm:w-10
+
+                md:right-5
+                md:h-11
+                md:w-11
+
+                lg:right-6
+                lg:h-12
+                lg:w-12
+              "
+            >
+              <ChevronRight
+                size={17}
+                strokeWidth={2.2}
+                className="sm:h-5 sm:w-5"
+              />
+            </button>
+          </div>
+
+          {/* =================================================
+              PAGINATION
+          ================================================= */}
+
+          <div
+            className="
+              flex
+              h-9
+              w-full
+              items-center
+              justify-center
+
+              sm:h-11
+            "
+          >
+            <div
+              className="
+                flex
+                items-center
+                gap-1
+                rounded-full
+                border
+                border-gray-200
+                bg-gray-100/90
+                px-2
+                py-1
+                shadow-sm
+
+                sm:gap-1.5
+                sm:px-2.5
+                sm:py-1.5
+              "
+            >
+              {Array.from({
+                length: totalSlides,
+              }).map((_, index) => {
+                const isActive =
+                  currentSlide === index;
+
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() =>
+                      setCurrentSlide(index)
+                    }
+                    aria-label={`Go to banner ${index + 1
+                      }`}
+                    aria-current={
+                      isActive
+                        ? "true"
+                        : undefined
+                    }
+                    className="
+                      flex
+                      h-3
+                      items-center
+                      justify-center
+                    "
+                  >
+                    <span
+                      className={`
+                        block
+                        h-1.5
+                        rounded-full
+                        transition-all
+                        duration-300
+                        ${isActive
+                          ? "w-6 bg-[rgb(255,170,0)] sm:w-9"
+                          : "w-1.5 bg-gray-400 hover:bg-gray-600"
+                        }
+                      `}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* =================================================
+              EXPRESS DELIVERY
+          ================================================= */}
+
+          <div
+            className="
+    relative
+    mx-auto
+    mt-2
+    mb-3
+    w-full
+    max-w-[1200px]
+    overflow-hidden
+    rounded-xl
+    border
+    border-orange-100
+    bg-gradient-to-r
+    from-[#fff4df]
+    via-[#fff9ef]
+    to-white
+    shadow-sm
+
+    sm:mt-3
+    sm:mb-14
+    sm:rounded-2xl
+
+    lg:max-w-[900px]
+  "
+          >
+            {/* Decorative glow */}
+
+            <div
+              className="
+                pointer-events-none
+                absolute
+                -right-10
+                -top-10
+                h-24
+                w-24
+                rounded-full
+                bg-[#ffb000]/10
+                blur-2xl
+
+                sm:h-32
+                sm:w-32
+              "
+            />
+
+            <div
+              className="
+                relative
+                flex
+                min-h-[68px]
+                items-center
+                gap-2
+                px-3
+                py-2.5
+
+                sm:min-h-[88px]
+                sm:gap-4
+                sm:px-5
+                sm:py-4
+
+                lg:px-8
+              "
+            >
+              {/* DELIVERY ICON */}
+
+              <div
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-[#cf0006]
+                  text-white
+                  shadow-md
+
+                  sm:h-12
+                  sm:w-12
+                "
+              >
+                <Truck
+                  size={18}
+                  strokeWidth={2}
+                  className="sm:h-[22px] sm:w-[22px]"
+                />
               </div>
 
-              <span className="text-sm font-semibold text-gray-700">
-                {category}
-              </span>
+              {/* DELIVERY TEXT */}
 
-            </Link>
+              <div className="min-w-0 flex-1">
+                <div
+                  className="
+                    flex
+                    flex-wrap
+                    items-center
+                    gap-x-1.5
+                    gap-y-0.5
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      items-center
+                      gap-1
+                      text-[11px]
+                      font-bold
+                      leading-tight
+                      text-[#cf0006]
 
-          ))}
+                      sm:gap-1.5
+                      sm:text-lg
 
+                      lg:text-xl
+                    "
+                  >
+                    <Zap
+                      size={12}
+                      fill="currentColor"
+                      strokeWidth={2}
+                      className="sm:h-[17px] sm:w-[17px]"
+                    />
+
+                    <span>
+                      Express Delivery
+                    </span>
+                  </div>
+
+                  <span
+                    className="
+                      hidden
+                      text-gray-300
+                      sm:inline
+                    "
+                  >
+                    •
+                  </span>
+
+                  <span
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-[#a76d00]
+
+                      sm:text-base
+                    "
+                  >
+                    In 4 hours
+                  </span>
+                </div>
+
+                <p
+                  className="
+                    mt-0.5
+                    truncate
+                    text-[9px]
+                    leading-relaxed
+                    text-gray-600
+
+                    sm:mt-1
+                    sm:text-sm
+                  "
+                >
+                  Order before 4 PM to receive your
+                  order in 4 hours.
+                </p>
+
+                <div
+                  className="
+                    mt-0.5
+                    flex
+                    items-center
+                    gap-1
+                    text-[8px]
+                    font-medium
+                    text-gray-400
+
+                    sm:mt-1
+                    sm:text-xs
+                  "
+                >
+                  <MapPin
+                    size={9}
+                    strokeWidth={2}
+                    className="sm:h-3 sm:w-3"
+                  />
+
+                  <span className="truncate">
+                    Available on select pincodes
+                    &amp; products
+                  </span>
+                </div>
+              </div>
+
+              {/* TIME BADGE */}
+
+              <div
+                className="
+                  hidden
+                  shrink-0
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-orange-100
+                  bg-white
+                  px-4
+                  py-2
+                  shadow-sm
+
+                  md:flex
+                "
+              >
+                <Clock3
+                  size={17}
+                  className="text-[#ffab00]"
+                />
+
+                <span
+                  className="
+                    text-sm
+                    font-semibold
+                    text-gray-700
+                  "
+                >
+                  4 Hour Delivery
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom accent */}
+
+            <div
+              className="
+                h-[2px]
+                w-full
+                bg-gradient-to-r
+                from-[#ffab00]
+                via-[#ff8a00]
+                to-[#cf0006]
+              "
+            />
+          </div>
         </div>
-
       </div>
-
-      {/* ==========================================
-          Trust Strip
-      ========================================== */}
-
-      <div className="mx-auto mt-10 max-w-7xl px-6">
-
-        <div className="grid gap-5 rounded-3xl border border-gray-200 bg-white p-6 shadow-lg md:grid-cols-4">
-
-          <div className="flex items-center gap-3">
-
-            <span className="text-2xl">🚚</span>
-
-            <div>
-
-              <h4 className="font-bold text-gray-900">
-                Free Delivery
-              </h4>
-
-              <p className="text-sm text-gray-500">
-                Across selected locations
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="flex items-center gap-3">
-
-            <span className="text-2xl">🛠</span>
-
-            <div>
-
-              <h4 className="font-bold text-gray-900">
-                Installation Included
-              </h4>
-
-              <p className="text-sm text-gray-500">
-                Professional setup
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="flex items-center gap-3">
-
-            <span className="text-2xl">⭐</span>
-
-            <div>
-
-              <h4 className="font-bold text-gray-900">
-                Premium Brands
-              </h4>
-
-              <p className="text-sm text-gray-500">
-                Trusted collections
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="flex items-center gap-3">
-
-            <span className="text-2xl">💳</span>
-
-            <div>
-
-              <h4 className="font-bold text-gray-900">
-                Easy EMI
-              </h4>
-
-              <p className="text-sm text-gray-500">
-                Flexible payment options
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
     </section>
   );
 }
