@@ -76,7 +76,7 @@ export default function InteriorShowcase() {
 
      -2 = far top
      -1 = near top
-      0 = active / center
+      0 = active
       1 = near bottom
       2 = far bottom
   ======================================================== */
@@ -100,6 +100,9 @@ export default function InteriorShowcase() {
   return (
     <section
       className="
+        relative
+        z-0
+        isolate
         w-full
         overflow-hidden
         bg-[rgb(255,245,245)]
@@ -124,20 +127,29 @@ export default function InteriorShowcase() {
           xl:gap-16
         "
       >
+
         {/* ==================================================
             LEFT — IMAGE STACK
         ================================================== */}
 
-        <div className="relative w-full">
+        <div className="relative z-0 w-full">
+
           {/* ==================================================
-              5 IMAGE STACK
+              IMAGE STACK VIEWPORT
+
+              overflow-hidden is important.
+
+              It prevents the animated cards from escaping
+              the showcase area.
           ================================================== */}
 
           <div
             className="
               relative
+              z-0
               h-[350px]
               w-full
+              overflow-hidden
               sm:h-[375px]
               lg:h-[400px]
             "
@@ -145,18 +157,35 @@ export default function InteriorShowcase() {
             {showcaseItems.map((item, index) => {
               const position = getPosition(index);
 
+              /*
+               * Every image gets one of these positions:
+               *
+               * -2
+               * -1
+               *  0
+               * +1
+               * +2
+               */
+
               if (position < -2 || position > 2) {
                 return null;
               }
 
               const isActive = position === 0;
+
               const isNearTop = position === -1;
               const isFarTop = position === -2;
+
               const isNearBottom = position === 1;
               const isFarBottom = position === 2;
 
               /* ==================================================
                  VERTICAL POSITION
+
+                 Tight stack.
+
+                 The cards are intentionally close together
+                 so the entire component remains rectangular.
               ================================================== */
 
               let translateY = 0;
@@ -193,6 +222,15 @@ export default function InteriorShowcase() {
 
               /* ==================================================
                  OPACITY
+
+                 Active:
+                 100%
+
+                 Near:
+                 30%
+
+                 Far:
+                 12%
               ================================================== */
 
               let opacity = 1;
@@ -206,17 +244,25 @@ export default function InteriorShowcase() {
               }
 
               /* ==================================================
-                 Z INDEX
+                 INTERNAL STACKING ONLY
+
+                 IMPORTANT:
+
+                 We no longer use z-index 50.
+
+                 The entire showcase is isolated with z-0,
+                 and these values only control the cards
+                 relative to one another.
               ================================================== */
 
-              let zIndex = 10;
+              let zIndex = 1;
 
               if (position === -1 || position === 1) {
-                zIndex = 20;
+                zIndex = 2;
               }
 
               if (isActive) {
-                zIndex = 50;
+                zIndex = 3;
               }
 
               /* ==================================================
@@ -267,22 +313,28 @@ export default function InteriorShowcase() {
                       )
                       scale(${scale})
                     `,
+
                     opacity,
+
                     zIndex,
+
                     pointerEvents: isActive ? "auto" : "none",
 
                     ...(maskImage !== "none"
                       ? {
                           WebkitMaskImage: maskImage,
                           maskImage: maskImage,
+
                           WebkitMaskSize: "100% 100%",
                           maskSize: "100% 100%",
+
                           WebkitMaskRepeat: "no-repeat",
                           maskRepeat: "no-repeat",
                         }
                       : {}),
                   }}
                 >
+
                   {/* ==================================================
                       IMAGE CARD
                   ================================================== */}
@@ -299,6 +351,11 @@ export default function InteriorShowcase() {
                       sm:rounded-[28px]
                     "
                   >
+
+                    {/* ==================================================
+                        IMAGE
+                    ================================================== */}
+
                     <Image
                       src={item.image}
                       alt={item.alt}
@@ -314,7 +371,11 @@ export default function InteriorShowcase() {
                         transition-transform
                         duration-[5000ms]
                         ease-out
-                        ${isActive ? "scale-105" : "scale-100"}
+                        ${
+                          isActive
+                            ? "scale-105"
+                            : "scale-100"
+                        }
                       `}
                     />
 
@@ -354,7 +415,7 @@ export default function InteriorShowcase() {
                     )}
 
                     {/* ==================================================
-                        ACTIVE CONTENT
+                        ACTIVE IMAGE CONTENT
                     ================================================== */}
 
                     {isActive && (
@@ -398,6 +459,7 @@ export default function InteriorShowcase() {
                         </h3>
                       </div>
                     )}
+
                   </div>
                 </div>
               );
@@ -411,7 +473,7 @@ export default function InteriorShowcase() {
           <div
             className="
               relative
-              z-[60]
+              z-10
               mt-3
               flex
               items-center
@@ -446,7 +508,8 @@ export default function InteriorShowcase() {
             RIGHT CONTENT
         ================================================== */}
 
-        <div className="max-w-xl">
+        <div className="relative z-0 max-w-xl">
+
           {/* ==================================================
               EYEBROW
           ================================================== */}
@@ -611,6 +674,7 @@ export default function InteriorShowcase() {
               "
             />
           </Link>
+
         </div>
       </div>
     </section>

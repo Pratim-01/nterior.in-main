@@ -7,6 +7,8 @@ import PlywoodLaminates from "./components/PlywoodLaminates";
 import Paints from "./components/Paints";
 import TopBrands from "./components/TopBrands";
 import NewArrivals from "./components/NewArrivals";
+import Stores from "./components/Stores";
+import WhyShopWithUs from "./components/WhyShopWithUs";
 import FeaturedCollections from "./components/FeaturedCollections";
 import WhyChooseUs from "./components/WhyChooseUs";
 import InteriorServices from "./components/InteriorServices";
@@ -23,18 +25,20 @@ export default function ProductsPage() {
       {/* <ExpressDelivery /> */}
       <Categories />
       <EditorsPicks />
-      <PlywoodLaminates />
-      <Paints />
+      {/* <PlywoodLaminates /> */}
+      {/* <Paints /> */}
       <TopBrands />
       <NewArrivals />
-      <FeaturedCollections />
-      <WhyChooseUs />
-      <InteriorServices />
-      <FeaturedProducts />
-      <Testimonials />
-      <BrandLogos />
-      <CTA />
-      <Footer />
+      <Stores />
+      <WhyShopWithUs />
+      {/* <FeaturedCollections /> */}
+      {/* <WhyChooseUs /> */}
+      {/* <InteriorServices /> */}
+      {/* <FeaturedProducts /> */}
+      {/* <Testimonials /> */}
+      {/* <BrandLogos /> */}
+      {/* <CTA /> */}
+      {/* <Footer /> */}
     </main>
   );
 }

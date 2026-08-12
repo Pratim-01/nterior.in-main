@@ -1,15 +1,14 @@
 "use client";
 
 /* ==========================================================
-   Featured Tiles
-   Premium Tile Product Carousel
+   Category Product Sections
+   Tiles / Ply Wood & Laminates / Paints
 ========================================================== */
 
 import Image from "next/image";
 import Link from "next/link";
 
 import {
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -21,11 +20,24 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 /* ==========================================================
-   Tile Product Data
-   Replace with API Later
+   PRODUCT TYPE
 ========================================================== */
 
-const products = [
+type Product = {
+  id: number;
+  slug: string;
+  title: string;
+  image: string;
+  price: string;
+  oldPrice: string;
+  discount: string;
+};
+
+/* ==========================================================
+   TILES
+========================================================== */
+
+const tileProducts: Product[] = [
   {
     id: 1,
     slug: "marble-finish-floor-tiles",
@@ -83,21 +95,152 @@ const products = [
 ];
 
 /* ==========================================================
-   MAIN COMPONENT
+   PLYWOOD & LAMINATES
 ========================================================== */
 
-export default function EditorsPicks() {
+const plywoodProducts: Product[] = [
+  {
+    id: 1,
+    slug: "premium-plywood-sheets",
+    title: "Premium Plywood Sheets",
+    image:
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1400&auto=format&fit=crop",
+    price: "₹1,299",
+    oldPrice: "₹1,699",
+    discount: "24% OFF",
+  },
+
+  {
+    id: 2,
+    slug: "decorative-laminates",
+    title: "Decorative Laminates",
+    image:
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1400&auto=format&fit=crop",
+    price: "₹899",
+    oldPrice: "₹1,199",
+    discount: "25% OFF",
+  },
+
+  {
+    id: 3,
+    slug: "wood-finish-laminates",
+    title: "Wood Finish Laminates",
+    image:
+      "https://images.unsplash.com/photo-1558997519-83ea9252edf8?q=80&w=1400&auto=format&fit=crop",
+    price: "₹999",
+    oldPrice: "₹1,299",
+    discount: "23% OFF",
+  },
+
+  {
+    id: 4,
+    slug: "interior-grade-plywood",
+    title: "Interior Grade Plywood",
+    image:
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?q=80&w=1400&auto=format&fit=crop",
+    price: "₹1,499",
+    oldPrice: "₹1,899",
+    discount: "21% OFF",
+  },
+
+  {
+    id: 5,
+    slug: "high-pressure-laminates",
+    title: "High Pressure Laminates",
+    image:
+      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=1400&auto=format&fit=crop",
+    price: "₹1,099",
+    oldPrice: "₹1,399",
+    discount: "21% OFF",
+  },
+];
+
+/* ==========================================================
+   PAINTS
+========================================================== */
+
+const paintProducts: Product[] = [
+  {
+    id: 1,
+    slug: "premium-interior-wall-paint",
+    title: "Premium Interior Wall Paint",
+    image:
+      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?q=80&w=1400&auto=format&fit=crop",
+    price: "₹899",
+    oldPrice: "₹1,199",
+    discount: "25% OFF",
+  },
+
+  {
+    id: 2,
+    slug: "weatherproof-exterior-paint",
+    title: "Weatherproof Exterior Paint",
+    image:
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1400&auto=format&fit=crop",
+    price: "₹1,299",
+    oldPrice: "₹1,699",
+    discount: "24% OFF",
+  },
+
+  {
+    id: 3,
+    slug: "luxury-matt-finish-paint",
+    title: "Luxury Matt Finish Paint",
+    image:
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1400&auto=format&fit=crop",
+    price: "₹1,099",
+    oldPrice: "₹1,399",
+    discount: "21% OFF",
+  },
+
+  {
+    id: 4,
+    slug: "easy-clean-emulsion-paint",
+    title: "Easy Clean Emulsion Paint",
+    image:
+      "https://images.unsplash.com/photo-1558997519-83ea9252edf8?q=80&w=1400&auto=format&fit=crop",
+    price: "₹999",
+    oldPrice: "₹1,299",
+    discount: "23% OFF",
+  },
+
+  {
+    id: 5,
+    slug: "decorative-texture-paint",
+    title: "Decorative Texture Paint",
+    image:
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?q=80&w=1400&auto=format&fit=crop",
+    price: "₹799",
+    oldPrice: "₹1,049",
+    discount: "24% OFF",
+  },
+];
+
+/* ==========================================================
+   REUSABLE CATEGORY CAROUSEL
+========================================================== */
+
+function CategoryCarousel({
+  title,
+  category,
+  products,
+  navigationId,
+}: {
+  title: string;
+  category: string;
+  products: Product[];
+  navigationId: string;
+}) {
   return (
     <section
       className="
         w-full
         overflow-hidden
-        bg-[rgb(255,255,255)]
-        pt-10
+        bg-white
+        pt-3
         pb-0
-        sm:py-14
-        md:pt-8
-        md:pb-0
+        sm:pt-4
+        md:pt-4
       "
     >
       <div
@@ -120,139 +263,127 @@ export default function EditorsPicks() {
     w-full
     items-center
     justify-between
+    gap-3
     sm:mb-5
   "
         >
-          {/* ====================================================
-              TILES VIEW ALL LINK
-          ==================================================== */}
+          {/* CATEGORY TITLE */}
 
           <Link
-            href="/products?category=tiles"
-            aria-label="View all tiles"
+            href={`/products?category=${category}`}
+            aria-label={`View all ${title}`}
             className="
-    group
-    inline-flex
-    items-center
-    gap-2
-    text-[rgb(207,0,6)]
-  "
+      group
+      flex
+      min-w-0
+      flex-1
+      items-center
+      gap-1.5
+      text-[rgb(207,0,6)]
+    "
           >
             <h2
               className="
-    text-3xl
-    font-black
-    leading-none
-    tracking-tight
-    text-[rgb(207,0,6)]
-    sm:text-4xl
-    lg:text-3xl
-  "
+        m-0
+        max-w-full
+        text-2xl
+        font-black
+        leading-[0.95]
+        tracking-tight
+        text-[rgb(207,0,6)]
+        sm:text-4xl
+        lg:text-3xl
+      "
             >
-              Tiles
-      
+              {title}
             </h2>
 
             <span
               className="
-    inline-flex
-    items-center
-    -translate-y-[3px]
-    text-[45px]
-    font-normal
-    leading-none
-    text-[rgb(207,0,6)]
-    transition-transform
-    duration-200
-    group-hover:translate-x-1
-  "
+        flex
+        shrink-0
+        items-center
+        text-[32px]
+        font-normal
+        leading-none
+        text-[rgb(207,0,6)]
+        transition-transform
+        duration-200
+        group-hover:translate-x-1
+        sm:text-[42px]
+      "
             >
               ›
             </span>
           </Link>
 
-          {/* ====================================================
-              CAROUSEL CONTROLS
-          ==================================================== */}
+          {/* CAROUSEL CONTROLS */}
 
           <div
             className="
-              flex
-              shrink-0
-              items-center
-              gap-2
-
-              sm:gap-3
-            "
+      flex
+      shrink-0
+      items-center
+      gap-1.5
+      sm:gap-3
+    "
           >
-            {/* PREVIOUS */}
-
             <button
               type="button"
-              aria-label="Previous tile products"
-              className="
-                editors-prev
-                flex
-                h-9
-                w-9
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                text-orange-600
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-[rgb(207,0,6)]
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-
-                sm:h-11
-                sm:w-11
-              "
+              aria-label={`Previous ${title}`}
+              className={`
+        ${navigationId}-prev
+        flex
+        h-8
+        w-8
+        shrink-0
+        items-center
+        justify-center
+        rounded-full
+        border
+        border-gray-200
+        bg-white
+        text-gray-800
+        shadow-sm
+        transition-all
+        duration-300
+        hover:bg-gray-100
+        sm:h-11
+        sm:w-11
+      `}
             >
               <ChevronLeft
-                size={18}
+                size={17}
                 className="sm:h-5 sm:w-5"
               />
             </button>
 
-            {/* NEXT */}
-
             <button
               type="button"
-              aria-label="Next tile products"
-              className="
-                editors-next
-                flex
-                h-9
-                w-9
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                text-orange-600
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-[rgb(207,0,6)]
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-
-                sm:h-11
-                sm:w-11
-              "
+              aria-label={`Next ${title}`}
+              className={`
+        ${navigationId}-next
+        flex
+        h-8
+        w-8
+        shrink-0
+        items-center
+        justify-center
+        rounded-full
+        border
+        border-gray-200
+        bg-white
+        text-gray-800
+        shadow-sm
+        transition-all
+        duration-300
+        hover:bg-gray-100
+        sm:h-11
+        sm:w-11
+      `}
             >
               <ChevronRight
-                size={18}
+                size={17}
                 className="sm:h-5 sm:w-5"
               />
             </button>
@@ -268,15 +399,15 @@ export default function EditorsPicks() {
             relative
             w-full
             overflow-hidden
-            pb-8
+            pb-2
             pt-1
           "
         >
           <Swiper
             modules={[Navigation, Autoplay]}
             navigation={{
-              prevEl: ".editors-prev",
-              nextEl: ".editors-next",
+              prevEl: `.${navigationId}-prev`,
+              nextEl: `.${navigationId}-next`,
             }}
             autoplay={{
               delay: 2300,
@@ -395,27 +526,6 @@ export default function EditorsPicks() {
                           to-transparent
                         "
                       />
-
-                      {/* DISCOUNT BADGE */}
-
-                      {/* <span
-                        className="
-                          absolute
-                          left-3
-                          top-3
-                          rounded-full
-                          bg-[rgb(207,0,6)]
-                          px-2.5
-                          py-1
-                          text-[10px]
-                          font-bold
-                          tracking-wide
-                          text-white
-                          shadow-sm
-                        "
-                      >
-                        {product.discount}
-                      </span> */}
                     </div>
                   </Link>
 
@@ -432,15 +542,12 @@ export default function EditorsPicks() {
                       px-4
                       pb-5
                       pt-4
-
                       sm:px-5
                       sm:pb-6
                       sm:pt-5
                     "
                   >
-                    {/* ==================================================
-                        PRODUCT TITLE
-                    ================================================== */}
+                    {/* PRODUCT TITLE */}
 
                     <Link
                       href={`/product/${product.slug}`}
@@ -457,7 +564,6 @@ export default function EditorsPicks() {
                           transition-colors
                           duration-300
                           hover:text-[rgb(207,0,6)]
-
                           sm:text-base
                           sm:leading-6
                         "
@@ -467,93 +573,107 @@ export default function EditorsPicks() {
                     </Link>
 
                     {/* ==================================================
-                        PRICE SECTION
+                        PRICE
                     ================================================== */}
 
-                    {/* PRICE SECTION */}
                     <div className="mt-1">
                       <div className="flex w-full items-end">
+                        {/* LEFT */}
 
-                        {/* LEFT: DISCOUNT + PRICE + GST */}
                         <div className="flex flex-col">
+                          {/* DISCOUNT */}
 
-                          {/* DISCOUNT ABOVE PRICE */}
                           <span
                             className="
-          mb-1
-          w-fit
-          rounded-md
-          bg-[rgb(207,0,6)]
-          px-2
-          py-1
-          text-[10px]
-          font-bold
-          leading-none
-          text-white
-        "
+                              mb-1
+                              w-fit
+                              rounded-md
+                              bg-[rgb(207,0,6)]
+                              px-2
+                              py-1
+                              text-[10px]
+                              font-bold
+                              leading-none
+                              text-white
+                            "
                           >
                             {product.discount}
                           </span>
 
-                          {/* ACTUAL PRICE */}
+                          {/* PRICE */}
+
                           <span
                             className="
-          text-[22px]
-          font-extrabold
-          leading-none
-          tracking-[-0.03em]
-          text-[rgb(20,0,6)]
-          sm:text-2xl
-        "
+                              text-[22px]
+                              font-extrabold
+                              leading-none
+                              tracking-[-0.03em]
+                              text-gray-950
+                              sm:text-2xl
+                            "
                           >
                             {product.price}
                           </span>
 
-                          {/* GST BELOW PRICE */}
+                          {/* GST */}
+
                           <span
                             className="
-          mt-1
-          text-[11px]
-          font-medium
-          text-gray-500
-          sm:text-xs
-        "
+                              mt-1
+                              text-[11px]
+                              font-medium
+                              text-gray-500
+                              sm:text-xs
+                            "
                           >
                             incl. GST
                           </span>
-
                         </div>
 
                         {/* DIVIDER */}
-                        <span className="mx-4 h-12 w-px bg-gray-300" />
 
-                        {/* RIGHT: MRP */}
-                        <div className="flex items-center gap-1.5 pb-1 whitespace-nowrap">
+                        <span
+                          className="
+                            mx-4
+                            h-12
+                            w-px
+                            bg-gray-300
+                          "
+                        />
 
+                        {/* MRP */}
+
+                        <div
+                          className="
+                            flex
+                            items-center
+                            gap-1.5
+                            whitespace-nowrap
+                            pb-1
+                          "
+                        >
                           <span
                             className="
-          text-[11px]
-          font-medium
-          text-gray-400
-          sm:text-xs
-        "
+                              text-[11px]
+                              font-medium
+                              text-gray-400
+                              sm:text-xs
+                            "
                           >
                             MRP
                           </span>
 
                           <span
                             className="
-          text-[11px]
-          text-orange-600
-          line-through
-          sm:text-xs
-        "
+                              text-[11px]
+                              text-gray-400
+                              line-through
+                              sm:text-xs
+                            "
                           >
                             {product.oldPrice}
                           </span>
-
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -564,5 +684,48 @@ export default function EditorsPicks() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ==========================================================
+   MAIN COMPONENT
+========================================================== */
+
+export default function Tiles() {
+  return (
+    <div className="w-full bg-white">
+      {/* ======================================================
+          1. TILES
+      ====================================================== */}
+
+      <CategoryCarousel
+        title="Tiles"
+        category="tiles"
+        products={tileProducts}
+        navigationId="tiles-carousel"
+      />
+
+      {/* ======================================================
+          2. PLY WOOD & LAMINATES
+      ====================================================== */}
+
+      <CategoryCarousel
+        title="Ply Wood & Laminates"
+        category="plywood-laminates"
+        products={plywoodProducts}
+        navigationId="plywood-carousel"
+      />
+
+      {/* ======================================================
+          3. PAINTS
+      ====================================================== */}
+
+      <CategoryCarousel
+        title="Paints"
+        category="paints"
+        products={paintProducts}
+        navigationId="paints-carousel"
+      />
+    </div>
   );
 }
