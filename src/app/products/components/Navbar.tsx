@@ -373,8 +373,6 @@ export default function Navbar() {
     // full category-navigation width; only this pointer moves.
     const [desktopCategory, setDesktopCategory] =
         useState<string | null>(null);
-    const [desktopPointerLeft, setDesktopPointerLeft] =
-        useState(0);
     const desktopMenuCloseTimer = useRef<ReturnType<
         typeof setTimeout
     > | null>(null);
@@ -394,16 +392,9 @@ export default function Navbar() {
         }, 120);
     };
 
-    const openDesktopCategory = (
-        event: MouseEvent<HTMLButtonElement>,
-        categoryName: string
-    ) => {
+    const openDesktopCategory = (categoryName: string) => {
         clearDesktopMenuCloseTimer();
-
-        const rect = event.currentTarget.getBoundingClientRect();
-
         setDesktopCategory(categoryName);
-        setDesktopPointerLeft(rect.left + rect.width / 2);
     };
 
     const activeDesktopCategory = categories.find(
@@ -533,8 +524,8 @@ export default function Navbar() {
                                 <Link
                                     href="/products"
                                     className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all duration-300 xl:px-6 xl:py-2.5 xl:text-sm ${isProduct
-                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                            : "text-gray-600 hover:text-gray-900"
+                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                        : "text-gray-600 hover:text-gray-900"
                                         }`}
                                 >
                                     E-Commerce
@@ -542,8 +533,8 @@ export default function Navbar() {
                                 <Link
                                     href="/crm"
                                     className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all duration-300 xl:px-6 xl:py-2.5 xl:text-sm ${!isProduct
-                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                            : "text-gray-600 hover:text-gray-900"
+                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                        : "text-gray-600 hover:text-gray-900"
                                         }`}
                                 >
                                     CRM
@@ -743,17 +734,11 @@ export default function Navbar() {
                                         {/* CATEGORY BUTTON */}
                                         <button
                                             type="button"
-                                            onMouseEnter={(event) =>
-                                                openDesktopCategory(
-                                                    event,
-                                                    category.name
-                                                )
+                                            onMouseEnter={() =>
+                                                openDesktopCategory(category.name)
                                             }
-                                            onFocus={(event) =>
-                                                openDesktopCategory(
-                                                    event,
-                                                    category.name
-                                                )
+                                            onFocus={() =>
+                                                openDesktopCategory(category.name)
                                             }
                                             className={`
                                                 relative
@@ -767,10 +752,9 @@ export default function Navbar() {
                                                 transition-all
                                                 duration-200
                                                 xl:text-sm
-                                                ${
-                                                    isActive
-                                                        ? "text-[rgb(207,0,6)]"
-                                                        : "text-gray-700 hover:text-[rgb(207,0,6)]"
+                                                ${isActive
+                                                    ? "text-[rgb(207,0,6)]"
+                                                    : "text-gray-700 hover:text-[rgb(207,0,6)]"
                                                 }
                                             `}
                                             aria-expanded={isActive}
@@ -786,10 +770,9 @@ export default function Navbar() {
                                                     shrink-0
                                                     transition-transform
                                                     duration-300
-                                                    ${
-                                                        isActive
-                                                            ? "rotate-180"
-                                                            : ""
+                                                    ${isActive
+                                                        ? "rotate-180"
+                                                        : ""
                                                     }
                                                 `}
                                             />
@@ -806,10 +789,9 @@ export default function Navbar() {
                                                     bg-[rgb(207,0,6)]
                                                     transition-all
                                                     duration-300
-                                                    ${
-                                                        isActive
-                                                            ? "w-full"
-                                                            : "w-0"
+                                                    ${isActive
+                                                        ? "w-full"
+                                                        : "w-0"
                                                     }
                                                 `}
                                             />
@@ -852,29 +834,6 @@ export default function Navbar() {
                                     closeDesktopMenuWithDelay
                                 }
                             >
-                                {/* POINTER CONNECTING TO ACTIVE CATEGORY */}
-                                <div
-                                    className="
-                                        pointer-events-none
-                                        absolute
-                                        -top-2
-                                        z-10
-                                        h-4
-                                        w-4
-                                        rotate-45
-                                        border-l
-                                        border-t
-                                        border-gray-200
-                                        bg-white
-                                        transition-all
-                                        duration-200
-                                        ease-out
-                                    "
-                                    style={{
-                                        left:
-                                            desktopPointerLeft - 8,
-                                    }}
-                                />
 
                                 <div
                                     className="
@@ -909,60 +868,6 @@ export default function Navbar() {
                                             xl:py-7
                                         "
                                     >
-                                        {/* MENU HEADER */}
-                                        <div
-                                            className="
-                                                mb-5
-                                                flex
-                                                items-center
-                                                justify-between
-                                            "
-                                        >
-                                            <div>
-                                                <p
-                                                    className="
-                                                        text-[10px]
-                                                        font-bold
-                                                        uppercase
-                                                        tracking-[0.2em]
-                                                        text-[rgb(207,0,6)]
-                                                    "
-                                                >
-                                                    Explore
-                                                </p>
-
-                                                <h3
-                                                    className="
-                                                        mt-1
-                                                        text-xl
-                                                        font-bold
-                                                        tracking-tight
-                                                        text-gray-900
-                                                    "
-                                                >
-                                                    {
-                                                        activeDesktopCategory.name
-                                                    }
-                                                </h3>
-                                            </div>
-
-                                            <span
-                                                className="
-                                                    flex
-                                                    h-10
-                                                    w-10
-                                                    items-center
-                                                    justify-center
-                                                    rounded-full
-                                                    bg-gray-50
-                                                    text-gray-400
-                                                "
-                                            >
-                                                <ChevronRight
-                                                    size={18}
-                                                />
-                                            </span>
-                                        </div>
 
                                         {/* MENU COLUMNS */}
                                         <div
@@ -1017,7 +922,7 @@ export default function Navbar() {
                                                                             items-center
                                                                             justify-between
                                                                             rounded-lg
-                                                                            px-2
+                                                                            px-0
                                                                             py-1.5
                                                                             text-left
                                                                             text-sm
@@ -1155,8 +1060,8 @@ export default function Navbar() {
                                 <Link
                                     href="/products"
                                     className={`min-w-0 flex-1 rounded-full px-2 py-2 text-center text-[10px] font-bold transition-all duration-300 sm:px-3 sm:text-xs ${isProduct
-                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                            : "text-gray-600"
+                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                        : "text-gray-600"
                                         }`}
                                 >
                                     <span className="block truncate">
@@ -1166,8 +1071,8 @@ export default function Navbar() {
                                 <Link
                                     href="/crm"
                                     className={`min-w-0 flex-1 rounded-full px-2 py-2 text-center text-[10px] font-bold transition-all duration-300 sm:px-3 sm:text-xs ${!isProduct
-                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                            : "text-gray-600"
+                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                        : "text-gray-600"
                                         }`}
                                 >
                                     <span className="block truncate">
