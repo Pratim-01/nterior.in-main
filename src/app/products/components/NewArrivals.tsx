@@ -105,7 +105,7 @@ export default function InteriorShowcase() {
         isolate
         w-full
         overflow-hidden
-        bg-[rgb(255,245,245)]
+        bg-[rgb(255, 255, 255)]
         py-10
         sm:py-14
         lg:py-16

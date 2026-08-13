@@ -9,6 +9,7 @@ import TopBrands from "./components/TopBrands";
 import NewArrivals from "./components/NewArrivals";
 import Stores from "./components/Stores";
 import WhyShopWithUs from "./components/WhyShopWithUs";
+import ContactUs from "./components/ContactUs";
 import FeaturedCollections from "./components/FeaturedCollections";
 import WhyChooseUs from "./components/WhyChooseUs";
 import InteriorServices from "./components/InteriorServices";
@@ -30,6 +31,7 @@ export default function ProductsPage() {
       <TopBrands />
       <NewArrivals />
       <Stores />
+      <ContactUs />
       <WhyShopWithUs />
       {/* <FeaturedCollections /> */}
       {/* <WhyChooseUs /> */}

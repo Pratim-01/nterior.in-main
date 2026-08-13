@@ -43,7 +43,7 @@ export default function WhyShopWithUs() {
         <section
             className="
         w-full
-    bg-white
+    bg-[#FFF5F5]
     px-4
     pt-3
     pb-10

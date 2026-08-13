@@ -673,7 +673,7 @@ export default function Categories() {
       className="
         w-full
         overflow-hidden
-        bg-[#f8f8f6]
+        bg-[#FFF5F5]
         py-10
         sm:py-14
         md:py-16
