@@ -1,7 +1,9 @@
 "use client";
-import { useRef, useState, type MouseEvent } from "react";
+
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import {
     Search,
     User,
@@ -12,10 +14,26 @@ import {
     Menu,
     X,
 } from "lucide-react";
+
+/* =========================================================
+   TYPES
+========================================================= */
+
+type MegaMenuColumn = {
+    title: string;
+    items: string[];
+};
+
+type Category = {
+    name: string;
+    columns: MegaMenuColumn[];
+};
+
 /* =========================================================
    CATEGORY DATA
 ========================================================= */
-const categories = [
+
+const categories: Category[] = [
     {
         name: "Tiles",
         columns: [
@@ -42,370 +60,989 @@ const categories = [
             },
         ],
     },
+
     {
         name: "Electricals",
         columns: [
             {
+                title: "Wires & Cables",
+                items: [
+                    "Low Tension Wire",
+                    "Coaxial TV Cable",
+                    "CCTV Cable",
+                ],
+            },
+            {
                 title: "Switches & Sockets",
                 items: [
-                    "Modular Switches",
-                    "Sockets",
-                    "Switch Plates",
+                    "Fan Regulator",
+                    "Switch Board Plate",
+                    "Lamp Holder",
+                    "Electrical Socket",
+                    "Communication Socket",
+                    "Blank Plate Cover",
+                    "Switch",
+                    "Combined Box",
+                    "Modular Surface Box",
+                    "Celiling Rose",
+                    "Plug Top",
+                    "LED Indicator",
                 ],
             },
             {
-                title: "Electrical Accessories",
+                title: "Batteries & Torch",
                 items: [
-                    "Wires & Cables",
-                    "MCB & Distribution",
-                    "Electrical Boxes",
+                    "Battery",
+                    "Torch",
                 ],
             },
             {
-                title: "Lighting",
+                title: "Circuit Breakers",
                 items: [
-                    "LED Lights",
-                    "Downlights",
-                    "Decorative Lights",
+                    "MCB",
+                    "RCCB",
+                    "ACCL",
+                    "Isolator",
+                ],
+            },
+            {
+                title: "Distributin Boards",
+                items: [
+                    "Distribution Board",
+                ],
+            },
+            {
+                title: "Conduit, Boxes & Fitting",
+                items: [
+                    "Conduit Fitting",
+                    "Conduit Pipe",
+                    "Conduit Solvent Cement",
+                    "Celeng Fan Box",
+                    "Concealed Box",
+                ],
+            },
+            {
+                title: "Electrical Tools & Accessories",
+                items: [
+                    "Accessory",
+                    "Door Bell",
+                    "Multi Plug Adaptor",
+                    "Spike Guard",
+                ],
+            },
+            {
+                title: "Power Generation & Transformers",
+                items: [
+                    "Inverter Battery",
+                    "Inverter",
+                    "Stabilizer",
+                    "Inverter Trolly",
+                ],
+            },
+            {
+                title: "Water Heaters & Geysers",
+                items: [
+                    "Instant Geyser",
+                    "Storage Geyser",
+                    "Spare Parts",
                 ],
             },
         ],
     },
+
     {
         name: "Power & Hand Tools",
         columns: [
             {
                 title: "Power Tools",
                 items: [
-                    "Drills",
-                    "Grinders",
-                    "Cutting Tools",
+                    "Angle Grinder",
+                    "Impact Drill",
+                    "Rotary Drill",
+                    "Hammer Drill",
+                    "Power Tool Kit",
+                    "Tile Cutter",
+                    "Chop Saw",
+                    "Circular Saw",
+                    "Sander",
+                    "Jig Saw",
+                    "Router",
+                    "Planner",
+                    "Trimmer",
+                    "Heat Gun",
+                    "Air Blower",
+                    "Vacuum Cleaner",
+                    "Power Pressure Washer",
+                    "Drill Driver",
+                    "Electric Screwdriver",
+                    "Glue Gun",
+                    "Electric Mixer",
+                    "Polisher",
+                    "Demolition Hammer",
+                    "Mitre Saw",
+                    "Welding Machine",
+                    "Chain Saw",
+                    "Tyre Inflator",
                 ],
             },
             {
                 title: "Hand Tools",
                 items: [
-                    "Hammers",
-                    "Screwdrivers",
-                    "Wrenches",
+                    "Spanners & Wrench",
+                    "Pliers & Pincer",
+                    "Screwdriver",
+                    "Hand Tool Set",
+                    "Hammer",
+                    "Socket & Socket Set",
+                    "Measuring & Layout Tool",
+                    "Chisel",
+                    "Cutting Tool",
+                    "Hand Saw",
+                    "Clamps & Vice",
+                    "Allen Key",
+                    "Tools Storage & Organizers",
+                    "Hand Plane",
+                    "MultiTools & Accessory",
+                    "Scissor",
+                    "Soldering Equipement",
+                    "Microfiber Cloth",
+                    "Electrical Test Meter",
                 ],
             },
             {
-                title: "Accessories",
+                title: "Power Tools Accessories",
                 items: [
-                    "Drill Bits",
-                    "Blades",
-                    "Tool Accessories",
+                    "Drill Bit",
+                    "Saw Blade",
+                    "Cutting Disc",
+                    "Grinding Disc",
+                    "Coated Abrasive",
+                    "Flap Disc",
+                    "Router Bit Set",
+                    "Planer Blade",
+                    "Glue Stick",
+                    "Welding Accessory",
+                ],
+            },
+            {
+                title: "Garden Tools",
+                items: [
+                    "Hand Pruner",
+                    "Sprayer",
+                    "Hedge Shear",
+                    "Hand Trowel",
+                    "Garden Glove",
+                    "Loppers",
+                    "Watering Hoses & Accessory",
+                    "Hoe",
+                    "Watering Can",
+                    "Cultivating Tool",
+                    "Weeder",
+                    "Sprinkler",
+                    "Flower pots & planters",
+                    "Fertilizers & pesticides",
+                    "Artificial Plants",
+                ],
+            },
+            {
+                title: "Safety Equipment",
+                items: [
+                    "Head Protection",
+                    "Protective Eyewear",
+                    "Safety Vest",
+                    "Safety Shoe",
+                    "Glove",
+                ],
+            },
+            {
+                title: "Household Cleaning",
+                items: [
+                    "Cleaning Tools",
+                    "Cleaner",
+                    "Polish",
+                    "Dustbins",
+                ],
+            },
+            {
+                title: "Ladders & Laundry",
+                items: [
+                    "Step Laundry",
+                    "Cloth Dryers",
+                    "Ironing Boards",
+                ],
+            },
+            {
+                title: "Kitchenware",
+                items: [
+                    "Pressure Cookers",
+                    "Patila and Pans",
+                    "Kadhai",
+                    "Mixing Bowl",
+                    "Basket",
+                    "Container",
+                    "Jar",
+                    "Bottle",
+                    "Lunch Box",
+                    "Casserole",
+                    "Floor Mats",
+                    "Kitchen Tools",
                 ],
             },
         ],
     },
+
     {
         name: "Plywood & Laminates",
         columns: [
             {
-                title: "Plywood",
+                title: "Plywood & Blockboard",
                 items: [
-                    "Commercial Plywood",
-                    "BWP Plywood",
-                    "Marine Plywood",
+                    "Plywood",
+                    "Blockboards",
+                ],
+            },
+            {
+                title: "Engineered Board",
+                items: [
+                    "MDF Board",
+                    "HDHMR HDF Board",
                 ],
             },
             {
                 title: "Laminates",
                 items: [
+                    "Liner Laminates",
                     "Decorative Laminates",
-                    "Wood Finish Laminates",
-                    "High Pressure Laminates",
+                    "Acrylic Laminates",
                 ],
             },
             {
-                title: "Boards",
+                title: "Adhesives",
                 items: [
-                    "MDF Boards",
-                    "Particle Boards",
-                    "Block Boards",
+                    "All Purpose Glue",
+                    "Woodwork Adhesives",
                 ],
             },
         ],
     },
+
     {
         name: "Hardware",
         columns: [
             {
+                title: "Cabinet Hardware",
+                items: [
+                    "Drawer Channel",
+                    "Cabinet Handle",
+                    "Drawer Lock",
+                    "Cabinet Knob",
+                ],
+            },
+            {
                 title: "Door Hardware",
                 items: [
-                    "Door Handles",
-                    "Locks",
-                    "Hinges",
+                    "Door Lock",
+                    "Door Hinge",
+                    "Tower Bolt",
+                    "Door Closer",
+                    "Cylindrical Lock",
+                    "Door Handle",
+                    "Door Accessory",
+                    "Knobs & Tubular Lock",
+                    "Door Stopper",
+                    "Door Aldrop/Latch",
                 ],
             },
             {
-                title: "Furniture Hardware",
+                title: "Kitchen Hardware",
                 items: [
-                    "Drawer Channels",
-                    "Cabinet Hinges",
-                    "Handles & Knobs",
+                    "Kitchen Accessory",
                 ],
             },
             {
-                title: "Accessories",
+                title: "Glass Fittings & Hardware",
                 items: [
-                    "Hooks",
-                    "Brackets",
-                    "Fasteners",
+                    "Glass Accessory",
+                ],
+            },
+            {
+                title: "Other Hardware",
+                items: [
+                    "Basket",
+                    "Gate Hook",
+                    "Magnetic Catcher",
+                    "Modular Accessory",
+                ],
+            },
+            {
+                title: "Curtain Hardware",
+                items: [
+                    "Curtain Finial",
+                ],
+            },
+            {
+                title: "Safes",
+                items: [
+                    "Digital Safe",
+                    "Keyed Safe Box",
                 ],
             },
         ],
     },
+
     {
         name: "Paints",
         columns: [
             {
                 title: "Interior Paints",
                 items: [
-                    "Interior Wall Paint",
-                    "Emulsion Paint",
-                    "Primer",
+                    "Interior Distemper - Color",
+                    "Interior Emulsion - Color",
+                    "Interior Emulsion - Base",
                 ],
             },
             {
                 title: "Exterior Paints",
                 items: [
-                    "Exterior Wall Paint",
-                    "Weatherproof Paint",
-                    "Exterior Primer",
+                    "Exterior Emulsion - Color",
+                    "Exterior Emulsion - Base",
                 ],
             },
             {
-                title: "Specialty Paints",
+                title: "Metal Paints",
                 items: [
-                    "Wood Paint",
-                    "Metal Paint",
-                    "Texture Paint",
+                    "Enamel - Color",
+                    "Enamel - Base",
+                ],
+            },
+            {
+                title: "Sealants",
+                items: [
+                    "Interior Sealant",
+                ],
+            },
+            {
+                title: "Undercoats",
+                items: [
+                    "Putty",
+                    "White Cement",
+                    "Filler",
+                    "Wall Primer",
+                    "Metal Primer",
+                    "Wood Primer",
+                ],
+            },
+            {
+                title: "Waterproofing",
+                items: [
+                    "General Purpose",
+                    "Waterproofing",
+                    "Wall Waterproofing",
+                    "Roof Waterproofing",
+                    "Floor Waterproofing",
+                ],
+            },
+            {
+                title: "Wood Coatings",
+                items: [
+                    "Varnish",
+                    "Melamine Coating",
+                    "Polyurethane (PU) Coating",
+                ],
+            },
+            {
+                title: "Other Paints",
+                items: [
+                    "Spray Paint",
+                ],
+            },
+            {
+                title: "Colorants",
+                items: [
+                    "Universal Stainer",
+                ],
+            },
+            {
+                title: "Applicators",
+                items: [
+                    "Roller",
+                    "Brush",
+                ],
+            },
+            {
+                title: "Paint Tools",
+                items: [
+                    "Knife",
+                    "Extension Pole",
+                    "Other Tools",
+                ],
+            },
+            {
+                title: "Tapes",
+                items: [
+                    "Masking Tape",
                 ],
             },
         ],
     },
+
     {
         name: "Lighting & Fans",
         columns: [
             {
-                title: "Lighting",
+                title: "Light Bulbs",
                 items: [
-                    "Ceiling Lights",
-                    "Pendant Lights",
-                    "Wall Lights",
+                    "LED Bulb",
+                    "LED Batten",
+                    "LED Night Bulb",
                 ],
             },
             {
-                title: "LED Lighting",
+                title: "Ceiling Lights",
                 items: [
-                    "LED Bulbs",
-                    "LED Panels",
-                    "Strip Lights",
+                    "LED Panel Light",
+                    "LED Downlighter",
+                    "LED Spotlight",
+                    "LED COB Light",
                 ],
             },
             {
-                title: "Fans",
+                title: "Fan",
                 items: [
-                    "Ceiling Fans",
-                    "Decorative Fans",
-                    "Exhaust Fans",
+                    "Pedestal Fan",
+                    "Table Fan",
+                    "Wall Fan",
+                    "Exhaust Fan",
+                    "Ceiling Fan",
+                ],
+            },
+            {
+                title: "Outdoor Lighting",
+                items: [
+                    "LED Flood Light",
+                    "LED Street Light",
+                    "Wall Light",
+                ],
+            },
+            {
+                title: "Decorative Lights",
+                items: [
+                    "LED Strip Light",
+                    "LED Rope Light",
+                    "Pendant Light",
+                    "Wall Light",
+                    "LED Scale Light",
+                ],
+            },
+            {
+                title: "Lighting Accessories",
+                items: [
+                    "LED Strip Light Driver",
                 ],
             },
         ],
     },
+
     {
         name: "Bathroom",
         columns: [
             {
-                title: "Sanitaryware",
+                title: "Bath Faucets",
                 items: [
-                    "Wash Basins",
-                    "Toilets",
-                    "Urinals",
+                    "Wall Mixer",
+                    "Diverter",
+                    "Bath Spout",
+                    "Bib Tap",
+                    "Shower Head",
+                    "Shower Arm",
+                    "Hand Held Shower",
+                    "Angle Valve",
                 ],
             },
             {
-                title: "Bath Fittings",
+                title: "Tiles Tools & Accessories",
                 items: [
-                    "Faucets",
-                    "Showers",
-                    "Health Faucets",
+                    "Tile Adhesive",
+                    "Tile Grout",
+                    "Tile Tools",
+                    "Tile Clean & Care",
                 ],
             },
             {
-                title: "Bathroom Accessories",
+                title: "Toilets",
                 items: [
-                    "Mirrors",
-                    "Towel Holders",
-                    "Bathroom Shelves",
+                    "One Piece Toilet",
+                    "Two Piece Toilet",
+                    "Toilet Seat Cover",
+                    "Indian Toilet (IWC)",
+                    "Flush Tank",
+                    "Flush Plate",
+                    "Health Faucet",
+                    "Urinal Push Cock",
+                ],
+            },
+            {
+                title: "Wash Basins",
+                items: [
+                    "Wall hung Basin",
+                    "Table Top Basin",
+                    "Pesestal Basin",
+                    "Pedestal",
+                ],
+            },
+            {
+                title: "Bath Accessories",
+                items: [
+                    "Storage Shelf",
+                    "Towel Rail",
+                    "Soap Holder",
+                    "Soap Dispenser",
+                    "Towel Ring",
+                    "Toilet Paper Holder",
+                    "Tumbler Holder",
+                    "Bottle Trap",
+                    "Waste Coupling",
+                    "Floor Drain",
+                    "Towel Rack",
+                    "Wall Bracket",
+                    "Hose Pipe",
+                    "Robe Hook",
+                    "Grab Bar",
+                ],
+            },
+            {
+                title: "Bath Mirrors",
+                items: [
+                    "Bath Mirror",
+                ],
+            },
+            {
+                title: "Bath Cabinets",
+                items: [
+                    "Medicine Cabinet",
+                ],
+            },
+            {
+                title: "Spares & Fittings",
+                items: [
+                    "Nozzel",
+                    "Aerator",
+                    "Cartridge",
+                    "Flange",
+                    "Ball Cock",
+                ],
+            },
+            {
+                title: "Basin Faucets",
+                items: [
+                    "Pillar Tap",
+                    "Deck Mixer",
                 ],
             },
         ],
     },
+
+    {
+        name: "Sofa and Dining",
+        columns: [
+            {
+                title: "Living Room",
+                items: [
+                    "Sofas",
+                    "Lounge Chairs",
+                    "Coffee Tables",
+                ],
+            },
+            {
+                title: "Dining",
+                items: [
+                    "Dining Tables",
+                    "Dining Chairs",
+                    "Dining Sets",
+                ],
+            },
+            {
+                title: "Furniture",
+                items: [
+                    "Accent Chairs",
+                    "Side Tables",
+                    "Benches",
+                ],
+            },
+        ],
+    },
+
     {
         name: "Plumbing",
         columns: [
             {
-                title: "Pipes",
-                items: [
-                    "PVC Pipes",
-                    "CPVC Pipes",
-                    "UPVC Pipes",
-                ],
-            },
-            {
                 title: "Fittings",
                 items: [
-                    "Pipe Fittings",
-                    "Valves",
-                    "Connectors",
+                    "Water Pipe Fitting",
+                    "SWR Fitting",
+                    "Agriculture Fitting",
                 ],
             },
             {
-                title: "Plumbing Accessories",
+                title: "Pumps",
                 items: [
-                    "Drainage",
-                    "Water Tanks",
-                    "Plumbing Tools",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Kitchen",
-        columns: [
-            {
-                title: "Kitchen Hardware",
-                items: [
-                    "Cabinet Handles",
-                    "Drawer Channels",
-                    "Kitchen Hinges",
+                    "Openwell Submersible Pump",
+                    "Centrifugal Pump",
+                    "Booster Pump",
+                    "Pump Accessory",
                 ],
             },
             {
-                title: "Kitchen Storage",
+                title: "Tanks",
                 items: [
-                    "Pull Out Baskets",
-                    "Corner Units",
-                    "Bottle Pull Outs",
+                    "Overhead Tank",
+                    "Tank Accessory",
                 ],
             },
             {
-                title: "Kitchen Accessories",
+                title: "Tapes, Adhesives and Cleaners",
                 items: [
-                    "Sinks",
-                    "Taps",
-                    "Kitchen Organizers",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Appliances",
-        columns: [
-            {
-                title: "Kitchen Appliances",
-                items: [
-                    "Chimneys",
-                    "Hobs",
-                    "Built-in Ovens",
-                ],
-            },
-            {
-                title: "Home Appliances",
-                items: [
-                    "Air Coolers",
-                    "Water Heaters",
-                    "Small Appliances",
-                ],
-            },
-            {
-                title: "Cooling",
-                items: [
-                    "Fans",
-                    "Air Conditioners",
-                    "Air Purifiers",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Rugs & Curtains",
-        columns: [
-            {
-                title: "Rugs",
-                items: [
-                    "Living Room Rugs",
-                    "Bedroom Rugs",
-                    "Area Rugs",
-                ],
-            },
-            {
-                title: "Curtains",
-                items: [
-                    "Blackout Curtains",
-                    "Sheer Curtains",
-                    "Window Curtains",
+                    "Solvent cement",
+                    "Rust remover",
+                    "Sealant",
+                    "Drain cleaner",
+                    "Tape",
                 ],
             },
             {
                 title: "Accessories",
                 items: [
-                    "Curtain Rods",
-                    "Blinds",
-                    "Cushions",
+                    "Waste pipe",
+                    "Connection pipe",
+                    "Nipple",
+                    "Flange",
+                    "Rainwater Filter",
+                    "Water Meter",
+                    "Fastening & Clamp",
+                    "Washing Machine Inlet Pipe",
+                ],
+            },
+        ],
+    },
+
+    {
+        name: "Kitchen",
+        columns: [
+            {
+                title: "Kitchen Faucets",
+                items: [
+                    "Sink Tap",
+                    "Deck Mixer",
+                    "Wall Mixer",
+                ],
+            },
+            {
+                title: "Kitchen Sinks",
+                items: [
+                    "Single Bowl Sink",
+                ],
+            },
+        ],
+    },
+
+    {
+        name: "Appliances",
+        columns: [
+            {
+                title: "Small Domestic Appliances",
+                items: [
+                    "Toaster",
+                    "Sandwich Maker",
+                    "Coffee Maker",
+                    "Hand Blender",
+                    "Mixer Grinder",
+                    "Wet Grinder",
+                    "Electric Kettle",
+                    "Chopper",
+                    "Air Fryer",
+                    "Air Cooler",
+                    "Rice Cooker",
+                    "OTG (Oven Toaster Griller)",
+                    "Iron Box",
+                    "Personal Care",
+                ],
+            },
+            {
+                title: "Hobs & Chimney",
+                items: [
+                    "Chimney",
+                    "Hob",
+                    "Induction Cooktop",
+                    "Gas Stove",
+                ],
+            },
+            {
+                title: "Large Domestic Appliances",
+                items: [
+                    "Air Conditioner",
+                ],
+            },
+            {
+                title: "Water Treatment",
+                items: [
+                    "RO Water Filter",
                 ],
             },
         ],
     },
 ];
+
+/* =========================================================
+   PRODUCT CATEGORY URL
+========================================================= */
+
+/**
+ * Creates the product listing URL for a submenu item.
+ *
+ * Example:
+ *
+ * "Ceramic Wall Tile"
+ *      ↓
+ * /products?category=Ceramic%20Wall%20Tile
+ *
+ * encodeURIComponent is important because category names
+ * can contain spaces, &, /, brackets, etc.
+ */
+function getProductCategoryHref(
+    category: string
+) {
+    return `/products?category=${encodeURIComponent(
+        category
+    )}`;
+}
+
+/* =========================================================
+   MEGA MENU COLUMN DISTRIBUTION
+========================================================= */
+
+function distributeMegaMenuColumns(
+    groups: MegaMenuColumn[],
+    columnCount: number
+): MegaMenuColumn[][] {
+    const columns: MegaMenuColumn[][] =
+        Array.from(
+            { length: columnCount },
+            () => []
+        );
+
+    const heights = Array.from(
+        { length: columnCount },
+        () => 0
+    );
+
+    const sortedGroups = [...groups].sort(
+        (a, b) =>
+            b.items.length - a.items.length
+    );
+
+    sortedGroups.forEach((group) => {
+        let shortestColumn = 0;
+
+        for (
+            let index = 1;
+            index < columnCount;
+            index++
+        ) {
+            if (
+                heights[index] <
+                heights[shortestColumn]
+            ) {
+                shortestColumn = index;
+            }
+        }
+
+        columns[shortestColumn].push(group);
+
+        heights[shortestColumn] +=
+            group.items.length + 2.5;
+    });
+
+    return columns;
+}
+
+/* =========================================================
+   MEGA MENU COLUMN
+========================================================= */
+
+function MegaMenuColumnStack({
+    groups,
+}: {
+    groups: MegaMenuColumn[];
+}) {
+    return (
+        <div
+            className="
+                flex
+                min-w-0
+                flex-col
+                gap-4
+            "
+        >
+            {groups.map((group) => (
+                <div
+                    key={group.title}
+                    className="min-w-0"
+                >
+                    <h4
+                        className="
+                            mb-1
+                            text-[13px]
+                            font-bold
+                            leading-5
+                            text-[rgb(207,0,6)]
+                        "
+                    >
+                        {group.title}
+                    </h4>
+
+                    <div className="flex flex-col">
+                        {group.items.map(
+                            (item) => (
+                                <Link
+                                    key={item}
+                                    href={`/products?category=${encodeURIComponent(item)}`}
+                                    className="
+                                        group/item
+                                        flex
+                                        min-h-6
+                                        items-center
+                                        rounded-md
+                                        px-2
+                                        py-0.5
+                                        text-[13px]
+                                        leading-5
+                                        text-gray-500
+                                        transition-all
+                                        duration-150
+                                        hover:bg-red-50
+                                        hover:text-[rgb(207,0,6)]
+                                    "
+                                >
+                                    <span>
+                                        {item}
+                                    </span>
+
+                                    <ChevronRight
+                                        size={12}
+                                        className="
+                                            ml-1
+                                            shrink-0
+                                            opacity-0
+                                            transition-all
+                                            duration-150
+                                            group-hover/item:translate-x-0.5
+                                            group-hover/item:opacity-100
+                                        "
+                                    />
+                                </Link>
+                            )
+                        )}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
 export default function Navbar() {
     const pathname = usePathname();
-    const isProduct = pathname === "/products";
-    const [mobileMenu, setMobileMenu] = useState(false);
-    const [openMobileCategory, setOpenMobileCategory] =
-        useState<string | null>(null);
 
-    // Desktop mega-menu state. The menu itself stays fixed to the
-    // full category-navigation width; only this pointer moves.
-    const [desktopCategory, setDesktopCategory] =
-        useState<string | null>(null);
-    const desktopMenuCloseTimer = useRef<ReturnType<
-        typeof setTimeout
-    > | null>(null);
+    const isProduct =
+        pathname === "/products";
 
-    const clearDesktopMenuCloseTimer = () => {
-        if (desktopMenuCloseTimer.current) {
-            clearTimeout(desktopMenuCloseTimer.current);
-            desktopMenuCloseTimer.current = null;
-        }
-    };
+    const [mobileMenu, setMobileMenu] =
+        useState(false);
 
-    const closeDesktopMenuWithDelay = () => {
+    const [
+        openMobileCategory,
+        setOpenMobileCategory,
+    ] = useState<string | null>(null);
+
+    const [
+        desktopCategory,
+        setDesktopCategory,
+    ] = useState<string | null>(null);
+
+    const desktopMenuCloseTimer =
+        useRef<ReturnType<
+            typeof setTimeout
+        > | null>(null);
+
+    /* =======================================================
+       DESKTOP MENU HELPERS
+    ======================================================= */
+
+    const clearDesktopMenuCloseTimer =
+        () => {
+            if (
+                desktopMenuCloseTimer.current
+            ) {
+                clearTimeout(
+                    desktopMenuCloseTimer.current
+                );
+
+                desktopMenuCloseTimer.current =
+                    null;
+            }
+        };
+
+    const closeDesktopMenuWithDelay =
+        () => {
+            clearDesktopMenuCloseTimer();
+
+            desktopMenuCloseTimer.current =
+                setTimeout(() => {
+                    setDesktopCategory(null);
+                }, 140);
+        };
+
+    const openDesktopCategory = (
+        categoryName: string
+    ) => {
         clearDesktopMenuCloseTimer();
 
-        desktopMenuCloseTimer.current = setTimeout(() => {
-            setDesktopCategory(null);
-        }, 120);
+        setDesktopCategory(
+            categoryName
+        );
     };
 
-    const openDesktopCategory = (categoryName: string) => {
-        clearDesktopMenuCloseTimer();
-        setDesktopCategory(categoryName);
-    };
+    const activeDesktopCategory =
+        categories.find(
+            (category) =>
+                category.name ===
+                desktopCategory
+        );
 
-    const activeDesktopCategory = categories.find(
-        (category) => category.name === desktopCategory
-    );
+    /* =======================================================
+       MOBILE CATEGORY
+    ======================================================= */
+
+    const toggleMobileCategory = (
+        categoryName: string
+    ) => {
+        setOpenMobileCategory(
+            (current) =>
+                current === categoryName
+                    ? null
+                    : categoryName
+        );
+    };
 
     return (
         <>
             {/* =========================================================
                 MAIN NAVBAR
             ========================================================= */}
+
             <header
                 className="
                     fixed
@@ -420,9 +1057,11 @@ export default function Navbar() {
                 "
             >
                 <div className="mx-auto w-full max-w-[1920px]">
+
                     {/* =================================================
-                        DESKTOP NAVBAR
+                        DESKTOP MAIN BAR
                     ================================================= */}
+
                     <div
                         className="
                             hidden
@@ -436,9 +1075,6 @@ export default function Navbar() {
                             xl:px-6
                         "
                     >
-                        {/* =================================================
-                            LEFT SIDE
-                        ================================================= */}
                         <div
                             className="
                                 flex
@@ -449,7 +1085,6 @@ export default function Navbar() {
                                 xl:gap-5
                             "
                         >
-                            {/* LOGO */}
                             <Link
                                 href="/"
                                 className="
@@ -481,6 +1116,7 @@ export default function Navbar() {
                                             opacity-80
                                         "
                                     />
+
                                     <span
                                         className="
                                             relative
@@ -495,6 +1131,7 @@ export default function Navbar() {
                                         "
                                     />
                                 </div>
+
                                 <span
                                     className="
                                         text-2xl
@@ -510,7 +1147,7 @@ export default function Navbar() {
                                     nterior
                                 </span>
                             </Link>
-                            {/* E-COMMERCE / CRM */}
+
                             <div
                                 className="
                                     flex
@@ -523,27 +1160,56 @@ export default function Navbar() {
                             >
                                 <Link
                                     href="/products"
-                                    className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all duration-300 xl:px-6 xl:py-2.5 xl:text-sm ${isProduct
-                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                        : "text-gray-600 hover:text-gray-900"
-                                        }`}
+                                    className={`
+                                        whitespace-nowrap
+                                        rounded-full
+                                        px-4
+                                        py-2
+                                        text-xs
+                                        font-bold
+                                        transition-all
+                                        duration-300
+                                        xl:px-6
+                                        xl:py-2.5
+                                        xl:text-sm
+                                        ${
+                                            isProduct
+                                                ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                                : "text-gray-600 hover:text-gray-900"
+                                        }
+                                    `}
                                 >
                                     E-Commerce
                                 </Link>
+
                                 <Link
                                     href="/crm"
-                                    className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all duration-300 xl:px-6 xl:py-2.5 xl:text-sm ${!isProduct
-                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                        : "text-gray-600 hover:text-gray-900"
-                                        }`}
+                                    className={`
+                                        whitespace-nowrap
+                                        rounded-full
+                                        px-4
+                                        py-2
+                                        text-xs
+                                        font-bold
+                                        transition-all
+                                        duration-300
+                                        xl:px-6
+                                        xl:py-2.5
+                                        xl:text-sm
+                                        ${
+                                            !isProduct
+                                                ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                                : "text-gray-600 hover:text-gray-900"
+                                        }
+                                    `}
                                 >
                                     CRM
                                 </Link>
                             </div>
                         </div>
-                        {/* =================================================
-                            SEARCH
-                        ================================================= */}
+
+                        {/* SEARCH */}
+
                         <div className="min-w-0">
                             <div className="relative">
                                 <Search
@@ -556,6 +1222,7 @@ export default function Navbar() {
                                         text-[rgb(255,170,0)]
                                     "
                                 />
+
                                 <input
                                     type="search"
                                     placeholder="Search furniture, wardrobes, kitchens..."
@@ -566,9 +1233,9 @@ export default function Navbar() {
                                         rounded-full
                                         border
                                         border-orange-100
-                                        bg-orange-50/40
-                                        pl-12
-                                        pr-5
+                                        bg-orange-50/20
+                                        pl-11
+                                        pr-4
                                         text-sm
                                         text-gray-800
                                         outline-none
@@ -582,52 +1249,51 @@ export default function Navbar() {
                                 />
                             </div>
                         </div>
-                        {/* =================================================
-                            RIGHT SIDE
-                        ================================================= */}
+
+                        {/* ACTIONS */}
+
                         <div
                             className="
                                 flex
                                 shrink-0
                                 items-center
-                                justify-end
                                 gap-2
-                                xl:gap-3
                             "
                         >
                             <button
                                 type="button"
                                 className="
-                                    hidden
+                                    flex
+                                    h-11
                                     items-center
                                     gap-2
-                                    whitespace-nowrap
                                     rounded-full
                                     border
                                     border-gray-200
-                                    px-4
-                                    py-2.5
+                                    bg-white
+                                    px-5
                                     text-sm
                                     font-semibold
                                     text-gray-700
                                     transition
                                     hover:border-[rgb(255,170,0)]
                                     hover:bg-orange-50
-                                    xl:flex
                                 "
                             >
                                 <User size={18} />
-                                Login
+
+                                <span className="hidden xl:inline">
+                                    Login
+                                </span>
                             </button>
+
                             <button
                                 type="button"
                                 aria-label="Wishlist"
                                 className="
-                                    relative
                                     flex
                                     h-11
                                     w-11
-                                    shrink-0
                                     items-center
                                     justify-center
                                     rounded-full
@@ -642,15 +1308,15 @@ export default function Navbar() {
                             >
                                 <Heart size={20} />
                             </button>
+
                             <button
                                 type="button"
-                                aria-label="Shopping cart"
+                                aria-label="Cart"
                                 className="
                                     relative
                                     flex
                                     h-11
                                     w-11
-                                    shrink-0
                                     items-center
                                     justify-center
                                     rounded-full
@@ -663,7 +1329,10 @@ export default function Navbar() {
                                     hover:bg-orange-50
                                 "
                             >
-                                <ShoppingCart size={20} />
+                                <ShoppingCart
+                                    size={20}
+                                />
+
                                 <span
                                     className="
                                         absolute
@@ -686,9 +1355,11 @@ export default function Navbar() {
                             </button>
                         </div>
                     </div>
+
                     {/* =================================================
                         DESKTOP CATEGORY BAR
                     ================================================= */}
+
                     <div
                         className="
                             relative
@@ -700,9 +1371,10 @@ export default function Navbar() {
                             border-gray-100
                             lg:flex
                         "
-                        onMouseLeave={closeDesktopMenuWithDelay}
+                        onMouseLeave={
+                            closeDesktopMenuWithDelay
+                        }
                     >
-                        {/* CATEGORY SCROLLER */}
                         <div
                             className="
                                 flex
@@ -719,492 +1391,536 @@ export default function Navbar() {
                                 [&::-webkit-scrollbar]:hidden
                             "
                         >
-                            {categories.map((category) => {
-                                const isActive =
-                                    desktopCategory === category.name;
+                            {categories.map(
+                                (category) => {
+                                    const isActive =
+                                        desktopCategory ===
+                                        category.name;
 
-                                return (
-                                    <div
-                                        key={category.name}
-                                        className="
-                                            relative
-                                            shrink-0
-                                        "
-                                    >
-                                        {/* CATEGORY BUTTON */}
-                                        <button
-                                            type="button"
-                                            onMouseEnter={() =>
-                                                openDesktopCategory(category.name)
-                                            }
-                                            onFocus={() =>
-                                                openDesktopCategory(category.name)
-                                            }
-                                            className={`
-                                                relative
-                                                flex
-                                                items-center
-                                                gap-1
-                                                whitespace-nowrap
-                                                py-1.5
-                                                text-xs
-                                                font-semibold
-                                                transition-all
-                                                duration-200
-                                                xl:text-sm
-                                                ${isActive
-                                                    ? "text-[rgb(207,0,6)]"
-                                                    : "text-gray-700 hover:text-[rgb(207,0,6)]"
-                                                }
-                                            `}
-                                            aria-expanded={isActive}
-                                            aria-haspopup="true"
-                                        >
-                                            <span>
-                                                {category.name}
-                                            </span>
-
-                                            <ChevronDown
-                                                size={14}
-                                                className={`
-                                                    shrink-0
-                                                    transition-transform
-                                                    duration-300
-                                                    ${isActive
-                                                        ? "rotate-180"
-                                                        : ""
-                                                    }
-                                                `}
-                                            />
-
-                                            {/* ACTIVE UNDERLINE */}
-                                            <span
-                                                className={`
-                                                    absolute
-                                                    bottom-0
-                                                    left-1/2
-                                                    h-0.5
-                                                    -translate-x-1/2
-                                                    rounded-full
-                                                    bg-[rgb(207,0,6)]
-                                                    transition-all
-                                                    duration-300
-                                                    ${isActive
-                                                        ? "w-full"
-                                                        : "w-0"
-                                                    }
-                                                `}
-                                            />
-                                        </button>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {/* =================================================
-                            DESKTOP MEGA MENU
-
-                            The panel is NOT positioned relative to the
-                            selected category. It always spans the complete
-                            category navigation width.
-
-                            Only the small pointer follows the selected
-                            category.
-                        ================================================= */}
-                        {activeDesktopCategory && (
-                            <div
-                                className="
-                                    fixed
-                                    left-0
-                                    right-0
-                                    z-[70]
-                                    translate-y-0
-                                    opacity-100
-                                    transition-all
-                                    duration-200
-                                    ease-out
-                                "
-                                style={{
-                                    top: "108px",
-                                }}
-                                onMouseEnter={
-                                    clearDesktopMenuCloseTimer
-                                }
-                                onMouseLeave={
-                                    closeDesktopMenuWithDelay
-                                }
-                            >
-
-                                <div
-                                    className="
-                                        relative
-                                        mx-auto
-                                        w-full
-                                        max-w-[1920px]
-                                        overflow-hidden
-                                        border-b
-                                        border-gray-200
-                                        bg-white
-                                        shadow-[0_20px_60px_rgba(15,23,42,0.14)]
-                                    "
-                                >
-                                    {/* TOP ACCENT */}
-                                    <div
-                                        className="
-                                            h-1
-                                            w-full
-                                            bg-gradient-to-r
-                                            from-[rgb(255,170,0)]
-                                            via-[rgb(255,100,0)]
-                                            to-[rgb(207,0,6)]
-                                        "
-                                    />
-
-                                    <div
-                                        className="
-                                            px-5
-                                            py-6
-                                            xl:px-8
-                                            xl:py-7
-                                        "
-                                    >
-
-                                        {/* MENU COLUMNS */}
+                                    return (
                                         <div
+                                            key={
+                                                category.name
+                                            }
                                             className="
-                                                grid
-                                                grid-cols-3
-                                                gap-8
-                                                xl:gap-12
+                                                relative
+                                                shrink-0
                                             "
                                         >
-                                            {activeDesktopCategory.columns.map(
-                                                (column) => (
-                                                    <div
-                                                        key={
-                                                            column.title
+                                            <button
+                                                type="button"
+                                                onMouseEnter={() =>
+                                                    openDesktopCategory(
+                                                        category.name
+                                                    )
+                                                }
+                                                onFocus={() =>
+                                                    openDesktopCategory(
+                                                        category.name
+                                                    )
+                                                }
+                                                className={`
+                                                    group
+                                                    relative
+                                                    flex
+                                                    items-center
+                                                    gap-1
+                                                    whitespace-nowrap
+                                                    py-1.5
+                                                    text-xs
+                                                    font-semibold
+                                                    transition-all
+                                                    duration-200
+                                                    xl:text-sm
+                                                    ${
+                                                        isActive
+                                                            ? "text-[rgb(207,0,6)]"
+                                                            : "text-gray-700 hover:text-[rgb(207,0,6)]"
+                                                    }
+                                                `}
+                                                aria-expanded={
+                                                    isActive
+                                                }
+                                                aria-haspopup="true"
+                                            >
+                                                <span>
+                                                    {
+                                                        category.name
+                                                    }
+                                                </span>
+
+                                                <ChevronDown
+                                                    size={14}
+                                                    className={`
+                                                        shrink-0
+                                                        transition-transform
+                                                        duration-300
+                                                        ${
+                                                            isActive
+                                                                ? "rotate-180"
+                                                                : ""
                                                         }
-                                                        className="
-                                                            min-w-0
-                                                        "
-                                                    >
-                                                        <h4
-                                                            className="
-                                                                mb-2.5
-                                                                text-sm
-                                                                font-bold
-                                                                text-[rgb(207,0,6)]
-                                                            "
-                                                        >
-                                                            {
-                                                                column.title
-                                                            }
-                                                        </h4>
+                                                    `}
+                                                />
 
-                                                        <div
-                                                            className="
-                                                                space-y-1
-                                                            "
-                                                        >
-                                                            {column.items.map(
-                                                                (
-                                                                    item
-                                                                ) => (
-                                                                    <button
-                                                                        key={
-                                                                            item
-                                                                        }
-                                                                        type="button"
-                                                                        className="
-                                                                            group/item
-                                                                            flex
-                                                                            w-full
-                                                                            items-center
-                                                                            justify-between
-                                                                            rounded-lg
-                                                                            px-0
-                                                                            py-1.5
-                                                                            text-left
-                                                                            text-sm
-                                                                            text-gray-600
-                                                                            transition-all
-                                                                            duration-200
-                                                                            hover:bg-red-50
-                                                                            hover:text-[rgb(207,0,6)]
-                                                                        "
-                                                                    >
-                                                                        <span>
-                                                                            {
-                                                                                item
-                                                                            }
-                                                                        </span>
-
-                                                                        <ChevronRight
-                                                                            size={
-                                                                                14
-                                                                            }
-                                                                            className="
-                                                                                -translate-x-1
-                                                                                opacity-0
-                                                                                transition-all
-                                                                                duration-200
-                                                                                group-hover/item:translate-x-0
-                                                                                group-hover/item:opacity-100
-                                                                            "
-                                                                        />
-                                                                    </button>
-                                                                )
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )
-                                            )}
+                                                <span
+                                                    className={`
+                                                        absolute
+                                                        bottom-0
+                                                        left-1/2
+                                                        h-0.5
+                                                        -translate-x-1/2
+                                                        rounded-full
+                                                        bg-[rgb(207,0,6)]
+                                                        transition-all
+                                                        duration-300
+                                                        ${
+                                                            isActive
+                                                                ? "w-full"
+                                                                : "w-0"
+                                                        }
+                                                    `}
+                                                />
+                                            </button>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    {/* =================================================
-                        MOBILE NAVBAR
-                    ================================================= */}
-                    <div className="lg:hidden">
-                        {/* MOBILE FIRST ROW */}
-                        <div
-                            className="
-                                flex
-                                h-16
-                                min-w-0
-                                items-center
-                                gap-2
-                                px-3
-                                sm:px-4
-                            "
-                        >
-                            {/* LOGO */}
-                            <Link
-                                href="/"
-                                className="
-                                    group
-                                    flex
-                                    min-w-0
-                                    shrink-0
-                                    items-center
-                                "
-                            >
-                                <div
-                                    className="
-                                        relative
-                                        -top-2
-                                        mr-1
-                                        flex
-                                        h-3
-                                        w-3
-                                        items-center
-                                        justify-center
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            absolute
-                                            inline-flex
-                                            h-4
-                                            w-4
-                                            animate-ping
-                                            rounded-full
-                                            bg-yellow-400
-                                            opacity-80
-                                        "
-                                    />
-                                    <span
-                                        className="
-                                            relative
-                                            inline-flex
-                                            h-3
-                                            w-3
-                                            rounded-full
-                                            bg-yellow-400
-                                        "
-                                    />
-                                </div>
-                                <span
-                                    className="
-                                        text-lg
-                                        font-bold
-                                        text-[rgb(207,0,6)]
-                                        sm:text-xl
-                                    "
-                                    style={{
-                                        fontFamily:
-                                            "Candal, sans-serif",
-                                    }}
-                                >
-                                    nterior
-                                </span>
-                            </Link>
-                            {/* MOBILE TOGGLE */}
-                            <div
-                                className="
-                                    mx-auto
-                                    flex
-                                    min-w-0
-                                    max-w-[220px]
-                                    flex-1
-                                    items-center
-                                    rounded-full
-                                    bg-gray-100
-                                    p-1
-                                    shadow-sm
-                                "
-                            >
-                                <Link
-                                    href="/products"
-                                    className={`min-w-0 flex-1 rounded-full px-2 py-2 text-center text-[10px] font-bold transition-all duration-300 sm:px-3 sm:text-xs ${isProduct
-                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                        : "text-gray-600"
-                                        }`}
-                                >
-                                    <span className="block truncate">
-                                        E-Commerce
-                                    </span>
-                                </Link>
-                                <Link
-                                    href="/crm"
-                                    className={`min-w-0 flex-1 rounded-full px-2 py-2 text-center text-[10px] font-bold transition-all duration-300 sm:px-3 sm:text-xs ${!isProduct
-                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                        : "text-gray-600"
-                                        }`}
-                                >
-                                    <span className="block truncate">
-                                        CRM
-                                    </span>
-                                </Link>
-                            </div>
-                            {/* MOBILE ACTIONS */}
-                            <div
-                                className="
-                                    flex
-                                    shrink-0
-                                    items-center
-                                    gap-1
-                                    sm:gap-2
-                                "
-                            >
-                                <button
-                                    type="button"
-                                    aria-label="Shopping cart"
-                                    className="
-                                        relative
-                                        flex
-                                        h-9
-                                        w-9
-                                        items-center
-                                        justify-center
-                                        rounded-full
-                                        text-gray-700
-                                        transition
-                                        hover:bg-gray-100
-                                        sm:h-10
-                                        sm:w-10
-                                    "
-                                >
-                                    <ShoppingCart size={20} />
-                                    <span
-                                        className="
-                                            absolute
-                                            -right-0.5
-                                            -top-0.5
-                                            flex
-                                            h-4
-                                            w-4
-                                            items-center
-                                            justify-center
-                                            rounded-full
-                                            bg-[rgb(207,0,6)]
-                                            text-[9px]
-                                            font-bold
-                                            text-white
-                                        "
-                                    >
-                                        0
-                                    </span>
-                                </button>
-                                <button
-                                    type="button"
-                                    aria-label="Open menu"
-                                    onClick={() =>
-                                        setMobileMenu(true)
-                                    }
-                                    className="
-                                        flex
-                                        h-9
-                                        w-9
-                                        items-center
-                                        justify-center
-                                        rounded-lg
-                                        text-gray-700
-                                        transition
-                                        hover:bg-gray-100
-                                        sm:h-10
-                                        sm:w-10
-                                    "
-                                >
-                                    <Menu size={23} />
-                                </button>
-                            </div>
-                        </div>
-                        {/* MOBILE SEARCH */}
-                        <div className="px-3 pb-3 sm:px-4">
-                            <div className="relative">
-                                <Search
-                                    size={18}
-                                    className="
-                                        absolute
-                                        left-4
-                                        top-1/2
-                                        -translate-y-1/2
-                                        text-[rgb(255,170,0)]
-                                    "
-                                />
-                                <input
-                                    type="search"
-                                    placeholder="Search products..."
-                                    className="
-                                        h-11
-                                        w-full
-                                        rounded-full
-                                        border
-                                        border-orange-100
-                                        bg-orange-50/40
-                                        pl-11
-                                        pr-4
-                                        text-sm
-                                        text-gray-800
-                                        outline-none
-                                        placeholder:text-gray-400
-                                        transition
-                                        focus:border-[rgb(255,170,0)]
-                                        focus:bg-white
-                                        focus:ring-4
-                                        focus:ring-yellow-200/40
-                                    "
-                                />
-                            </div>
+                                    );
+                                }
+                            )}
                         </div>
                     </div>
                 </div>
             </header>
-            {/* =============================================================
+
+            {/* =========================================================
+                DESKTOP MEGA MENU
+            ========================================================= */}
+
+            {activeDesktopCategory && (
+                <div
+                    className="
+                        fixed
+                        inset-x-0
+                        top-[108px]
+                        z-[70]
+                        border-b
+                        border-gray-200
+                        bg-white
+                        shadow-[0_16px_40px_rgba(24,34,53,0.10)]
+                        animate-[megaMenuIn_180ms_ease-out]
+                    "
+                    onMouseEnter={
+                        clearDesktopMenuCloseTimer
+                    }
+                    onMouseLeave={
+                        closeDesktopMenuWithDelay
+                    }
+                >
+                    <div
+                        className="
+                            h-1
+                            w-full
+                            bg-gradient-to-r
+                            from-[rgb(255,170,0)]
+                            via-orange-500
+                            to-[rgb(207,0,6)]
+                        "
+                    />
+
+                    <div
+                        className="
+                            mx-auto
+                            w-full
+                            max-w-[1920px]
+                            px-5
+                            py-3
+                            xl:px-8
+                            xl:py-4
+                            2xl:px-10
+                        "
+                    >
+                        {/* 4 COLUMNS */}
+
+                        <div
+                            className="
+                                grid
+                                grid-cols-4
+                                gap-x-6
+                                lg:gap-x-7
+                                xl:hidden
+                            "
+                        >
+                            {distributeMegaMenuColumns(
+                                activeDesktopCategory.columns,
+                                4
+                            ).map(
+                                (
+                                    column,
+                                    index
+                                ) => (
+                                    <MegaMenuColumnStack
+                                        key={index}
+                                        groups={column}
+                                    />
+                                )
+                            )}
+                        </div>
+
+                        {/* 6 COLUMNS */}
+
+                        <div
+                            className="
+                                hidden
+                                grid-cols-6
+                                gap-x-7
+                                xl:grid
+                                2xl:hidden
+                            "
+                        >
+                            {distributeMegaMenuColumns(
+                                activeDesktopCategory.columns,
+                                6
+                            ).map(
+                                (
+                                    column,
+                                    index
+                                ) => (
+                                    <MegaMenuColumnStack
+                                        key={index}
+                                        groups={column}
+                                    />
+                                )
+                            )}
+                        </div>
+
+                        {/* 7 COLUMNS */}
+
+                        <div
+                            className="
+                                hidden
+                                grid-cols-7
+                                gap-x-8
+                                2xl:grid
+                            "
+                        >
+                            {distributeMegaMenuColumns(
+                                activeDesktopCategory.columns,
+                                7
+                            ).map(
+                                (
+                                    column,
+                                    index
+                                ) => (
+                                    <MegaMenuColumnStack
+                                        key={index}
+                                        groups={column}
+                                    />
+                                )
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* =========================================================
+                MOBILE NAVBAR
+            ========================================================= */}
+
+            <div
+                className="
+                    fixed
+                    inset-x-0
+                    top-0
+                    z-50
+                    border-b
+                    border-gray-100
+                    bg-white/95
+                    shadow-sm
+                    backdrop-blur-xl
+                    lg:hidden
+                "
+            >
+                {/* MOBILE FIRST ROW */}
+
+                <div
+                    className="
+                        flex
+                        h-16
+                        min-w-0
+                        items-center
+                        gap-2
+                        px-3
+                        sm:px-4
+                    "
+                >
+                    {/* LOGO */}
+
+                    <Link
+                        href="/"
+                        className="
+                            group
+                            flex
+                            min-w-0
+                            shrink-0
+                            items-center
+                        "
+                    >
+                        <div
+                            className="
+                                relative
+                                -top-1
+                                mr-1
+                                flex
+                                h-3
+                                w-3
+                                items-center
+                                justify-center
+                            "
+                        >
+                            <span
+                                className="
+                                    absolute
+                                    inline-flex
+                                    h-3
+                                    w-3
+                                    animate-ping
+                                    rounded-full
+                                    bg-[rgb(255,193,0)]
+                                    opacity-70
+                                "
+                            />
+
+                            <span
+                                className="
+                                    relative
+                                    inline-flex
+                                    h-3
+                                    w-3
+                                    rounded-full
+                                    bg-[rgb(255,193,0)]
+                                "
+                            />
+                        </div>
+
+                        <span
+                            className="
+                                text-lg
+                                font-bold
+                                tracking-tight
+                                text-[rgb(207,0,6)]
+                                sm:text-xl
+                            "
+                            style={{
+                                fontFamily:
+                                    "Candal, sans-serif",
+                            }}
+                        >
+                            nterior
+                        </span>
+                    </Link>
+
+                    {/* MODE SWITCH */}
+
+                    <div
+                        className="
+                            mx-auto
+                            flex
+                            min-w-0
+                            max-w-[220px]
+                            flex-1
+                            items-center
+                            rounded-full
+                            bg-gray-100
+                            p-1
+                        "
+                    >
+                        <Link
+                            href="/products"
+                            className={`
+                                flex-1
+                                rounded-full
+                                px-2
+                                py-2
+                                text-center
+                                text-[11px]
+                                font-bold
+                                transition
+                                ${
+                                    isProduct
+                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
+                                        : "text-gray-600"
+                                }
+                            `}
+                        >
+                            E-Commerce
+                        </Link>
+
+                        <Link
+                            href="/crm"
+                            className={`
+                                flex-1
+                                rounded-full
+                                px-2
+                                py-2
+                                text-center
+                                text-[11px]
+                                font-bold
+                                transition
+                                ${
+                                    !isProduct
+                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
+                                        : "text-gray-600"
+                                }
+                            `}
+                        >
+                            CRM
+                        </Link>
+                    </div>
+
+                    {/* MOBILE ACTIONS */}
+
+                    <div
+                        className="
+                            flex
+                            shrink-0
+                            items-center
+                            gap-1
+                        "
+                    >
+                        <button
+                            type="button"
+                            aria-label="Wishlist"
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            <Heart size={19} />
+                        </button>
+
+                        <button
+                            type="button"
+                            aria-label="Cart"
+                            className="
+                                relative
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            <ShoppingCart size={19} />
+
+                            <span
+                                className="
+                                    absolute
+                                    -right-0.5
+                                    -top-0.5
+                                    flex
+                                    h-4
+                                    w-4
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-[rgb(207,0,6)]
+                                    text-[9px]
+                                    font-bold
+                                    text-white
+                                "
+                            >
+                                0
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            aria-label="Open menu"
+                            onClick={() =>
+                                setMobileMenu(true)
+                            }
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-lg
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            <Menu size={23} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* MOBILE SEARCH */}
+
+                <div className="px-3 pb-3 sm:px-4">
+                    <div className="relative">
+                        <Search
+                            size={18}
+                            className="
+                                absolute
+                                left-4
+                                top-1/2
+                                -translate-y-1/2
+                                text-[rgb(255,170,0)]
+                            "
+                        />
+
+                        <input
+                            type="search"
+                            placeholder="Search products..."
+                            className="
+                                h-11
+                                w-full
+                                rounded-full
+                                border
+                                border-orange-100
+                                bg-orange-50/30
+                                pl-11
+                                pr-4
+                                text-sm
+                                text-gray-800
+                                outline-none
+                                placeholder:text-gray-400
+                                transition
+                                focus:border-[rgb(255,170,0)]
+                                focus:bg-white
+                                focus:ring-4
+                                focus:ring-yellow-200/40
+                            "
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* =========================================================
                 MOBILE DRAWER
-            ============================================================= */}
+            ========================================================= */}
+
             {mobileMenu && (
                 <div
                     className="
                         fixed
                         inset-0
-                        z-[60]
-                        bg-black/50
+                        z-[100]
+                        bg-black/45
                         backdrop-blur-sm
+                        lg:hidden
                     "
                     onClick={() =>
                         setMobileMenu(false)
@@ -1215,85 +1931,56 @@ export default function Navbar() {
                             absolute
                             right-0
                             top-0
+                            flex
                             h-full
                             w-[88%]
-                            max-w-sm
-                            overflow-y-auto
+                            max-w-[420px]
+                            flex-col
                             bg-white
                             shadow-2xl
                         "
-                        onClick={(e) =>
-                            e.stopPropagation()
+                        onClick={(event) =>
+                            event.stopPropagation()
                         }
                     >
                         {/* DRAWER HEADER */}
+
                         <div
                             className="
-                                sticky
-                                top-0
-                                z-10
                                 flex
+                                h-16
+                                shrink-0
                                 items-center
                                 justify-between
                                 border-b
                                 border-gray-100
-                                bg-white/95
                                 px-5
-                                py-5
-                                backdrop-blur-xl
                             "
                         >
-                            <div className="flex items-center">
-                                <div
+                            <div>
+                                <p
                                     className="
-                                        relative
-                                        -top-2
-                                        mr-1
-                                        flex
-                                        h-4
-                                        w-4
-                                        items-center
-                                        justify-center
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            absolute
-                                            inline-flex
-                                            h-4
-                                            w-4
-                                            animate-ping
-                                            rounded-full
-                                            bg-[rgb(255,193,0)]
-                                            opacity-80
-                                        "
-                                    />
-                                    <span
-                                        className="
-                                            relative
-                                            inline-flex
-                                            h-4
-                                            w-4
-                                            rounded-full
-                                            bg-[rgb(255,193,0)]
-                                            shadow-[0_0_15px_rgba(255,193,0,.8)]
-                                        "
-                                    />
-                                </div>
-                                <span
-                                    className="
-                                        text-2xl
+                                        text-[10px]
                                         font-bold
+                                        uppercase
+                                        tracking-[0.24em]
                                         text-[rgb(207,0,6)]
                                     "
-                                    style={{
-                                        fontFamily:
-                                            "Candal, sans-serif",
-                                    }}
                                 >
-                                    nterior
-                                </span>
+                                    Explore
+                                </p>
+
+                                <h2
+                                    className="
+                                        text-lg
+                                        font-bold
+                                        text-[#182235]
+                                    "
+                                >
+                                    Categories
+                                </h2>
                             </div>
+
                             <button
                                 type="button"
                                 aria-label="Close menu"
@@ -1301,408 +1988,229 @@ export default function Navbar() {
                                     setMobileMenu(false)
                                 }
                                 className="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
                                     rounded-full
-                                    p-2
+                                    bg-gray-50
                                     text-gray-700
                                     transition
-                                    hover:bg-gray-100
+                                    hover:bg-red-50
+                                    hover:text-[rgb(207,0,6)]
                                 "
                             >
-                                <X size={24} />
+                                <X size={22} />
                             </button>
                         </div>
-                        {/* =================================================
-                            LOGIN CARD
-                        ================================================= */}
+
+                        {/* CATEGORY LIST */}
+
                         <div
                             className="
-                                m-5
-                                rounded-3xl
-                                bg-gradient-to-r
-                                from-[rgb(255,170,0)]
-                                to-[rgb(207,0,6)]
-                                p-5
-                                text-white
-                                shadow-xl
+                                flex-1
+                                overflow-y-auto
+                                px-4
+                                py-4
                             "
                         >
-                            <div className="flex items-center gap-4">
-                                <div
-                                    className="
-                                        flex
-                                        h-14
-                                        w-14
-                                        items-center
-                                        justify-center
-                                        rounded-2xl
-                                        bg-white/20
-                                        backdrop-blur
-                                    "
-                                >
-                                    <User size={28} />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-white/90">
-                                        Welcome to
-                                    </p>
-                                    <h3 className="text-2xl font-black">
-                                        Nterior
-                                    </h3>
-                                </div>
-                            </div>
-                            <div className="mt-5 grid grid-cols-2 gap-3">
-                                <Link
-                                    href="/login"
-                                    onClick={() =>
-                                        setMobileMenu(false)
-                                    }
-                                    className="
-                                        rounded-2xl
-                                        bg-white
-                                        py-3
-                                        text-center
-                                        font-bold
-                                        text-[rgb(207,0,6)]
-                                    "
-                                >
-                                    Log In
-                                </Link>
-                                <Link
-                                    href="/register"
-                                    onClick={() =>
-                                        setMobileMenu(false)
-                                    }
-                                    className="
-                                        rounded-2xl
-                                        border
-                                        border-white/30
-                                        bg-white/10
-                                        py-3
-                                        text-center
-                                        font-bold
-                                        text-white
-                                        backdrop-blur
-                                    "
-                                >
-                                    Sign Up
-                                </Link>
-                            </div>
-                        </div>
-                        {/* =================================================
-                            QUICK ACTIONS
-                        ================================================= */}
-                        <div className="px-5">
-                            <p
-                                className="
-                                    mb-3
-                                    text-xs
-                                    font-bold
-                                    uppercase
-                                    tracking-[0.25em]
-                                    text-gray-400
-                                "
-                            >
-                                Quick Actions
-                            </p>
-                            <div className="grid grid-cols-2 gap-3">
-                                <Link
-                                    href="/wishlist"
-                                    onClick={() =>
-                                        setMobileMenu(false)
-                                    }
-                                    className="
-                                        flex
-                                        items-center
-                                        gap-3
-                                        rounded-2xl
-                                        border
-                                        border-gray-100
-                                        bg-white
-                                        p-4
-                                        shadow-sm
-                                    "
-                                >
-                                    <div
-                                        className="
-                                            flex
-                                            h-10
-                                            w-10
-                                            shrink-0
-                                            items-center
-                                            justify-center
-                                            rounded-xl
-                                            bg-red-50
-                                            text-[rgb(207,0,6)]
-                                        "
-                                    >
-                                        <Heart size={20} />
-                                    </div>
-                                    <span className="font-semibold text-gray-800">
-                                        Wishlist
-                                    </span>
-                                </Link>
-                                <Link
-                                    href="/cart"
-                                    onClick={() =>
-                                        setMobileMenu(false)
-                                    }
-                                    className="
-                                        flex
-                                        items-center
-                                        gap-3
-                                        rounded-2xl
-                                        border
-                                        border-gray-100
-                                        bg-white
-                                        p-4
-                                        shadow-sm
-                                    "
-                                >
-                                    <div
-                                        className="
-                                            flex
-                                            h-10
-                                            w-10
-                                            shrink-0
-                                            items-center
-                                            justify-center
-                                            rounded-xl
-                                            bg-orange-50
-                                            text-[rgb(255,170,0)]
-                                        "
-                                    >
-                                        <ShoppingCart size={20} />
-                                    </div>
-                                    <span className="font-semibold text-gray-800">
-                                        Cart
-                                    </span>
-                                </Link>
-                            </div>
-                        </div>
-                        {/* =================================================
-                            MOBILE CATEGORIES
-                        ================================================= */}
-                        <div className="mt-8 px-5 pb-8">
-                            <div className="mb-4 flex items-center justify-between">
-                                <p
-                                    className="
-                                        text-xs
-                                        font-bold
-                                        uppercase
-                                        tracking-[0.25em]
-                                        text-gray-400
-                                    "
-                                >
-                                    Categories
-                                </p>
-                                <Link
-                                    href="/products"
-                                    onClick={() =>
-                                        setMobileMenu(false)
-                                    }
-                                    className="
-                                        text-sm
-                                        font-bold
-                                        text-[rgb(207,0,6)]
-                                    "
-                                >
-                                    View All
-                                </Link>
-                            </div>
                             <div className="space-y-2">
-                                {categories.map((category) => {
-                                    const isOpen =
-                                        openMobileCategory ===
-                                        category.name;
-                                    return (
-                                        <div
-                                            key={category.name}
-                                            className="
-                                                overflow-hidden
-                                                rounded-2xl
-                                                border
-                                                border-gray-100
-                                                bg-white
-                                                shadow-sm
-                                                transition-all
-                                                duration-300
-                                            "
-                                        >
-                                            {/* CATEGORY */}
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setOpenMobileCategory(
-                                                        isOpen
-                                                            ? null
-                                                            : category.name
-                                                    )
+                                {categories.map(
+                                    (category) => {
+                                        const isOpen =
+                                            openMobileCategory ===
+                                            category.name;
+
+                                        return (
+                                            <div
+                                                key={
+                                                    category.name
                                                 }
-                                                className={`
-                                                    flex
-                                                    w-full
-                                                    items-center
-                                                    justify-between
-                                                    px-4
-                                                    py-4
-                                                    text-left
-                                                    transition-colors
-                                                    ${isOpen
-                                                        ? "bg-red-50 text-[rgb(207,0,6)]"
-                                                        : "text-gray-800 hover:bg-gray-50"
-                                                    }
-                                                `}
+                                                className="
+                                                    overflow-hidden
+                                                    rounded-2xl
+                                                    border
+                                                    border-gray-100
+                                                    bg-white
+                                                "
                                             >
-                                                <span className="font-semibold">
-                                                    {category.name}
-                                                </span>
-                                                <ChevronDown
-                                                    size={18}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        toggleMobileCategory(
+                                                            category.name
+                                                        )
+                                                    }
                                                     className={`
-                                                        transition-transform
-                                                        duration-300
-                                                        ${isOpen
-                                                            ? "rotate-180 text-[rgb(207,0,6)]"
-                                                            : "text-gray-400"
+                                                        flex
+                                                        w-full
+                                                        items-center
+                                                        justify-between
+                                                        px-4
+                                                        py-3.5
+                                                        text-left
+                                                        transition
+                                                        ${
+                                                            isOpen
+                                                                ? "bg-red-50 text-[rgb(207,0,6)]"
+                                                                : "text-gray-800 hover:bg-gray-50"
                                                         }
                                                     `}
-                                                />
-                                            </button>
-                                            {/* SUBMENU */}
-                                            <div
-                                                className={`
-                                                    grid
-                                                    transition-all
-                                                    duration-300
-                                                    ease-in-out
-                                                    ${isOpen
-                                                        ? "grid-rows-[1fr] opacity-100"
-                                                        : "grid-rows-[0fr] opacity-0"
-                                                    }
-                                                `}
-                                            >
-                                                <div className="overflow-hidden">
-                                                    <div
-                                                        className="
-                                                            border-t
-                                                            border-gray-100
-                                                            bg-gray-50/60
-                                                            px-4
-                                                            py-4
-                                                        "
-                                                    >
-                                                        <div className="space-y-4">
-                                                            {category.columns.map(
-                                                                (
-                                                                    column
-                                                                ) => (
-                                                                    <div
-                                                                        key={
-                                                                            column.title
-                                                                        }
-                                                                    >
-                                                                        <p
-                                                                            className="
-                                                                                mb-2
-                                                                                text-[11px]
-                                                                                font-bold
-                                                                                uppercase
-                                                                                tracking-[0.12em]
-                                                                                text-[rgb(207,0,6)]
-                                                                            "
-                                                                        >
-                                                                            {
+                                                >
+                                                    <span className="text-sm font-semibold">
+                                                        {
+                                                            category.name
+                                                        }
+                                                    </span>
+
+                                                    <ChevronDown
+                                                        size={17}
+                                                        className={`
+                                                            transition-transform
+                                                            duration-300
+                                                            ${
+                                                                isOpen
+                                                                    ? "rotate-180"
+                                                                    : ""
+                                                            }
+                                                        `}
+                                                    />
+                                                </button>
+
+                                                {/* MOBILE SUBMENU */}
+
+                                                <div
+                                                    className={`
+                                                        grid
+                                                        transition-all
+                                                        duration-300
+                                                        ${
+                                                            isOpen
+                                                                ? "grid-rows-[1fr]"
+                                                                : "grid-rows-[0fr]"
+                                                        }
+                                                    `}
+                                                >
+                                                    <div className="overflow-hidden">
+                                                        <div
+                                                            className="
+                                                                border-t
+                                                                border-gray-100
+                                                                bg-gray-50/60
+                                                                px-4
+                                                                py-3
+                                                            "
+                                                        >
+                                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                                {category.columns.map(
+                                                                    (
+                                                                        column
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
                                                                                 column.title
                                                                             }
-                                                                        </p>
-                                                                        <div className="space-y-1">
-                                                                            {column.items.map(
-                                                                                (
-                                                                                    item
-                                                                                ) => (
-                                                                                    <button
-                                                                                        key={
-                                                                                            item
-                                                                                        }
-                                                                                        type="button"
-                                                                                        onClick={() =>
-                                                                                            setMobileMenu(
-                                                                                                false
-                                                                                            )
-                                                                                        }
-                                                                                        className="
-                                                                                            flex
-                                                                                            w-full
-                                                                                            items-center
-                                                                                            justify-between
-                                                                                            rounded-lg
-                                                                                            px-2
-                                                                                            py-2
-                                                                                            text-left
-                                                                                            text-sm
-                                                                                            text-gray-600
-                                                                                            transition
-                                                                                            hover:bg-white
-                                                                                            hover:text-[rgb(207,0,6)]
-                                                                                        "
-                                                                                    >
-                                                                                        <span>
+                                                                        >
+                                                                            <h4
+                                                                                className="
+                                                                                    mb-1.5
+                                                                                    text-xs
+                                                                                    font-bold
+                                                                                    text-[rgb(207,0,6)]
+                                                                                "
+                                                                            >
+                                                                                {
+                                                                                    column.title
+                                                                                }
+                                                                            </h4>
+
+                                                                            <div className="flex flex-col">
+                                                                                {column.items.map(
+                                                                                    (
+                                                                                        item
+                                                                                    ) => (
+                                                                                        <Link
+                                                                                            key={
+                                                                                                item
+                                                                                            }
+                                                                                            href={getProductCategoryHref(
+                                                                                                item
+                                                                                            )}
+                                                                                            onClick={() =>
+                                                                                                setMobileMenu(
+                                                                                                    false
+                                                                                                )
+                                                                                            }
+                                                                                            className="
+                                                                                                rounded-md
+                                                                                                py-1.5
+                                                                                                text-sm
+                                                                                                text-gray-600
+                                                                                                transition
+                                                                                                hover:bg-white
+                                                                                                hover:text-[rgb(207,0,6)]
+                                                                                            "
+                                                                                        >
                                                                                             {
                                                                                                 item
                                                                                             }
-                                                                                        </span>
-                                                                                        <ChevronRight
-                                                                                            size={
-                                                                                                15
-                                                                                            }
-                                                                                            className="text-gray-300"
-                                                                                        />
-                                                                                    </button>
-                                                                                )
-                                                                            )}
+                                                                                        </Link>
+                                                                                    )
+                                                                                )}
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                )
-                                                            )}
+                                                                    )
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    }
+                                )}
                             </div>
                         </div>
-                        {/* =================================================
-                            BOTTOM CTA
-                        ================================================= */}
-                        <div className="px-5 pb-8">
+
+                        {/* DRAWER FOOTER */}
+
+                        <div
+                            className="
+                                shrink-0
+                                border-t
+                                border-gray-100
+                                p-4
+                            "
+                        >
                             <Link
                                 href="/contact-us"
                                 onClick={() =>
                                     setMobileMenu(false)
                                 }
                                 className="
-                                    block
-                                    rounded-2xl
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    rounded-xl
                                     bg-gradient-to-r
                                     from-[rgb(255,170,0)]
                                     to-[rgb(207,0,6)]
-                                    py-4
-                                    text-center
-                                    text-lg
-                                    font-black
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    font-bold
                                     text-white
-                                    shadow-[0_12px_30px_rgba(207,0,6,.28)]
-                                    transition
-                                    hover:scale-[1.02]
+                                    shadow-md
                                 "
                             >
-                                Book Free Consultation
+                                Need help?
+
+                                <ChevronRight
+                                    size={16}
+                                />
                             </Link>
-                            <p className="mt-4 text-center text-xs text-gray-500">
-                                Design • Furniture • Execution • Warranty
-                            </p>
                         </div>
                     </div>
                 </div>

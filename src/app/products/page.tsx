@@ -10,6 +10,7 @@ import NewArrivals from "./components/NewArrivals";
 import Stores from "./components/Stores";
 import WhyShopWithUs from "./components/WhyShopWithUs";
 import ContactUs from "./components/ContactUs";
+import NoProductsFound from "./components/NoProductsFound";
 import FeaturedCollections from "./components/FeaturedCollections";
 import WhyChooseUs from "./components/WhyChooseUs";
 import InteriorServices from "./components/InteriorServices";
