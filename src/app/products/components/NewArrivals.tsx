@@ -533,7 +533,7 @@ export default function InteriorShowcase() {
                 sm:text-[11px]
               "
             >
-              Explore Home & Interior Essentials
+              BUILD • STYLE • COMPLETE
             </span>
           </div>
 
@@ -553,7 +553,7 @@ export default function InteriorShowcase() {
               lg:text-5xl
             "
           >
-            Everything You Need to Build Better Spaces
+            Everything Your Space Needs, All in One Place
           </h2>
 
           {/* ==================================================
@@ -572,8 +572,7 @@ export default function InteriorShowcase() {
               sm:leading-7
             "
           >
-            Discover tiles, electricals, hardware, lighting, paints
-            and more for modern homes and interiors.
+            From the first tile to the final finishing touch, discover quality materials and modern solutions for every room, renovation, and project.
           </p>
 
           {/* ==================================================
@@ -589,10 +588,10 @@ export default function InteriorShowcase() {
             "
           >
             {[
-              "Quality products for every space",
-              "Tiles, electricals and building essentials",
-              "Modern designs and reliable materials",
-              "Everything for your home and interior projects",
+              "Materials for every project",
+              "Designed for modern spaces",
+              "Trusted quality, better value",
+              "From idea to finished space",
             ].map((feature) => (
               <div
                 key={feature}
@@ -663,7 +662,7 @@ export default function InteriorShowcase() {
               sm:mt-8
             "
           >
-            Explore Products
+            Explore Our Collection
 
             <ArrowRight
               size={17}
