@@ -10,7 +10,7 @@ export default function PlywoodLaminatesHero() {
           BREADCRUMB
       ===================================================== */}
 
-      <div className="mx-auto w-full max-w-[1600px] px-4 pt-5 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1600px] px-4 pt-5.5 sm:px-6 lg:px-8">
         <nav
           aria-label="Breadcrumb"
           className="flex items-center gap-2 text-sm"
@@ -39,7 +39,7 @@ export default function PlywoodLaminatesHero() {
           HERO BANNER
       ===================================================== */}
 
-      <div className="mx-auto mt-15 w-full max-w-[1600px] px-0 sm:px-4 lg:px-6">
+      <div className="mt-6 w-full">
         <div
           className="
             relative
@@ -50,31 +50,71 @@ export default function PlywoodLaminatesHero() {
         >
           <div
             className="
-              grid
-              min-h-[430px]
-              lg:grid-cols-[42%_58%]
+              relative
+              min-h-[380px]
+              lg:grid
               lg:min-h-[470px]
+              lg:grid-cols-[42%_58%]
             "
           >
+            {/* =================================================
+                MOBILE BACKGROUND IMAGE
+                Visible only below lg
+            ================================================= */}
+
+            <div className="absolute inset-0 lg:hidden">
+              <Image
+                src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d"
+                alt="Modern interior featuring plywood cabinetry and laminate finishes"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+              />
+
+              {/* Dark overlay for text readability */}
+
+              <div
+                aria-hidden="true"
+                className="
+                  absolute
+                  inset-0
+                  bg-gradient-to-b
+                  from-black/60
+                  via-black/50
+                  to-black/75
+                "
+              />
+            </div>
+
             {/* =================================================
                 LEFT CONTENT
             ================================================= */}
 
             <div
               className="
-                relative
-                flex
-                flex-col
-                justify-center
-                px-6
-                py-12
-                sm:px-10
-                sm:py-14
-                lg:px-14
-                xl:px-16
-              "
+    relative
+    z-10
+    flex
+    min-h-[380px]
+    flex-col
+    justify-start
+    px-5
+    pt-16
+    pb-8
+    sm:px-8
+    sm:pt-20
+    sm:pb-10
+    lg:min-h-[470px]
+    lg:justify-center
+    lg:px-14
+    lg:py-12
+    xl:px-16
+  "
             >
-              {/* Soft decorative background */}
+              {/* =================================================
+                  DESKTOP DECORATIVE BACKGROUND
+              ================================================= */}
 
               <div
                 aria-hidden="true"
@@ -83,12 +123,14 @@ export default function PlywoodLaminatesHero() {
                   absolute
                   -left-24
                   top-1/2
+                  hidden
                   h-72
                   w-72
                   -translate-y-1/2
                   rounded-full
                   bg-orange-100/60
                   blur-3xl
+                  lg:block
                 "
               />
 
@@ -112,7 +154,8 @@ export default function PlywoodLaminatesHero() {
                       font-bold
                       uppercase
                       tracking-[0.2em]
-                      text-[rgb(207,0,6)]
+                      text-[rgb(255,190,40)]
+                      lg:text-[rgb(207,0,6)]
                       sm:text-xs
                     "
                   >
@@ -131,16 +174,22 @@ export default function PlywoodLaminatesHero() {
                     font-black
                     leading-[0.98]
                     tracking-tight
-                    text-[#202020]
+                    text-white
                     sm:text-5xl
                     lg:text-[52px]
+                    lg:text-[#202020]
                     xl:text-[58px]
                   "
                 >
                   Strong Boards.
                   <br />
 
-                  <span className="text-[rgb(207,0,6)]">
+                  <span
+                    className="
+                      text-[rgb(255,190,40)]
+                      lg:text-[rgb(207,0,6)]
+                    "
+                  >
                     Beautiful Surfaces.
                   </span>
                 </h1>
@@ -155,9 +204,10 @@ export default function PlywoodLaminatesHero() {
                     max-w-[510px]
                     text-sm
                     leading-6
-                    text-gray-600
+                    text-white/90
                     sm:text-base
                     sm:leading-7
+                    lg:text-gray-600
                   "
                 >
                   From durable plywood to contemporary laminates, find
@@ -195,14 +245,15 @@ export default function PlywoodLaminatesHero() {
                       className="
                         text-sm
                         font-semibold
-                        text-gray-700
+                        text-white
+                        lg:text-gray-700
                       "
                     >
                       Fast Delivery
                     </span>
                   </div>
 
-                  {/* AUTHENTIC */}
+                  {/* 100% AUTHENTIC */}
 
                   <div className="flex items-center gap-2">
                     <span
@@ -227,7 +278,8 @@ export default function PlywoodLaminatesHero() {
                       className="
                         text-sm
                         font-semibold
-                        text-gray-700
+                        text-white
+                        lg:text-gray-700
                       "
                     >
                       100% Authentic
@@ -239,15 +291,16 @@ export default function PlywoodLaminatesHero() {
 
             {/* =================================================
                 RIGHT IMAGE
+                Desktop only
             ================================================= */}
 
             <div
               className="
                 relative
-                min-h-[280px]
+                hidden
+                min-h-[470px]
                 overflow-hidden
-                sm:min-h-[360px]
-                lg:min-h-[470px]
+                lg:block
               "
             >
               <Image
@@ -255,7 +308,7 @@ export default function PlywoodLaminatesHero() {
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority
-                sizes="(max-width: 1023px) 100vw, 58vw"
+                sizes="58vw"
                 className="
                   object-cover
                   object-center
