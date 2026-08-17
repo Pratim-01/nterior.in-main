@@ -78,6 +78,9 @@ type ProductsPageProps = {
   }>;
 };
 
+
+
+
 export default async function ProductsPage({
   searchParams,
 }: ProductsPageProps) {
@@ -98,6 +101,9 @@ export default async function ProductsPage({
       </main>
     );
   }
+
+
+
 
   return (
     <main className="overflow-x-hidden bg-white">

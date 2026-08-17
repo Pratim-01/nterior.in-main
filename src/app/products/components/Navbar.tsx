@@ -793,21 +793,39 @@ const categories: Category[] = [
 ];
 
 /* =========================================================
+   CATEGORY PAGE URL
+========================================================= */
+
+function getCategoryHref(categoryName: string) {
+    const slugMap: Record<string, string> = {
+        "Tiles": "tiles",
+        "Electricals": "electricals",
+        "Power & Hand Tools": "power-hand-tools",
+        "Plywood & Laminates": "plywood-laminates",
+        "Hardware": "hardware",
+        "Paints": "paints",
+        "Lighting & Fans": "lighting-fans",
+        "Bathroom": "bathroom",
+        "Sofa and Dining": "sofa-dining",
+        "Plumbing": "plumbing",
+        "Kitchen": "kitchen",
+        "Appliances": "appliances",
+    };
+
+    const slug =
+        slugMap[categoryName] ??
+        categoryName
+            .toLowerCase()
+            .replace(/&/g, "and")
+            .replace(/\s+/g, "-");
+
+    return `/products/items/${slug}`;
+}
+
+/* =========================================================
    PRODUCT CATEGORY URL
 ========================================================= */
 
-/**
- * Creates the product listing URL for a submenu item.
- *
- * Example:
- *
- * "Ceramic Wall Tile"
- *      ↓
- * /products?category=Ceramic%20Wall%20Tile
- *
- * encodeURIComponent is important because category names
- * can contain spaces, &, /, brackets, etc.
- */
 function getProductCategoryHref(
     category: string
 ) {
@@ -905,7 +923,9 @@ function MegaMenuColumnStack({
                             (item) => (
                                 <Link
                                     key={item}
-                                    href={`/products?category=${encodeURIComponent(item)}`}
+                                    href={getProductCategoryHref(
+                                        item
+                                    )}
                                     className="
                                         group/item
                                         flex
@@ -1012,6 +1032,19 @@ export default function Navbar() {
 
         setDesktopCategory(
             categoryName
+        );
+    };
+
+    const toggleDesktopCategory = (
+        categoryName: string
+    ) => {
+        clearDesktopMenuCloseTimer();
+
+        setDesktopCategory(
+            (current) =>
+                current === categoryName
+                    ? null
+                    : categoryName
         );
     };
 
@@ -1381,12 +1414,12 @@ export default function Navbar() {
                                 min-w-0
                                 w-full
                                 items-center
-                                gap-5
+                                gap-2
                                 overflow-x-auto
-                                px-5
+                                px-3
                                 py-1
-                                xl:gap-7
-                                xl:px-6
+                                xl:gap-5.5
+                                xl:px-5
                                 [scrollbar-width:none]
                                 [&::-webkit-scrollbar]:hidden
                             "
@@ -1397,6 +1430,11 @@ export default function Navbar() {
                                         desktopCategory ===
                                         category.name;
 
+                                    const categoryHref =
+                                        getCategoryHref(
+                                            category.name
+                                        );
+
                                     return (
                                         <div
                                             key={
@@ -1404,14 +1442,25 @@ export default function Navbar() {
                                             }
                                             className="
                                                 relative
+                                                flex
                                                 shrink-0
+                                                items-center
                                             "
+                                            onMouseEnter={() =>
+                                                openDesktopCategory(
+                                                    category.name
+                                                )
+                                            }
                                         >
-                                            <button
-                                                type="button"
-                                                onMouseEnter={() =>
-                                                    openDesktopCategory(
-                                                        category.name
+                                            {/* CATEGORY NAME */}
+
+                                            <Link
+                                                href={
+                                                    categoryHref
+                                                }
+                                                onClick={() =>
+                                                    setDesktopCategory(
+                                                        null
                                                     )
                                                 }
                                                 onFocus={() =>
@@ -1424,7 +1473,6 @@ export default function Navbar() {
                                                     relative
                                                     flex
                                                     items-center
-                                                    gap-1
                                                     whitespace-nowrap
                                                     py-1.5
                                                     text-xs
@@ -1438,10 +1486,6 @@ export default function Navbar() {
                                                             : "text-gray-700 hover:text-[rgb(207,0,6)]"
                                                     }
                                                 `}
-                                                aria-expanded={
-                                                    isActive
-                                                }
-                                                aria-haspopup="true"
                                             >
                                                 <span>
                                                     {
@@ -1449,27 +1493,12 @@ export default function Navbar() {
                                                     }
                                                 </span>
 
-                                                <ChevronDown
-                                                    size={14}
-                                                    className={`
-                                                        shrink-0
-                                                        transition-transform
-                                                        duration-300
-                                                        ${
-                                                            isActive
-                                                                ? "rotate-180"
-                                                                : ""
-                                                        }
-                                                    `}
-                                                />
-
                                                 <span
                                                     className={`
                                                         absolute
                                                         bottom-0
-                                                        left-1/2
+                                                        left-0
                                                         h-0.5
-                                                        -translate-x-1/2
                                                         rounded-full
                                                         bg-[rgb(207,0,6)]
                                                         transition-all
@@ -1480,6 +1509,60 @@ export default function Navbar() {
                                                                 : "w-0"
                                                         }
                                                     `}
+                                                />
+                                            </Link>
+
+                                            {/* DROPDOWN ARROW */}
+
+                                            <button
+                                                type="button"
+                                                aria-label={`Open ${category.name} menu`}
+                                                aria-expanded={
+                                                    isActive
+                                                }
+                                                aria-haspopup="true"
+                                                onClick={(
+                                                    event
+                                                ) => {
+                                                    event.stopPropagation();
+
+                                                    toggleDesktopCategory(
+                                                        category.name
+                                                    );
+                                                }}
+                                                className={`
+                                                    ml-1
+                                                    flex
+                                                    h-7
+                                                    w-6
+                                                    shrink-0
+                                                    items-center
+                                                    justify-center
+                                                    rounded-md
+                                                    text-gray-600
+                                                    transition-all
+                                                    duration-200
+                                                    hover:bg-red-50
+                                                    hover:text-[rgb(207,0,6)]
+                                                    ${
+                                                        isActive
+                                                            ? "text-[rgb(207,0,6)]"
+                                                            : ""
+                                                    }
+                                                `}
+                                            >
+                                                <ChevronDown
+                                                    size={14}
+                                                    className="
+                                                        transition-transform
+                                                        duration-300
+                                                    "
+                                                    style={{
+                                                        transform:
+                                                            isActive
+                                                                ? "rotate(180deg)"
+                                                                : "rotate(0deg)",
+                                                    }}
                                                 />
                                             </button>
                                         </div>
@@ -2022,6 +2105,11 @@ export default function Navbar() {
                                             openMobileCategory ===
                                             category.name;
 
+                                        const categoryHref =
+                                            getCategoryHref(
+                                                category.name
+                                            );
+
                                         return (
                                             <div
                                                 key={
@@ -2035,48 +2123,100 @@ export default function Navbar() {
                                                     bg-white
                                                 "
                                             >
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        toggleMobileCategory(
-                                                            category.name
-                                                        )
-                                                    }
+                                                {/* MOBILE CATEGORY HEADER */}
+
+                                                <div
                                                     className={`
                                                         flex
                                                         w-full
                                                         items-center
-                                                        justify-between
-                                                        px-4
-                                                        py-3.5
-                                                        text-left
                                                         transition
                                                         ${
                                                             isOpen
-                                                                ? "bg-red-50 text-[rgb(207,0,6)]"
-                                                                : "text-gray-800 hover:bg-gray-50"
+                                                                ? "bg-red-50"
+                                                                : "bg-white"
                                                         }
                                                     `}
                                                 >
-                                                    <span className="text-sm font-semibold">
+                                                    {/* CATEGORY LINK */}
+
+                                                    <Link
+                                                        href={
+                                                            categoryHref
+                                                        }
+                                                        onClick={() =>
+                                                            setMobileMenu(
+                                                                false
+                                                            )
+                                                        }
+                                                        className={`
+                                                            flex
+                                                            min-w-0
+                                                            flex-1
+                                                            items-center
+                                                            px-4
+                                                            py-3.5
+                                                            text-left
+                                                            text-sm
+                                                            font-semibold
+                                                            transition
+                                                            ${
+                                                                isOpen
+                                                                    ? "text-[rgb(207,0,6)]"
+                                                                    : "text-gray-800"
+                                                            }
+                                                        `}
+                                                    >
                                                         {
                                                             category.name
                                                         }
-                                                    </span>
+                                                    </Link>
 
-                                                    <ChevronDown
-                                                        size={17}
+                                                    {/* SUBMENU ARROW */}
+
+                                                    <button
+                                                        type="button"
+                                                        aria-label={`Toggle ${category.name} submenu`}
+                                                        aria-expanded={
+                                                            isOpen
+                                                        }
+                                                        onClick={() =>
+                                                            toggleMobileCategory(
+                                                                category.name
+                                                            )
+                                                        }
                                                         className={`
-                                                            transition-transform
-                                                            duration-300
+                                                            mr-2
+                                                            flex
+                                                            h-9
+                                                            w-9
+                                                            shrink-0
+                                                            items-center
+                                                            justify-center
+                                                            rounded-full
+                                                            transition
                                                             ${
                                                                 isOpen
-                                                                    ? "rotate-180"
-                                                                    : ""
+                                                                    ? "text-[rgb(207,0,6)]"
+                                                                    : "text-gray-600"
                                                             }
                                                         `}
-                                                    />
-                                                </button>
+                                                    >
+                                                        <ChevronDown
+                                                            size={17}
+                                                            className="
+                                                                transition-transform
+                                                                duration-300
+                                                            "
+                                                            style={{
+                                                                transform:
+                                                                    isOpen
+                                                                        ? "rotate(180deg)"
+                                                                        : "rotate(0deg)",
+                                                            }}
+                                                        />
+                                                    </button>
+                                                </div>
 
                                                 {/* MOBILE SUBMENU */}
 
