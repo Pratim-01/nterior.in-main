@@ -7,7 +7,7 @@ export default function PlywoodLaminatesPage() {
     <main className="min-h-screen bg-white">
       <Hero />
       <TopCategories />
-      <FeaturedProducts products={[]}/>
+      <FeaturedProducts />
     </main>
   );
 }

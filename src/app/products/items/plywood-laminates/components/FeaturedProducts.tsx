@@ -1,35 +1,77 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, ShoppingBag } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export type PlywoodProduct = {
-  id: string | number;
-  name: string;
-  image: string;
-  price: number;
-  href?: string;
-  unit?: string;
+type Product = {
+  product_id: number;
+  product_name: string;
+  category: string;
+  product_type: "sqft" | "unit";
+  short_description: string | null;
+  sell_mrp: number | string;
+  mrp: number | string;
+  gst_percentage: number | string;
+  gst_exclude: number;
+  image_url: string | null;
+  image_alt_text: string | null;
 };
 
-type FeaturedProductsProps = {
-  products: PlywoodProduct[];
-  title?: string;
-  viewAllHref?: string;
+type ApiResponse = {
+  success: boolean;
+  products: Product[];
+  message?: string;
 };
 
-function formatPrice(price: number) {
+function formatPrice(price: number | string) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(price);
+  }).format(Number(price));
 }
 
-export default function FeaturedProducts({
-  products,
-  title = "Explore Our Range of Plywood",
-  viewAllHref = "/products/items/plywood-laminates/plywood",
-}: FeaturedProductsProps) {
+export default function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          "/api/kayapalat-products?category=Plywood"
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch tile products");
+        }
+
+        const data: ApiResponse = await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message || "Failed to fetch tile products"
+          );
+        }
+
+        setProducts(data.products || []);
+      } catch (error) {
+        console.error("Tile products fetch error:", error);
+
+        setError("Unable to load products right now.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
+
   return (
     <section className="w-full bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-10 lg:py-20">
       <div className="mx-auto w-full max-w-[1500px]">
@@ -70,8 +112,10 @@ export default function FeaturedProducts({
                 lg:text-4xl
               "
             >
-              {title}
+              Explore Our Range of Ply Woods
             </h2>
+
+            {/* DESCRIPTION */}
 
             <p
               className="
@@ -84,8 +128,8 @@ export default function FeaturedProducts({
                 sm:block
               "
             >
-              Discover quality materials selected for furniture,
-              kitchens, wardrobes and modern interior projects.
+              Discover premium Ply Wood selected to bring style,
+              durability and character to every interior space.
             </p>
           </div>
 
@@ -94,7 +138,7 @@ export default function FeaturedProducts({
           =================================================== */}
 
           <Link
-            href={viewAllHref}
+            href="/products/items/tiles"
             className="
               group
               flex
@@ -109,7 +153,9 @@ export default function FeaturedProducts({
               hover:text-[rgb(170,0,5)]
             "
           >
-            <span className="hidden sm:inline">View All</span>
+            <span className="hidden sm:inline">
+              View All
+            </span>
 
             <span
               className="
@@ -142,29 +188,119 @@ export default function FeaturedProducts({
         </div>
 
         {/* =====================================================
-            PRODUCTS
+            LOADING STATE
         ===================================================== */}
 
-        {products.length > 0 ? (
+        {loading && (
           <div
             className="
               grid
               grid-cols-2
               gap-3
-              sm:grid-cols-2
+              sm:grid-cols-3
               sm:gap-5
-              lg:grid-cols-4
+              lg:grid-cols-5
             "
           >
-            {products.slice(0, 4).map((product) => {
-              const productHref =
-                product.href ||
-                `/products/${product.id}`;
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="
+                  overflow-hidden
+                  rounded-2xl
+                  border
+                  border-gray-100
+                  bg-white
+                "
+              >
+                <div
+                  className="
+                    aspect-square
+                    animate-pulse
+                    bg-gray-100
+                  "
+                />
+
+                <div className="space-y-3 p-4 sm:p-5">
+                  <div className="h-3 w-1/3 animate-pulse rounded bg-gray-100" />
+
+                  <div className="h-4 w-4/5 animate-pulse rounded bg-gray-100" />
+
+                  <div className="h-5 w-2/5 animate-pulse rounded bg-gray-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* =====================================================
+            ERROR
+        ===================================================== */}
+
+        {!loading && error && (
+          <div
+            className="
+              rounded-2xl
+              border
+              border-red-100
+              bg-red-50
+              px-6
+              py-12
+              text-center
+            "
+          >
+            <p className="text-sm font-medium text-red-600">
+              {error}
+            </p>
+          </div>
+        )}
+
+        {/* =====================================================
+            EMPTY STATE
+        ===================================================== */}
+
+        {!loading && !error && products.length === 0 && (
+          <div
+            className="
+              rounded-2xl
+              border
+              border-dashed
+              border-gray-200
+              bg-gray-50
+              px-6
+              py-14
+              text-center
+            "
+          >
+            <p className="text-sm font-medium text-gray-500">
+              No tile products are available right now.
+            </p>
+          </div>
+        )}
+
+        {/* =====================================================
+            PRODUCT GRID
+        ===================================================== */}
+
+        {!loading && !error && products.length > 0 && (
+          <div
+            className="
+              grid
+              grid-cols-2
+              gap-3
+              sm:grid-cols-3
+              sm:gap-5
+              lg:grid-cols-5
+            "
+          >
+            {products.slice(0, 5).map((product) => {
+              const price = Number(product.sell_mrp);
+              const mrp = Number(product.mrp);
 
               return (
                 <Link
-                  key={product.id}
-                  href={productHref}
+                  key={product.product_id}
+                  href={`/products/${product.product_id}`}
                   className="
                     group
                     relative
@@ -182,6 +318,10 @@ export default function FeaturedProducts({
                     hover:-translate-y-1
                     hover:border-red-100
                     hover:shadow-[0_14px_35px_rgba(0,0,0,0.10)]
+                    focus:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-[rgb(207,0,6)]
+                    focus-visible:ring-offset-2
                   "
                 >
                   {/* =================================================
@@ -196,29 +336,47 @@ export default function FeaturedProducts({
                       bg-[#f7f7f7]
                     "
                   >
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      sizes="
-                        (max-width: 639px) 50vw,
-                        (max-width: 1023px) 50vw,
-                        25vw
-                      "
-                      className="
-                        object-contain
-                        p-4
-                        transition-transform
-                        duration-500
-                        ease-out
-                        group-hover:scale-[1.04]
-                        sm:p-6
-                      "
-                    />
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={
+                          product.image_alt_text ||
+                          product.product_name
+                        }
+                        loading="lazy"
+                        className="
+                          absolute
+                          inset-0
+                          h-full
+                          w-full
+                          object-contain
+                          p-4
+                          transition-transform
+                          duration-500
+                          ease-out
+                          group-hover:scale-[1.05]
+                          sm:p-6
+                        "
+                      />
+                    ) : (
+                      <div
+                        className="
+                          flex
+                          h-full
+                          items-center
+                          justify-center
+                        "
+                      >
+                        <span className="text-xs text-gray-400">
+                          No image available
+                        </span>
+                      </div>
+                    )}
 
                     {/* IMAGE OVERLAY */}
 
                     <div
+                      aria-hidden="true"
                       className="
                         pointer-events-none
                         absolute
@@ -229,9 +387,32 @@ export default function FeaturedProducts({
                       "
                     />
 
-                    {/* QUICK VIEW ICON */}
+                    {/* PRODUCT TYPE */}
 
-                    <div
+                    <span
+                      className="
+                        absolute
+                        left-3
+                        top-3
+                        rounded-full
+                        bg-white/95
+                        px-2.5
+                        py-1
+                        text-[10px]
+                        font-bold
+                        uppercase
+                        tracking-wide
+                        text-gray-700
+                        shadow-sm
+                        backdrop-blur-sm
+                      "
+                    >
+                      {product.product_type}
+                    </span>
+
+                    {/* SHOP ICON */}
+
+                    <span
                       className="
                         absolute
                         right-3
@@ -258,7 +439,7 @@ export default function FeaturedProducts({
                         size={16}
                         strokeWidth={1.8}
                       />
-                    </div>
+                    </span>
                   </div>
 
                   {/* =================================================
@@ -266,12 +447,28 @@ export default function FeaturedProducts({
                   ================================================= */}
 
                   <div className="flex flex-1 flex-col p-4 sm:p-5">
+                    {/* CATEGORY */}
+
+                    <p
+                      className="
+                        text-[10px]
+                        font-bold
+                        uppercase
+                        tracking-[0.12em]
+                        text-[rgb(207,0,6)]
+                        sm:text-xs
+                      "
+                    >
+                      {product.category}
+                    </p>
+
                     {/* PRODUCT NAME */}
 
                     <h3
                       className="
+                        mt-1
                         line-clamp-2
-                        min-h-[42px]
+                        min-h-[40px]
                         text-sm
                         font-bold
                         leading-5
@@ -283,29 +480,61 @@ export default function FeaturedProducts({
                         sm:leading-6
                       "
                     >
-                      {product.name}
+                      {product.product_name}
                     </h3>
+
+                    {/* DESCRIPTION */}
+
+                    {product.short_description && (
+                      <p
+                        className="
+                          mt-2
+                          hidden
+                          line-clamp-2
+                          text-xs
+                          leading-5
+                          text-gray-500
+                          sm:block
+                        "
+                      >
+                        {product.short_description}
+                      </p>
+                    )}
 
                     {/* PRICE */}
 
-                    <div className="mt-5">
-                      <div
-                        className="
-                          text-lg
-                          font-black
-                          text-[rgb(207,0,6)]
-                          sm:text-xl
-                        "
-                      >
-                        {formatPrice(product.price)}
+                    <div className="mt-auto pt-4">
+                      <div className="flex flex-wrap items-baseline gap-2">
+                        <span
+                          className="
+                            text-lg
+                            font-black
+                            text-[rgb(207,0,6)]
+                            sm:text-xl
+                          "
+                        >
+                          {formatPrice(price)}
+                        </span>
+
+                        {mrp > price && (
+                          <span
+                            className="
+                              text-xs
+                              text-gray-400
+                              line-through
+                              sm:text-sm
+                            "
+                          >
+                            {formatPrice(mrp)}
+                          </span>
+                        )}
                       </div>
 
-                      {/* GST */}
-
-                      <div className="mt-0.5 text-[11px] text-gray-500 sm:text-xs">
-                        Incl. GST
-                        {product.unit && ` • ${product.unit}`}
-                      </div>
+                      <p className="mt-1 text-[11px] text-gray-500 sm:text-xs">
+                        {product.gst_exclude
+                          ? `GST ${product.gst_percentage}% extra`
+                          : `Incl. GST ${product.gst_percentage}%`}
+                      </p>
                     </div>
                   </div>
 
@@ -331,27 +560,6 @@ export default function FeaturedProducts({
                 </Link>
               );
             })}
-          </div>
-        ) : (
-          /* =====================================================
-             EMPTY STATE
-          ===================================================== */
-
-          <div
-            className="
-              rounded-2xl
-              border
-              border-dashed
-              border-gray-200
-              bg-gray-50
-              px-6
-              py-14
-              text-center
-            "
-          >
-            <p className="text-sm font-medium text-gray-500">
-              No products available right now.
-            </p>
           </div>
         )}
       </div>

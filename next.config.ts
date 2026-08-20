@@ -26,6 +26,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "upload.wikimedia.org",
       },
+      // // Kayapalat product images
+      // {
+      //   protocol: "https",
+      //   hostname: "kayapalat.co",
+      //   pathname: "/product_images/**",
+      // },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3001",
+        pathname: "/product_images/**",
+      },
     ],
   },
 };
