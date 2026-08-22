@@ -6,37 +6,29 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Plywood & Blockboards",
-    description: "Strong and reliable boards for interiors",
+    name: "Vetrified Tiles",
+    description: "Strong, elegant surfaces for modern spaces",
     image:
-      "https://itco-sa.com/img/1710932233categoryImagePlywood.png",
+      "https://s.alicdn.com/%40sc04/kf/H02918150098840729e1bd5b7259af1fbF/60x60-Low-Rate-for-Anti-dumping-Duty-to-Pakistan-Porcelanato-Polished-Vitrified-Interior-Tiles.jpg",
 
     // Updated route
-    href: "/products/items/plywood-blockboards/plywood",
+    href: "/products/items/tiles/vetrified",
   },
   {
     id: 2,
-    name: "Laminates",
-    description: "Premium finishes for modern interiors",
+    name: "Ceramic Tiles",
+    description: "Durable and versatile tiles for stylish interiors",
     image:
-      "https://tiimg.tistatic.com/fp/1/009/066/decorative-wood-laminate-sheet-720.jpg",
-    href: "/products/items/plywood-laminates/laminates",
+      "https://98eda87788a287f6d084.cdn6.editmysite.com/uploads/b/98eda87788a287f6d0840d09cd1bee28c3a25ecfec22000db28f2dee86413fc2/2025-09-25_15-38-37_1758829147.png?optimize=medium&width=2400",
+    href: "/products/items/tiles/ceramic",
   },
   {
     id: 3,
-    name: "Engineered Boards",
-    description: "Smooth and versatile interior boards",
+    name: "Laminate Flooring",
+    description: "Warm wood-look flooring for contemporary interiors",
     image:
-      "https://maderascoapa.com/wp-content/uploads/2024/08/hoja-de-mdf.jpg",
-    href: "/products/items/plywood-laminates/eng-board",
-  },
-  {
-    id: 4,
-    name: "Adhesives",
-    description: "High-Quality adhesives",
-    image:
-      "https://cpimg.tistatic.com/7759076/b/1/high-density-high-moisture-resistance-plywood.jpg",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://media.diy.com/is/image/Kingfisher/3-strip-wood-planks-oak-effect-smooth-straight-laminate-flooring-3-003m-~3663602997436_02bq?%24MOB_PREV%24=&%24height=600&%24width=600",
+    href: "/products/items/tiles/flooring",
   },
 ];
 
@@ -88,9 +80,9 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore quality plywood, blockboards and premium surface
-            finishes for furniture, kitchens, wardrobes and modern
-            interior projects.
+            Explore quality floor tiles, wall tiles and premium surface finishes
+            for living rooms, kitchens, bathrooms, balconies and modern interior
+            spaces.
           </p>
         </div>
 
@@ -98,13 +90,18 @@ export default function TopCategories() {
 
         <div
           className="
-            grid
-            grid-cols-2
-            gap-3
-            sm:gap-5
-            md:grid-cols-3
-            lg:grid-cols-4
-            justify-center
+            mx-auto
+    grid
+    w-full
+    max-w-6xl
+
+    grid-cols-3
+    gap-3
+
+    sm:gap-5
+
+    md:grid-cols-3
+    lg:grid-cols-3
           "
         >
           {categories.map((category) => (
@@ -193,10 +190,7 @@ export default function TopCategories() {
                     group-hover:opacity-100
                   "
                 >
-                  <ArrowUpRight
-                    size={17}
-                    strokeWidth={2}
-                  />
+                  <ArrowUpRight size={17} strokeWidth={2} />
                 </div>
 
                 {/* CARD CONTENT */}

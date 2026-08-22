@@ -92,23 +92,12 @@ export default function ProductListing({
   const [error, setError] =
     useState("");
 
-  /*
-   * Number of pages for the current category.
-   */
   const [totalPages, setTotalPages] =
     useState(0);
 
-  /*
-   * Total number of products for
-   * the current category.
-   */
   const [totalProducts, setTotalProducts] =
     useState(0);
 
-  /*
-   * Product counts for the sidebar category
-   * buttons.
-   */
   const [categoryCounts, setCategoryCounts] =
     useState({
       Plywood: 0,
@@ -117,11 +106,6 @@ export default function ProductListing({
 
   /* ==========================================================
      FETCH PRODUCTS
-
-     12 products per page.
-
-     Desktop:
-     4 columns × 3 rows = 12 products.
   ========================================================== */
 
   useEffect(() => {
@@ -145,13 +129,6 @@ export default function ProductListing({
           String(currentPage)
         );
 
-        /*
-         * 12 products per page.
-         *
-         * Desktop:
-         * 4 columns
-         * 3 rows
-         */
         params.set("limit", "12");
 
         params.set(
@@ -188,35 +165,19 @@ export default function ProductListing({
           return;
         }
 
-        /* ====================================================
-           PRODUCTS
-        ==================================================== */
-
         setProducts(
           data.products || []
         );
-
-        /* ====================================================
-           PAGINATION
-        ==================================================== */
 
         setTotalPages(
           data.pagination
             ?.totalPages || 0
         );
 
-        /* ====================================================
-           TOTAL PRODUCT COUNT
-        ==================================================== */
-
         setTotalProducts(
           data.pagination
             ?.totalProducts || 0
         );
-
-        /* ====================================================
-           CATEGORY COUNTS
-        ==================================================== */
 
         setCategoryCounts(
           data.categoryCounts || {
@@ -303,7 +264,7 @@ export default function ProductListing({
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen w-full bg-white">
       {/* ========================================================
           PAGE CONTAINER
       ======================================================== */}
@@ -313,12 +274,15 @@ export default function ProductListing({
           mx-auto
           w-full
           max-w-[1440px]
-          px-5
+
+          px-0
+
           pb-12
-          pt-5
+          pt-3
 
           sm:px-6
           sm:pb-16
+          sm:pt-5
 
           lg:px-7
           lg:pt-7
@@ -326,22 +290,27 @@ export default function ProductListing({
           xl:px-8
         "
       >
+
         {/* ======================================================
             BREADCRUMB
+
+            Desktop only.
         ====================================================== */}
 
         <nav
           aria-label="Breadcrumb"
           className="
             mb-5
-            flex
+            hidden
             flex-wrap
             items-center
             gap-2
+            px-5
             text-[13px]
             text-gray-500
 
-            sm:mb-6
+            sm:flex
+            sm:px-0
             sm:text-sm
           "
         >
@@ -380,19 +349,24 @@ export default function ProductListing({
 
         {/* ======================================================
             PAGE HEADING
+
+            Kept for desktop.
         ====================================================== */}
 
-       
+        <div className="hidden">
+          <h1>{title}</h1>
+          <p>{description}</p>
+        </div>
 
         {/* ======================================================
-            MAIN LISTING LAYOUT
+            MAIN LISTING
         ====================================================== */}
 
         <div
           className="
             flex
+            w-full
             flex-col
-            gap-6
 
             lg:flex-row
             lg:items-start
@@ -401,16 +375,21 @@ export default function ProductListing({
             xl:gap-9
           "
         >
+
           {/* ====================================================
-              LEFT FILTER SIDEBAR
+              DESKTOP FILTER SIDEBAR
+
+              Completely hidden below lg.
           ==================================================== */}
 
-          <div
+          <aside
             className="
               hidden
               shrink-0
+
               lg:block
               lg:w-[280px]
+
               xl:w-[290px]
             "
           >
@@ -421,31 +400,95 @@ export default function ProductListing({
                 }
               />
             </div>
-          </div>
+          </aside>
 
           {/* ====================================================
               PRODUCTS AREA
+
+              IMPORTANT:
+              width is 100% on mobile.
           ==================================================== */}
 
           <section
             className="
               min-w-0
+              w-full
               flex-1
             "
           >
+
+            {/* ==================================================
+                MOBILE CATEGORY HEADER
+            ================================================== */}
+
+            <div
+              className="
+                block
+                border-b
+                border-gray-200
+                px-4
+                pb-3
+
+                sm:hidden
+              "
+            >
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  gap-3
+                "
+              >
+                <h1
+                  className="
+                    truncate
+                    text-lg
+                    font-bold
+                    tracking-tight
+                    text-gray-900
+                  "
+                >
+                  {category}
+                </h1>
+
+                <span
+                  className="
+                    shrink-0
+                    text-xs
+                    text-gray-500
+                  "
+                >
+                  {totalProducts} products
+                </span>
+              </div>
+            </div>
+
             {/* ==================================================
                 TOOLBAR
             ================================================== */}
 
             <div
               className="
-                mb-5
                 flex
+                w-full
                 items-center
                 justify-between
-                gap-4
+                gap-3
+
+                border-b
+                border-gray-100
+
+                px-4
+                py-3
+
+                sm:mb-5
+                sm:border-0
+                sm:px-0
+                sm:py-0
               "
             >
+
               {/* PRODUCT COUNT */}
 
               <p
@@ -456,9 +499,12 @@ export default function ProductListing({
                   sm:text-sm
                 "
               >
-                {loading
-                  ? "Loading products..."
-                  : `${totalProducts} products`}
+                <span className="font-medium">
+                  {loading
+                    ? "Loading..."
+                    : totalProducts}
+                </span>{" "}
+                products
               </p>
 
               {/* SORT */}
@@ -473,10 +519,9 @@ export default function ProductListing({
             {loading && (
               <div
                 className="
-                  grid
-                  grid-cols-2
-                  gap-3
+                  w-full
 
+                  sm:grid
                   sm:grid-cols-2
                   sm:gap-4
 
@@ -495,22 +540,51 @@ export default function ProductListing({
                     <div
                       key={index}
                       className="
-                        overflow-hidden
-                        rounded-xl
-                        border
-                        border-gray-100
+                        flex
+                        h-[108px]
+                        w-full
+                        border-b
+                        border-gray-200
                         bg-white
+
+                        sm:h-auto
+                        sm:flex-col
+                        sm:overflow-hidden
+                        sm:rounded-xl
+                        sm:border
+                        sm:border-gray-100
                       "
                     >
+                      {/* MOBILE IMAGE */}
+
                       <div
                         className="
-                          aspect-[4/4.6]
+                          h-[108px]
+                          w-[108px]
+                          min-w-[108px]
                           animate-pulse
                           bg-gray-100
+
+                          sm:h-[280px]
+                          sm:w-full
                         "
                       />
 
-                      <div className="space-y-3 p-4">
+                      {/* MOBILE CONTENT */}
+
+                      <div
+                        className="
+                          flex
+                          min-w-0
+                          flex-1
+                          flex-col
+                          gap-2
+                          px-3
+                          py-2
+
+                          sm:p-4
+                        "
+                      >
                         <div
                           className="
                             h-4
@@ -533,6 +607,17 @@ export default function ProductListing({
 
                         <div
                           className="
+                            h-3
+                            w-2/5
+                            animate-pulse
+                            rounded
+                            bg-gray-100
+                          "
+                        />
+
+                        <div
+                          className="
+                            mt-auto
                             h-5
                             w-1/3
                             animate-pulse
@@ -555,6 +640,7 @@ export default function ProductListing({
               error && (
                 <div
                   className="
+                    mx-4
                     flex
                     min-h-[300px]
                     items-center
@@ -565,6 +651,8 @@ export default function ProductListing({
                     bg-red-50
                     px-6
                     text-center
+
+                    sm:mx-0
                   "
                 >
                   <p className="text-sm font-medium text-red-600">
@@ -582,6 +670,7 @@ export default function ProductListing({
               products.length === 0 && (
                 <div
                   className="
+                    mx-4
                     flex
                     min-h-[350px]
                     items-center
@@ -593,6 +682,8 @@ export default function ProductListing({
                     bg-gray-50
                     px-6
                     text-center
+
+                    sm:mx-0
                   "
                 >
                   <div>

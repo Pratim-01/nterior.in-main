@@ -6,36 +6,52 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Plywood & Blockboards",
-    description: "Strong and reliable boards for interiors",
+    name: "Fan",
+    description: "Stylish airflow for everyday comfort",
     image:
-      "https://itco-sa.com/img/1710932233categoryImagePlywood.png",
+      "https://print.rapidled.com.au/catalog/listing/product-2313-251007-043231.png",
 
     // Updated route
     href: "/products/items/plywood-blockboards/plywood",
   },
   {
     id: 2,
-    name: "Laminates",
-    description: "Premium finishes for modern interiors",
+    name: "Decorative Lights",
+    description: "Elegant lighting with character",
     image:
-      "https://tiimg.tistatic.com/fp/1/009/066/decorative-wood-laminate-sheet-720.jpg",
+      "https://www.pngkey.com/png/detail/133-1338414_nickel-pendant-light-brushed-nickel-lighting-brushed-brushed.png",
     href: "/products/items/plywood-laminates/laminates",
   },
   {
     id: 3,
-    name: "Engineered Boards",
-    description: "Smooth and versatile interior boards",
+    name: "Celling Lights",
+    description: "Modern lighting for bright spaces",
     image:
-      "https://maderascoapa.com/wp-content/uploads/2024/08/hoja-de-mdf.jpg",
+      "https://lum.ge/assets/img/products/668e53f0c2b5b.png",
     href: "/products/items/plywood-laminates/eng-board",
   },
   {
     id: 4,
-    name: "Adhesives",
-    description: "High-Quality adhesives",
+    name: "Light Bulbs",
+    description: "Efficient everyday illumination",
     image:
-      "https://cpimg.tistatic.com/7759076/b/1/high-density-high-moisture-resistance-plywood.jpg",
+      "https://www.pngkit.com/png/detail/253-2537554_bulb-header-light2x-aeotec-by-aeon-labs-zw098.png",
+    href: "/products/items/plywood-laminates/adhesives",
+  },
+  {
+    id: 5,
+    name: "Outdoor Lighting",
+    description: "Durable lighting for outdoor spaces",
+    image:
+      "https://artlustra.ru/wa-data/public/shop/products/29/46/54629/images/99375/99375.970.jpeg",
+    href: "/products/items/plywood-laminates/adhesives",
+  },
+  {
+    id: 6,
+    name: "Lighting Accessories",
+    description: "Essentials for complete lighting setups",
+    image:
+      "https://www.lightingshop.com.sg/cdn/shop/collections/lighting_accessories_singapore_shops_1200x1200.jpg?v=1625932989",
     href: "/products/items/plywood-laminates/adhesives",
   },
 ];
@@ -74,7 +90,7 @@ export default function TopCategories() {
               lg:text-5xl
             "
           >
-            Shop Top Categories
+            Shop Lighting & Fans
           </h2>
 
           <p
@@ -88,9 +104,7 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore quality plywood, blockboards and premium surface
-            finishes for furniture, kitchens, wardrobes and modern
-            interior projects.
+            Explore stylish lighting, ceiling fans and modern fixtures designed for living rooms, bedrooms, kitchens and contemporary interior spaces.
           </p>
         </div>
 
@@ -99,11 +113,11 @@ export default function TopCategories() {
         <div
           className="
             grid
-            grid-cols-2
+            grid-cols-3
             gap-3
             sm:gap-5
             md:grid-cols-3
-            lg:grid-cols-4
+            lg:grid-cols-6
             justify-center
           "
         >

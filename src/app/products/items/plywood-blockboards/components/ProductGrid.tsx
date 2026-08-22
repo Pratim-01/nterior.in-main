@@ -12,24 +12,37 @@ export default function ProductGrid({
       <div
         className="
           flex
-          min-h-[350px]
+          min-h-[300px]
           items-center
           justify-center
-          rounded-xl
+          rounded-2xl
           border
           border-dashed
           border-gray-200
           bg-gray-50
-          p-8
+          px-6
+          py-12
           text-center
         "
       >
         <div>
-          <h3 className="text-lg font-bold text-gray-900">
+          <h3
+            className="
+              text-lg
+              font-bold
+              text-gray-900
+            "
+          >
             No products found
           </h3>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p
+            className="
+              mt-2
+              text-sm
+              text-gray-500
+            "
+          >
             Try changing your filters or browse
             another category.
           </p>
@@ -42,19 +55,37 @@ export default function ProductGrid({
     <div
       className="
         grid
-        grid-cols-1
+
+        /* ==================================================
+           MOBILE
+           2 PRODUCTS PER ROW
+        ================================================== */
+
+        grid-cols-2
         gap-3
 
-        sm:grid-cols-1
-        sm:gap-4
+        /* ==================================================
+           TABLET
+           3 PRODUCTS PER ROW
+        ================================================== */
 
-        md:grid-cols-3
-        md:gap-4
+        sm:grid-cols-3
+        sm:gap-5
+
+        /* ==================================================
+           DESKTOP
+           4 PRODUCTS PER ROW
+        ================================================== */
 
         lg:grid-cols-4
+        lg:gap-5
+
+        /* ==================================================
+           LARGE DESKTOP
+        ================================================== */
 
         xl:grid-cols-4
-        xl:gap-5
+        xl:gap-6
       "
     >
       {products.map((product) => (
