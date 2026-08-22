@@ -143,11 +143,11 @@ export default function Hero() {
           w-screen
           -translate-x-1/2
 
-          pt-[135px]
+          pt-[20px]
 
           sm:pt-[86px]
 
-          lg:pt-[136px]
+          lg:pt-[20px]
         "
       >
         {/* ====================================================

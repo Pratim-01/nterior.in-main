@@ -96,7 +96,7 @@ export default function FeaturedProducts() {
                   sm:text-xs
                 "
               >
-                Featured Products
+                FEATURED TILES
               </span>
             </div>
 
@@ -112,7 +112,7 @@ export default function FeaturedProducts() {
                 lg:text-4xl
               "
             >
-              Explore Our Range of Ply Woods
+              Explore Our Range of Tiles
             </h2>
 
             {/* DESCRIPTION */}
@@ -128,8 +128,7 @@ export default function FeaturedProducts() {
                 sm:block
               "
             >
-              Discover premium Ply Wood selected to bring style,
-              durability and character to every interior space.
+              Discover premium tiles selected to bring elegance, durability and character to every interior and exterior space.
             </p>
           </div>
 

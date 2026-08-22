@@ -112,7 +112,7 @@ export default function FeaturedProducts() {
                 lg:text-4xl
               "
             >
-              Explore Our Range of Ply Woods
+              Explore Our Lighting & Fan Range
             </h2>
 
             {/* DESCRIPTION */}
@@ -128,8 +128,7 @@ export default function FeaturedProducts() {
                 sm:block
               "
             >
-              Discover premium Ply Wood selected to bring style,
-              durability and character to every interior space.
+              Discover premium lighting and fans selected to combine style, performance and comfort for every interior.
             </p>
           </div>
 

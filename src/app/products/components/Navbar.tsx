@@ -977,7 +977,8 @@ export default function Navbar() {
     const pathname = usePathname();
 
     const isProduct =
-        pathname === "/products";
+        pathname === "/products" ||
+        pathname.startsWith("/products/");
 
     const [mobileMenu, setMobileMenu] =
         useState(false);
@@ -1205,10 +1206,9 @@ export default function Navbar() {
                                         xl:px-6
                                         xl:py-2.5
                                         xl:text-sm
-                                        ${
-                                            isProduct
-                                                ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                                : "text-gray-600 hover:text-gray-900"
+                                        ${isProduct
+                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                            : "text-gray-600 hover:text-gray-900"
                                         }
                                     `}
                                 >
@@ -1229,10 +1229,9 @@ export default function Navbar() {
                                         xl:px-6
                                         xl:py-2.5
                                         xl:text-sm
-                                        ${
-                                            !isProduct
-                                                ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                                                : "text-gray-600 hover:text-gray-900"
+                                        ${!isProduct
+                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                            : "text-gray-600 hover:text-gray-900"
                                         }
                                     `}
                                 >
@@ -1480,10 +1479,9 @@ export default function Navbar() {
                                                     transition-all
                                                     duration-200
                                                     xl:text-sm
-                                                    ${
-                                                        isActive
-                                                            ? "text-[rgb(207,0,6)]"
-                                                            : "text-gray-700 hover:text-[rgb(207,0,6)]"
+                                                    ${isActive
+                                                        ? "text-[rgb(207,0,6)]"
+                                                        : "text-gray-700 hover:text-[rgb(207,0,6)]"
                                                     }
                                                 `}
                                             >
@@ -1503,10 +1501,9 @@ export default function Navbar() {
                                                         bg-[rgb(207,0,6)]
                                                         transition-all
                                                         duration-300
-                                                        ${
-                                                            isActive
-                                                                ? "w-full"
-                                                                : "w-0"
+                                                        ${isActive
+                                                            ? "w-full"
+                                                            : "w-0"
                                                         }
                                                     `}
                                                 />
@@ -1544,10 +1541,9 @@ export default function Navbar() {
                                                     duration-200
                                                     hover:bg-red-50
                                                     hover:text-[rgb(207,0,6)]
-                                                    ${
-                                                        isActive
-                                                            ? "text-[rgb(207,0,6)]"
-                                                            : ""
+                                                    ${isActive
+                                                        ? "text-[rgb(207,0,6)]"
+                                                        : ""
                                                     }
                                                 `}
                                             >
@@ -1827,10 +1823,9 @@ export default function Navbar() {
                                 text-[11px]
                                 font-bold
                                 transition
-                                ${
-                                    isProduct
-                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
-                                        : "text-gray-600"
+                                ${isProduct
+                                    ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
+                                    : "text-gray-600"
                                 }
                             `}
                         >
@@ -1848,10 +1843,9 @@ export default function Navbar() {
                                 text-[11px]
                                 font-bold
                                 transition
-                                ${
-                                    !isProduct
-                                        ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
-                                        : "text-gray-600"
+                                ${!isProduct
+                                    ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
+                                    : "text-gray-600"
                                 }
                             `}
                         >
@@ -2131,10 +2125,9 @@ export default function Navbar() {
                                                         w-full
                                                         items-center
                                                         transition
-                                                        ${
-                                                            isOpen
-                                                                ? "bg-red-50"
-                                                                : "bg-white"
+                                                        ${isOpen
+                                                            ? "bg-red-50"
+                                                            : "bg-white"
                                                         }
                                                     `}
                                                 >
@@ -2160,10 +2153,9 @@ export default function Navbar() {
                                                             text-sm
                                                             font-semibold
                                                             transition
-                                                            ${
-                                                                isOpen
-                                                                    ? "text-[rgb(207,0,6)]"
-                                                                    : "text-gray-800"
+                                                            ${isOpen
+                                                                ? "text-[rgb(207,0,6)]"
+                                                                : "text-gray-800"
                                                             }
                                                         `}
                                                     >
@@ -2195,10 +2187,9 @@ export default function Navbar() {
                                                             justify-center
                                                             rounded-full
                                                             transition
-                                                            ${
-                                                                isOpen
-                                                                    ? "text-[rgb(207,0,6)]"
-                                                                    : "text-gray-600"
+                                                            ${isOpen
+                                                                ? "text-[rgb(207,0,6)]"
+                                                                : "text-gray-600"
                                                             }
                                                         `}
                                                     >
@@ -2225,10 +2216,9 @@ export default function Navbar() {
                                                         grid
                                                         transition-all
                                                         duration-300
-                                                        ${
-                                                            isOpen
-                                                                ? "grid-rows-[1fr]"
-                                                                : "grid-rows-[0fr]"
+                                                        ${isOpen
+                                                            ? "grid-rows-[1fr]"
+                                                            : "grid-rows-[0fr]"
                                                         }
                                                     `}
                                                 >
