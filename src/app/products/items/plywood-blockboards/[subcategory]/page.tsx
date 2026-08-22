@@ -370,7 +370,7 @@ export default async function ProductListingPage({
               Blockboards
             </Link>
 
-            <button
+            {/* <button
               type="button"
               disabled
               className="
@@ -390,7 +390,7 @@ export default async function ProductListingPage({
               "
             >
               Flexible Ply
-            </button>
+            </button> */}
           </div>
         </header>
 

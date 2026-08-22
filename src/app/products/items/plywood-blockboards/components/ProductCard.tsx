@@ -192,7 +192,7 @@ export default function ProductCard({
             without options remain aligned.
         ==================================================== */}
 
-        <div
+        {/* <div
           className="
             mt-2
             min-h-[18px]
@@ -202,7 +202,7 @@ export default function ProductCard({
           "
         >
           Available options
-        </div>
+        </div> */}
 
         {/* ====================================================
             PRICE
@@ -244,9 +244,9 @@ export default function ProductCard({
               sm:text-xs
             "
           >
-            {product.gst_exclude
+            {/* {product.gst_exclude
               ? "GST excluded"
-              : "Incl. GST"}
+              : "Incl. GST"} */}
           </p>
         </div>
       </div>

@@ -12,10 +12,10 @@ const categories = [
     name: "Blockboards",
     slug: "blockboards",
   },
-  {
-    name: "Flexible Ply",
-    slug: "flexible-ply",
-  },
+  // {
+  //   name: "Flexible Ply",
+  //   slug: "flexible-ply",
+  // },
 ];
 
 export default function CategoryTabs() {

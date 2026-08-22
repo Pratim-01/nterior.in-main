@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PaginationProps = {
   currentPage: number;
@@ -16,123 +13,159 @@ export default function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
+  /* ==========================================================
+     HIDE PAGINATION WHEN THERE IS ONLY ONE PAGE
+  ========================================================== */
+
   if (totalPages <= 1) {
     return null;
   }
 
-  const safeCurrentPage = Math.min(
-    Math.max(currentPage, 1),
-    totalPages
-  );
+  /* ==========================================================
+     KEEP CURRENT PAGE WITHIN VALID RANGE
+  ========================================================== */
 
-  function getPageNumbers(): (
-    number | "..."
-  )[] {
-    const pages: (
-      | number
-      | "..."
-    )[] = [];
+  const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
+
+  /* ==========================================================
+     PAGE NUMBER GENERATION
+  ========================================================== */
+
+  function getPageNumbers(): (number | "...")[] {
+    /*
+     * If there are 5 or fewer pages,
+     * ALWAYS show every page number.
+     *
+     * Example:
+     *
+     * 1  2
+     * 1  2  3
+     * 1  2  3  4
+     * 1  2  3  4  5
+     */
 
     if (totalPages <= 5) {
-      for (
-        let page = 1;
-        page <= totalPages;
-        page++
-      ) {
-        pages.push(page);
-      }
-
-      return pages;
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
     }
 
+    /*
+     * For more than 5 pages,
+     * use ellipsis when necessary.
+     */
+
+    const pages: (number | "...")[] = [];
+
+    /*
+     * Always show first page.
+     */
     pages.push(1);
 
-    if (safeCurrentPage > 3) {
+    /*
+     * Calculate pages around current page.
+     */
+    const start = Math.max(2, safeCurrentPage - 1);
+
+    const end = Math.min(totalPages - 1, safeCurrentPage + 1);
+
+    /*
+     * Add ellipsis between page 1
+     * and the current page range.
+     */
+    if (start > 2) {
       pages.push("...");
     }
 
-    const start = Math.max(
-      2,
-      safeCurrentPage - 1
-    );
-
-    const end = Math.min(
-      totalPages - 1,
-      safeCurrentPage + 1
-    );
-
-    for (
-      let page = start;
-      page <= end;
-      page++
-    ) {
+    /*
+     * Add pages around current page.
+     */
+    for (let page = start; page <= end; page++) {
       pages.push(page);
     }
 
-    if (
-      safeCurrentPage <
-      totalPages - 2
-    ) {
+    /*
+     * Add ellipsis before the last page.
+     */
+    if (end < totalPages - 1) {
       pages.push("...");
     }
 
+    /*
+     * Always show final page.
+     */
     pages.push(totalPages);
 
-    return pages;
+    /*
+     * Remove any accidental duplicates.
+     */
+    return [...new Set(pages)];
   }
 
+  const pageNumbers = getPageNumbers();
+
+  /* ==========================================================
+     PAGE CHANGE
+  ========================================================== */
+
   function handlePageChange(page: number) {
-    if (
-      page < 1 ||
-      page > totalPages ||
-      page === safeCurrentPage
-    ) {
+    /*
+     * Don't allow invalid pages or clicking
+     * the page that is already active.
+     */
+    if (page < 1 || page > totalPages || page === safeCurrentPage) {
       return;
     }
 
     onPageChange(page);
   }
 
+  /* ==========================================================
+     RENDER
+  ========================================================== */
+
   return (
     <nav
       aria-label="Product pagination"
       className="
         mt-8
+        mb-8
         flex
+        w-full
         flex-col
-        items-center
+        items-end
         gap-3
 
         sm:mt-10
       "
     >
-      {/* PAGINATION CONTROLS */}
+      {/* ======================================================
+          PAGINATION CONTROLS
+      ====================================================== */}
 
       <div
         className="
           flex
           items-center
-          gap-1
+          justify-center
+          gap-1.5
+
           sm:gap-2
         "
       >
-        {/* PREVIOUS */}
+        {/* ====================================================
+            PREVIOUS
+        ==================================================== */}
 
         <button
           type="button"
-          disabled={
-            safeCurrentPage === 1
-          }
-          onClick={() =>
-            handlePageChange(
-              safeCurrentPage - 1
-            )
-          }
+          disabled={safeCurrentPage === 1}
+          onClick={() => handlePageChange(safeCurrentPage - 1)}
+          aria-label="Go to previous page"
           className="
             inline-flex
             h-10
             items-center
-            gap-1
+            justify-center
+            gap-1.5
             rounded-lg
             border
             border-gray-200
@@ -143,9 +176,11 @@ export default function Pagination({
             font-semibold
             text-gray-700
 
-            transition
+            transition-colors
+            duration-200
 
             hover:border-gray-300
+            hover:bg-gray-50
             hover:text-gray-900
 
             disabled:cursor-not-allowed
@@ -155,103 +190,116 @@ export default function Pagination({
             sm:text-sm
           "
         >
-          <ChevronLeft size={15} />
+          <ChevronLeft size={15} strokeWidth={2} />
 
-          <span className="hidden sm:inline">
-            Previous
-          </span>
+          <span>Previous</span>
         </button>
 
-        {/* NUMBERS */}
+        {/* ====================================================
+            PAGE NUMBERS
+        ==================================================== */}
 
-        <div className="flex items-center gap-1">
-          {getPageNumbers().map(
-            (page, index) => {
-              if (page === "...") {
-                return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="
+        <div
+          className="
+            flex
+            items-center
+            gap-1
+
+            sm:gap-2
+          "
+        >
+          {pageNumbers.map((page, index) => {
+            /* ==============================================
+                 ELLIPSIS
+              ============================================== */
+
+            if (page === "...") {
+              return (
+                <span
+                  key={`ellipsis-${index}`}
+                  aria-hidden="true"
+                  className="
                       flex
                       h-10
                       w-7
                       items-center
                       justify-center
-                      text-xs
+
+                      text-sm
+                      font-medium
                       text-gray-400
                     "
-                  >
-                    ...
-                  </span>
-                );
-              }
+                >
+                  ...
+                </span>
+              );
+            }
 
-              const active =
-                page === safeCurrentPage;
+            /* ==============================================
+                 ACTIVE PAGE
+              ============================================== */
 
-              return (
-                <button
-                  key={page}
-                  type="button"
-                  onClick={() =>
-                    handlePageChange(page)
-                  }
-                  aria-current={
-                    active
-                      ? "page"
-                      : undefined
-                  }
-                  className={`
+            const active = page === safeCurrentPage;
+
+            return (
+              <button
+                key={page}
+                type="button"
+                onClick={() => handlePageChange(page)}
+                aria-label={`Go to page ${page}`}
+                aria-current={active ? "page" : undefined}
+                className={`
                     flex
                     h-10
                     w-10
                     items-center
                     justify-center
                     rounded-lg
+                    border
 
                     text-sm
                     font-semibold
 
-                    transition
+                    transition-colors
+                    duration-200
 
                     ${
                       active
                         ? `
-                          bg-[#171717]
+                          bg-[#CF0006]
                           text-white
                         `
                         : `
+                          border-gray-200
+                          bg-white
                           text-gray-700
                           hover:bg-gray-50
+                          hover:text-gray-900
                         `
                     }
                   `}
-                >
-                  {page}
-                </button>
-              );
-            }
-          )}
+              >
+                {page}
+              </button>
+            );
+          })}
         </div>
 
-        {/* NEXT */}
+        {/* ====================================================
+            NEXT
+        ==================================================== */}
 
         <button
           type="button"
-          disabled={
-            safeCurrentPage ===
-            totalPages
-          }
-          onClick={() =>
-            handlePageChange(
-              safeCurrentPage + 1
-            )
-          }
+          disabled={safeCurrentPage === totalPages}
+          onClick={() => handlePageChange(safeCurrentPage + 1)}
+          aria-label="Go to next page"
           className="
             inline-flex
             h-10
             items-center
-            gap-1
+            justify-center
+            gap-1.5
             rounded-lg
             border
             border-gray-200
@@ -262,9 +310,11 @@ export default function Pagination({
             font-semibold
             text-gray-700
 
-            transition
+            transition-colors
+            duration-200
 
             hover:border-gray-300
+            hover:bg-gray-50
             hover:text-gray-900
 
             disabled:cursor-not-allowed
@@ -274,17 +324,22 @@ export default function Pagination({
             sm:text-sm
           "
         >
-          <span className="hidden sm:inline">
-            Next
-          </span>
+          <span>Next</span>
 
-          <ChevronRight size={15} />
+          <ChevronRight size={15} strokeWidth={2} />
         </button>
       </div>
 
-      {/* PAGE STATUS */}
+      {/* ======================================================
+          PAGE STATUS
+      ====================================================== */}
 
-      <p className="text-xs text-gray-400">
+      {/* <p
+        className="
+          text-xs
+          text-gray-400
+        "
+      >
         Page{" "}
         <span className="font-semibold text-gray-700">
           {safeCurrentPage}
@@ -293,7 +348,7 @@ export default function Pagination({
         <span className="font-semibold text-gray-700">
           {totalPages}
         </span>
-      </p>
+      </p> */}
     </nav>
   );
 }

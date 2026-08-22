@@ -3,11 +3,24 @@
 import {
   useRouter,
   useSearchParams,
+  usePathname,
 } from "next/navigation";
+
 import {
   ChevronDown,
   Search,
 } from "lucide-react";
+
+import Link from "next/link";
+
+/* ==========================================================
+   CATEGORY COUNTS
+========================================================== */
+
+type CategoryCounts = {
+  Plywood: number;
+  Blockboards: number;
+};
 
 /* ==========================================================
    FILTER SECTION
@@ -33,8 +46,6 @@ function FilterSection({
         last:border-b-0
       "
     >
-      {/* HEADER */}
-
       <div
         className="
           mb-3
@@ -60,7 +71,10 @@ function FilterSection({
           <ChevronDown
             size={15}
             strokeWidth={2}
-            className="shrink-0 text-gray-700"
+            className="
+              shrink-0
+              text-gray-700
+            "
           />
         )}
       </div>
@@ -98,14 +112,14 @@ function FilterCheckbox({
         py-[2px]
         text-[12px]
         leading-[18px]
-        ${disabled
-          ? "cursor-not-allowed"
-          : "cursor-pointer"
+
+        ${
+          disabled
+            ? "cursor-not-allowed"
+            : "cursor-pointer"
         }
       `}
     >
-      {/* CHECKBOX */}
-
       <input
         type="checkbox"
         disabled={disabled}
@@ -137,23 +151,21 @@ function FilterCheckbox({
         "
       />
 
-      {/* LABEL */}
-
       <span
         className={`
           min-w-0
           flex-1
           truncate
-          ${disabled
-            ? "text-gray-300"
-            : "text-gray-700"
+
+          ${
+            disabled
+              ? "text-gray-300"
+              : "text-gray-700"
           }
         `}
       >
         {label}
       </span>
-
-      {/* COUNT */}
 
       {typeof count === "number" && (
         <span
@@ -164,9 +176,11 @@ function FilterCheckbox({
             text-right
             text-[11px]
             leading-[18px]
-            ${disabled
-              ? "text-gray-300"
-              : "text-gray-400"
+
+            ${
+              disabled
+                ? "text-gray-300"
+                : "text-gray-400"
             }
           `}
         >
@@ -174,6 +188,72 @@ function FilterCheckbox({
         </span>
       )}
     </label>
+  );
+}
+
+/* ==========================================================
+   CATEGORY OPTION
+
+   Normal clickable navigation item.
+========================================================== */
+
+function CategoryOption({
+  name,
+  href,
+  count,
+  active,
+}: {
+  name: string;
+  href: string;
+  count: number;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      scroll={false}
+      className={`
+        flex
+        min-h-[30px]
+        w-full
+        items-center
+        rounded-md
+        px-1
+        py-1
+        text-[12px]
+        leading-[18px]
+        transition-colors
+
+        ${
+          active
+            ? "font-semibold text-[rgb(207,0,6)]"
+            : "text-gray-700 hover:bg-gray-50 hover:text-[rgb(207,0,6)]"
+        }
+      `}
+    >
+      <span className="min-w-0 flex-1 truncate">
+        {name}
+      </span>
+
+      <span
+        className={`
+          ml-auto
+          w-[34px]
+          shrink-0
+          text-right
+          text-[11px]
+          leading-[18px]
+
+          ${
+            active
+              ? "text-[rgb(207,0,6)]"
+              : "text-gray-400"
+          }
+        `}
+      >
+        ({count})
+      </span>
+    </Link>
   );
 }
 
@@ -265,9 +345,21 @@ function MoreButton() {
    PRODUCT FILTERS
 ========================================================== */
 
-export default function ProductFilters() {
+export default function ProductFilters({
+  categoryCounts = {
+    Plywood: 0,
+    Blockboards: 0,
+  },
+}: {
+  categoryCounts?: CategoryCounts;
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+
+  const searchParams =
+    useSearchParams();
+
+  const pathname =
+    usePathname();
 
   /* ========================================================
      PRICE FILTER
@@ -277,27 +369,41 @@ export default function ProductFilters() {
     min?: string,
     max?: string
   ) {
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
+    const params =
+      new URLSearchParams(
+        searchParams.toString()
+      );
 
     if (min) {
-      params.set("minPrice", min);
+      params.set(
+        "minPrice",
+        min
+      );
     } else {
-      params.delete("minPrice");
+      params.delete(
+        "minPrice"
+      );
     }
 
     if (max) {
-      params.set("maxPrice", max);
+      params.set(
+        "maxPrice",
+        max
+      );
     } else {
-      params.delete("maxPrice");
+      params.delete(
+        "maxPrice"
+      );
     }
 
     params.delete("page");
 
-    router.push(`?${params.toString()}`, {
-      scroll: false,
-    });
+    router.push(
+      `?${params.toString()}`,
+      {
+        scroll: false,
+      }
+    );
   }
 
   /* ========================================================
@@ -305,15 +411,17 @@ export default function ProductFilters() {
   ======================================================== */
 
   function clearFilters() {
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
+    const params =
+      new URLSearchParams(
+        searchParams.toString()
+      );
 
     params.delete("minPrice");
     params.delete("maxPrice");
     params.delete("page");
 
-    const query = params.toString();
+    const query =
+      params.toString();
 
     router.push(
       query
@@ -344,20 +452,21 @@ export default function ProductFilters() {
           bg-white
         "
       >
+
         {/* ==================================================
             HEADER
         ================================================== */}
 
         <div
           className="
-           flex
-    min-h-[56px]
-    items-center
-    justify-between
-    border-b
-    border-gray-100
-    px-5
-    py-4
+            flex
+            min-h-[56px]
+            items-center
+            justify-between
+            border-b
+            border-gray-100
+            px-5
+            py-4
           "
         >
           <h2
@@ -398,17 +507,28 @@ export default function ProductFilters() {
           ================================================= */}
 
           <FilterSection title="Category">
-            <div className="w-full">
-              <FilterCheckbox
-                label="Plywood"
-                count={74}
+            <div className="w-full space-y-1">
+
+              <CategoryOption
+                name="Plywood"
+                href="/products/items/plywood-blockboards/plywood"
+                count={
+                  categoryCounts.Plywood
+                }
+                active={pathname ===
+                  "/products/items/plywood-blockboards/plywood"}
               />
 
-              <FilterCheckbox
-                label="Blockboards"
-                count={35}
-                disabled
+              <CategoryOption
+                name="Blockboards"
+                href="/products/items/plywood-blockboards/blockboards"
+                count={
+                  categoryCounts.Blockboards
+                }
+                active={pathname ===
+                  "/products/items/plywood-blockboards/blockboards"}
               />
+
             </div>
           </FilterSection>
 
@@ -420,11 +540,8 @@ export default function ProductFilters() {
             title="Brand"
             collapsible
           >
-            {/* <FilterSearch
-              placeholder="Search for Brand"
-            /> */}
-
             <div className="w-full">
+
               <FilterCheckbox
                 label="CenturyPly"
                 count={19}
@@ -454,6 +571,7 @@ export default function ProductFilters() {
                 count={8}
                 disabled
               />
+
             </div>
 
             <MoreButton />
@@ -465,6 +583,7 @@ export default function ProductFilters() {
 
           <FilterSection title="Price Range">
             <div className="w-full">
+
               <FilterCheckbox
                 label="₹1,000 - ₹2,000"
                 count={29}
@@ -508,6 +627,7 @@ export default function ProductFilters() {
                   )
                 }
               />
+
             </div>
           </FilterSection>
 
@@ -519,12 +639,8 @@ export default function ProductFilters() {
             title="Thickness"
             collapsible
           >
-            {/* <FilterSearch
-              placeholder="Search for Thickness"
-              disabled
-            /> */}
-
             <div className="w-full">
+
               <FilterCheckbox
                 label="6 mm"
                 count={15}
@@ -554,6 +670,7 @@ export default function ProductFilters() {
                 count={10}
                 disabled
               />
+
             </div>
 
             <MoreButton />
@@ -564,6 +681,7 @@ export default function ProductFilters() {
           ================================================= */}
 
           <FilterSection title="Material">
+
             <FilterCheckbox
               label="Hardwood"
               count={62}
@@ -581,6 +699,7 @@ export default function ProductFilters() {
               count={4}
               disabled
             />
+
           </FilterSection>
 
           {/* =================================================
@@ -588,6 +707,7 @@ export default function ProductFilters() {
           ================================================= */}
 
           <FilterSection title="Size">
+
             <FilterCheckbox
               label="8 ft. x 4 ft."
               count={40}
@@ -599,6 +719,7 @@ export default function ProductFilters() {
               count={34}
               disabled
             />
+
           </FilterSection>
 
           {/* =================================================
@@ -606,6 +727,7 @@ export default function ProductFilters() {
           ================================================= */}
 
           <FilterSection title="Grade">
+
             <FilterCheckbox
               label="BWP/Marine"
               count={39}
@@ -617,6 +739,7 @@ export default function ProductFilters() {
               count={35}
               disabled
             />
+
           </FilterSection>
 
           {/* =================================================
@@ -624,11 +747,13 @@ export default function ProductFilters() {
           ================================================= */}
 
           <FilterSection title="Colour">
+
             <FilterCheckbox
               label="Brown"
               count={74}
               disabled
             />
+
           </FilterSection>
 
           {/* =================================================
@@ -636,11 +761,13 @@ export default function ProductFilters() {
           ================================================= */}
 
           <FilterSection title="MR">
+
             <FilterCheckbox
               label="MR"
               count={35}
               disabled
             />
+
           </FilterSection>
 
         </div>

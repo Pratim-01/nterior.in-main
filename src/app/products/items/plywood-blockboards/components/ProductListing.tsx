@@ -3,256 +3,336 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    useRouter,
-    useSearchParams,
+  useRouter,
+  useSearchParams,
 } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import ProductFilters from "./ProductFilters";
 import ProductGrid from "./ProductGrid";
-import CategoryTabs from "./CategoryTabs";
 import SortDropdown from "./SortDropdown";
 import Pagination from "./Pagination";
 
 export type Product = {
-    product_id: number;
-    product_name: string;
-    category: string;
-    product_type: "sqft" | "unit";
-    short_description: string | null;
-    sell_mrp: number | string | null;
-    mrp: number | string | null;
-    gst_percentage: number | string | null;
-    gst_exclude: number | boolean | null;
-    image_url: string | null;
-    image_alt_text: string | null;
+  product_id: number;
+  product_name: string;
+  category: string;
+  product_type: "sqft" | "unit";
+  short_description: string | null;
+  sell_mrp: number | string | null;
+  mrp: number | string | null;
+  gst_percentage: number | string | null;
+  gst_exclude: number | boolean | null;
+  image_url: string | null;
+  image_alt_text: string | null;
 };
 
 type ProductListingProps = {
-    category: string;
-    title: string;
-    description: string;
+  category: string;
+  title: string;
+  description: string;
 };
 
 type ApiResponse = {
-    success: boolean;
-    message?: string;
-    products?: Product[];
-    pagination?: {
-        page: number;
-        limit: number;
-        totalProducts: number;
-        totalPages: number;
-        hasNextPage: boolean;
-        hasPreviousPage: boolean;
-    };
+  success: boolean;
+  message?: string;
+
+  products?: Product[];
+
+  categoryCounts?: {
+    Plywood: number;
+    Blockboards: number;
+  };
+
+  pagination?: {
+    page: number;
+    limit: number;
+    totalProducts: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 };
 
 export default function ProductListing({
-    category,
-    title,
-    description,
+  category,
+  title,
+  description,
 }: ProductListingProps) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-    /* ==========================================================
-       URL STATE
-    ========================================================== */
+  /* ==========================================================
+     URL STATE
+  ========================================================== */
 
-    const pageFromUrl = Number(
-        searchParams.get("page") || "1"
-    );
+  const pageFromUrl = Number(
+    searchParams.get("page") || "1"
+  );
 
-    const currentSort =
-        searchParams.get("sort") || "newest";
+  const currentSort =
+    searchParams.get("sort") || "newest";
 
-    const currentPage =
-        Number.isFinite(pageFromUrl) &&
-            pageFromUrl > 0
-            ? Math.floor(pageFromUrl)
-            : 1;
+  const currentPage =
+    Number.isFinite(pageFromUrl) &&
+    pageFromUrl > 0
+      ? Math.floor(pageFromUrl)
+      : 1;
 
-    /* ==========================================================
-       PRODUCT STATE
-    ========================================================== */
+  /* ==========================================================
+     PRODUCT STATE
+  ========================================================== */
 
-    const [products, setProducts] = useState<Product[]>(
-        []
-    );
+  const [products, setProducts] =
+    useState<Product[]>([]);
 
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-    const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
-    const [totalPages, setTotalPages] = useState(0);
+  /*
+   * Number of pages for the current category.
+   */
+  const [totalPages, setTotalPages] =
+    useState(0);
 
-    const [totalProducts, setTotalProducts] =
-        useState(0);
+  /*
+   * Total number of products for
+   * the current category.
+   */
+  const [totalProducts, setTotalProducts] =
+    useState(0);
 
-    /* ==========================================================
-       FETCH PRODUCTS
-       
-       16 products = 4 x 4 desktop grid.
-    ========================================================== */
+  /*
+   * Product counts for the sidebar category
+   * buttons.
+   */
+  const [categoryCounts, setCategoryCounts] =
+    useState({
+      Plywood: 0,
+      Blockboards: 0,
+    });
 
-    useEffect(() => {
-        let cancelled = false;
+  /* ==========================================================
+     FETCH PRODUCTS
 
-        async function fetchProducts() {
-            try {
-                setLoading(true);
-                setError("");
+     12 products per page.
 
-                const params = new URLSearchParams();
+     Desktop:
+     4 columns × 3 rows = 12 products.
+  ========================================================== */
 
-                params.set("category", category);
-                params.set("page", String(currentPage));
+  useEffect(() => {
+    let cancelled = false;
 
-                /*
-                 * Desktop:
-                 *
-                 * 4 columns
-                 * 4 rows
-                 *
-                 * = 16 products
-                 */
-                params.set("limit", "16");
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError("");
 
-                params.set("sort", currentSort);
+        const params =
+          new URLSearchParams();
 
-                const response = await fetch(
-                    `/api/kayapalat-products?${params.toString()}`,
-                    {
-                        method: "GET",
-                        cache: "no-store",
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(
-                        "Failed to fetch products"
-                    );
-                }
-
-                const data: ApiResponse =
-                    await response.json();
-
-                if (!data.success) {
-                    throw new Error(
-                        data.message ||
-                        "Failed to fetch products"
-                    );
-                }
-
-                if (cancelled) {
-                    return;
-                }
-
-                setProducts(data.products || []);
-
-                setTotalPages(
-                    data.pagination?.totalPages || 0
-                );
-
-                setTotalProducts(
-                    data.pagination?.totalProducts || 0
-                );
-            } catch (err) {
-                if (cancelled) {
-                    return;
-                }
-
-                console.error(
-                    "Product listing error:",
-                    err
-                );
-
-                setError(
-                    "Unable to load products right now. Please try again later."
-                );
-
-                setProducts([]);
-                setTotalPages(0);
-                setTotalProducts(0);
-            } finally {
-                if (!cancelled) {
-                    setLoading(false);
-                }
-            }
-        }
-
-        fetchProducts();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [
-        category,
-        currentPage,
-        currentSort,
-    ]);
-
-    /* ==========================================================
-       PAGINATION
-    ========================================================== */
-
-    function handlePageChange(page: number) {
-        if (page < 1) {
-            return;
-        }
-
-        if (
-            totalPages > 0 &&
-            page > totalPages
-        ) {
-            return;
-        }
-
-        const params = new URLSearchParams(
-            searchParams.toString()
+        params.set(
+          "category",
+          category
         );
 
-        params.set("page", String(page));
+        params.set(
+          "page",
+          String(currentPage)
+        );
 
-        router.push(
-            `?${params.toString()}`,
+        /*
+         * 12 products per page.
+         *
+         * Desktop:
+         * 4 columns
+         * 3 rows
+         */
+        params.set("limit", "12");
+
+        params.set(
+          "sort",
+          currentSort
+        );
+
+        const response =
+          await fetch(
+            `/api/kayapalat-products?${params.toString()}`,
             {
-                scroll: false,
+              method: "GET",
+              cache: "no-store",
             }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            "Failed to fetch products"
+          );
+        }
+
+        const data: ApiResponse =
+          await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message ||
+              "Failed to fetch products"
+          );
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        /* ====================================================
+           PRODUCTS
+        ==================================================== */
+
+        setProducts(
+          data.products || []
         );
+
+        /* ====================================================
+           PAGINATION
+        ==================================================== */
+
+        setTotalPages(
+          data.pagination
+            ?.totalPages || 0
+        );
+
+        /* ====================================================
+           TOTAL PRODUCT COUNT
+        ==================================================== */
+
+        setTotalProducts(
+          data.pagination
+            ?.totalProducts || 0
+        );
+
+        /* ====================================================
+           CATEGORY COUNTS
+        ==================================================== */
+
+        setCategoryCounts(
+          data.categoryCounts || {
+            Plywood: 0,
+            Blockboards: 0,
+          }
+        );
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(
+          "Product listing error:",
+          err
+        );
+
+        setError(
+          "Unable to load products right now. Please try again later."
+        );
+
+        setProducts([]);
+
+        setTotalPages(0);
+
+        setTotalProducts(0);
+
+        setCategoryCounts({
+          Plywood: 0,
+          Blockboards: 0,
+        });
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
     }
 
-    return (
-        <main className="min-h-screen bg-white">
+    fetchProducts();
 
-            {/* ========================================================
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    category,
+    currentPage,
+    currentSort,
+  ]);
+
+  /* ==========================================================
+     PAGINATION
+  ========================================================== */
+
+  function handlePageChange(
+    page: number
+  ) {
+    if (page < 1) {
+      return;
+    }
+
+    if (
+      totalPages > 0 &&
+      page > totalPages
+    ) {
+      return;
+    }
+
+    const params =
+      new URLSearchParams(
+        searchParams.toString()
+      );
+
+    params.set(
+      "page",
+      String(page)
+    );
+
+    router.push(
+      `?${params.toString()}`,
+      {
+        scroll: false,
+      }
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-white">
+      {/* ========================================================
           PAGE CONTAINER
       ======================================================== */}
 
-            <div
-                className="
-    mx-auto
-    w-full
-    max-w-[1440px]
-    px-5
-    pb-12
-    pt-5
-    sm:px-6
-    sm:pb-16
-    lg:px-7
-    lg:pt-7
-    xl:px-8
-        "
-            >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1440px]
+          px-5
+          pb-12
+          pt-5
 
-                {/* ======================================================
+          sm:px-6
+          sm:pb-16
+
+          lg:px-7
+          lg:pt-7
+
+          xl:px-8
+        "
+      >
+        {/* ======================================================
             BREADCRUMB
         ====================================================== */}
 
-                <nav
-                    aria-label="Breadcrumb"
-                    className="
+        <nav
+          aria-label="Breadcrumb"
+          className="
             mb-5
             flex
             flex-wrap
@@ -264,101 +344,52 @@ export default function ProductListing({
             sm:mb-6
             sm:text-sm
           "
-                >
-                    <Link
-                        href="/products"
-                        className="
+        >
+          <Link
+            href="/products"
+            className="
               transition-colors
               hover:text-[rgb(207,0,6)]
             "
-                    >
-                        Home
-                    </Link>
+          >
+            Home
+          </Link>
 
-                    <span className="text-gray-300">
-                        /
-                    </span>
+          <span className="text-gray-300">
+            /
+          </span>
 
-                    <Link
-                        href="/products/items/plywood-laminates"
-                        className="
+          <Link
+            href="/products/items/plywood-laminates"
+            className="
               transition-colors
               hover:text-[rgb(207,0,6)]
             "
-                    >
-                        Plywood & Laminates
-                    </Link>
+          >
+            Plywood & Laminates
+          </Link>
 
-                    <span className="text-gray-300">
-                        /
-                    </span>
+          <span className="text-gray-300">
+            /
+          </span>
 
-                    <span className="font-medium text-gray-900">
-                        {category}
-                    </span>
-                </nav>
+          <span className="font-medium text-gray-900">
+            {category}
+          </span>
+        </nav>
 
-                {/* ======================================================
+        {/* ======================================================
             PAGE HEADING
         ====================================================== */}
 
-                <div className="mb-6">
+       
 
-                    <h1
-                        className="
-              text-xl
-              font-bold
-              tracking-tight
-              text-gray-900
-
-              sm:text-2xl
-            "
-                    >
-                        {title}
-                    </h1>
-
-                    <p
-                        className="
-              mt-1
-              max-w-3xl
-              text-xs
-              leading-5
-              text-gray-500
-
-              sm:text-sm
-              sm:leading-6
-            "
-                    >
-                        {description}
-                    </p>
-
-                </div>
-
-                {/* ======================================================
-            CATEGORY TABS
-
-            Plywood
-            Blockboards
-            Flexible Ply
-        ====================================================== */}
-
-                <CategoryTabs />
-
-                {/* ======================================================
+        {/* ======================================================
             MAIN LISTING LAYOUT
-
-            Desktop:
-
-            ┌────────────┬─────────────────────────────┐
-            │            │                             │
-            │  FILTERS   │        PRODUCTS             │
-            │            │                             │
-            │            │                             │
-            └────────────┴─────────────────────────────┘
         ====================================================== */}
 
-                <div
-                    className="
+        <div
+          className="
             flex
             flex-col
             gap-6
@@ -369,79 +400,79 @@ export default function ProductListing({
 
             xl:gap-9
           "
-                >
-
-                    {/* ====================================================
+        >
+          {/* ====================================================
               LEFT FILTER SIDEBAR
           ==================================================== */}
 
-                    <div
-                        className="
-    hidden
-    shrink-0
-    lg:block
-    lg:w-[280px]
-    xl:w-[290px]
-  "
-                    >
-                        <div className="sticky top-28">
-                            <ProductFilters />
-                        </div>
-                    </div>
+          <div
+            className="
+              hidden
+              shrink-0
+              lg:block
+              lg:w-[280px]
+              xl:w-[290px]
+            "
+          >
+            <div className="sticky top-28">
+              <ProductFilters
+                categoryCounts={
+                  categoryCounts
+                }
+              />
+            </div>
+          </div>
 
-                    {/* ====================================================
+          {/* ====================================================
               PRODUCTS AREA
           ==================================================== */}
 
-                    <section
-                        className="
+          <section
+            className="
               min-w-0
               flex-1
             "
-                    >
-
-                        {/* ==================================================
+          >
+            {/* ==================================================
                 TOOLBAR
             ================================================== */}
 
-                        <div
-                            className="
+            <div
+              className="
                 mb-5
                 flex
                 items-center
                 justify-between
                 gap-4
               "
-                        >
+            >
+              {/* PRODUCT COUNT */}
 
-                            {/* PRODUCT COUNT */}
-
-                            <p
-                                className="
+              <p
+                className="
                   text-xs
                   text-gray-500
 
                   sm:text-sm
                 "
-                            >
-                                {loading
-                                    ? "Loading products..."
-                                    : `${totalProducts} products`}
-                            </p>
+              >
+                {loading
+                  ? "Loading products..."
+                  : `${totalProducts} products`}
+              </p>
 
-                            {/* SORT */}
+              {/* SORT */}
 
-                            <SortDropdown />
+              <SortDropdown />
+            </div>
 
-                        </div>
-
-                        {/* ==================================================
+            {/* ==================================================
                 LOADING
             ================================================== */}
 
-                        {loading && (
-                            <div
-                                className="
+            {loading && (
+              <div
+                className="
                   grid
                   grid-cols-2
                   gap-3
@@ -451,105 +482,106 @@ export default function ProductListing({
 
                   md:grid-cols-3
 
-                  lg:grid-cols-3
+                  lg:grid-cols-4
 
                   xl:grid-cols-4
                   xl:gap-5
                 "
-                            >
-                                {Array.from({
-                                    length: 16,
-                                }).map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className="
-                      overflow-hidden
-                      rounded-xl
-                      border
-                      border-gray-100
-                      bg-white
-                    "
-                                    >
-                                        <div
-                                            className="
-                        aspect-[4/4.6]
-                        animate-pulse
-                        bg-gray-100
+              >
+                {Array.from({
+                  length: 12,
+                }).map(
+                  (_, index) => (
+                    <div
+                      key={index}
+                      className="
+                        overflow-hidden
+                        rounded-xl
+                        border
+                        border-gray-100
+                        bg-white
                       "
-                                        />
-
-                                        <div className="space-y-3 p-4">
-
-                                            <div
-                                                className="
-                          h-4
-                          w-4/5
+                    >
+                      <div
+                        className="
+                          aspect-[4/4.6]
                           animate-pulse
-                          rounded
                           bg-gray-100
                         "
-                                            />
+                      />
 
-                                            <div
-                                                className="
-                          h-3
-                          w-1/2
-                          animate-pulse
-                          rounded
-                          bg-gray-100
-                        "
-                                            />
+                      <div className="space-y-3 p-4">
+                        <div
+                          className="
+                            h-4
+                            w-4/5
+                            animate-pulse
+                            rounded
+                            bg-gray-100
+                          "
+                        />
 
-                                            <div
-                                                className="
-                          h-5
-                          w-1/3
-                          animate-pulse
-                          rounded
-                          bg-gray-100
-                        "
-                                            />
+                        <div
+                          className="
+                            h-3
+                            w-1/2
+                            animate-pulse
+                            rounded
+                            bg-gray-100
+                          "
+                        />
 
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        <div
+                          className="
+                            h-5
+                            w-1/3
+                            animate-pulse
+                            rounded
+                            bg-gray-100
+                          "
+                        />
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
 
-                        {/* ==================================================
+            {/* ==================================================
                 ERROR
             ================================================== */}
 
-                        {!loading && error && (
-                            <div
-                                className="
-                  flex
-                  min-h-[300px]
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  border-red-100
-                  bg-red-50
-                  px-6
-                  text-center
-                "
-                            >
-                                <p className="text-sm font-medium text-red-600">
-                                    {error}
-                                </p>
-                            </div>
-                        )}
+            {!loading &&
+              error && (
+                <div
+                  className="
+                    flex
+                    min-h-[300px]
+                    items-center
+                    justify-center
+                    rounded-xl
+                    border
+                    border-red-100
+                    bg-red-50
+                    px-6
+                    text-center
+                  "
+                >
+                  <p className="text-sm font-medium text-red-600">
+                    {error}
+                  </p>
+                </div>
+              )}
 
-                        {/* ==================================================
+            {/* ==================================================
                 EMPTY
             ================================================== */}
 
-                        {!loading &&
-                            !error &&
-                            products.length === 0 && (
-                                <div
-                                    className="
+            {!loading &&
+              !error &&
+              products.length === 0 && (
+                <div
+                  className="
                     flex
                     min-h-[350px]
                     items-center
@@ -562,24 +594,23 @@ export default function ProductListing({
                     px-6
                     text-center
                   "
-                                >
-                                    <div>
+                >
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">
+                      No{" "}
+                      {category.toLowerCase()}{" "}
+                      products found
+                    </h2>
 
-                                        <h2 className="text-lg font-bold text-gray-900">
-                                            No{" "}
-                                            {category.toLowerCase()}{" "}
-                                            products found
-                                        </h2>
+                    <p className="mt-2 text-sm text-gray-500">
+                      There are currently no
+                      products available in
+                      this category.
+                    </p>
 
-                                        <p className="mt-2 text-sm text-gray-500">
-                                            There are currently no
-                                            products available in this
-                                            category.
-                                        </p>
-
-                                        <Link
-                                            href="/products"
-                                            className="
+                    <Link
+                      href="/products"
+                      className="
                         mt-5
                         inline-flex
                         items-center
@@ -594,45 +625,49 @@ export default function ProductListing({
                         transition-colors
                         hover:bg-[rgb(170,0,5)]
                       "
-                                        >
-                                            <ArrowLeft size={15} />
+                    >
+                      <ArrowLeft
+                        size={15}
+                      />
 
-                                            Browse Products
-                                        </Link>
+                      Browse Products
+                    </Link>
+                  </div>
+                </div>
+              )}
 
-                                    </div>
-                                </div>
-                            )}
-
-                        {/* ==================================================
+            {/* ==================================================
                 PRODUCTS
             ================================================== */}
 
-                        {!loading &&
-                            !error &&
-                            products.length > 0 && (
-                                <>
-                                    <ProductGrid
-                                        products={products}
-                                    />
+            {!loading &&
+              !error &&
+              products.length > 0 && (
+                <>
+                  <ProductGrid
+                    products={products}
+                  />
 
-                                    {/* =================================================
+                  {/* =================================================
                       PAGINATION
                   ================================================= */}
 
-                                    <Pagination
-                                        currentPage={currentPage}
-                                        totalPages={totalPages}
-                                        onPageChange={
-                                            handlePageChange
-                                        }
-                                    />
-                                </>
-                            )}
-
-                    </section>
-                </div>
-            </div>
-        </main>
-    );
+                  <Pagination
+                    currentPage={
+                      currentPage
+                    }
+                    totalPages={
+                      totalPages
+                    }
+                    onPageChange={
+                      handlePageChange
+                    }
+                  />
+                </>
+              )}
+          </section>
+        </div>
+      </div>
+    </main>
+  );
 }
