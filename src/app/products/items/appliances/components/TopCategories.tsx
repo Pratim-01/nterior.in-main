@@ -6,29 +6,21 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Vetrified Tiles",
-    description: "Strong, elegant surfaces for modern spaces",
+    name: "Kitchen Faucets",
+    description: "Stylish, durable fittings for everyday use.",
     image:
-      "https://s.alicdn.com/%40sc04/kf/H02918150098840729e1bd5b7259af1fbF/60x60-Low-Rate-for-Anti-dumping-Duty-to-Pakistan-Porcelanato-Polished-Vitrified-Interior-Tiles.jpg",
+      "https://images.unsplash.com/photo-1757787697646-e84d5490add1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/tiles/vetrified",
+    href: "/products/items/kitchen/faucets",
   },
   {
     id: 2,
-    name: "Ceramic Tiles",
-    description: "Durable and versatile tiles for stylish interiors",
+    name: "Kitchen Sinks",
+    description: "Stylish, durable fittings for everyday use.",
     image:
-      "https://98eda87788a287f6d084.cdn6.editmysite.com/uploads/b/98eda87788a287f6d0840d09cd1bee28c3a25ecfec22000db28f2dee86413fc2/2025-09-25_15-38-37_1758829147.png?optimize=medium&width=2400",
-    href: "/products/items/tiles/ceramic",
-  },
-  {
-    id: 3,
-    name: "Laminate Flooring",
-    description: "Warm wood-look flooring for contemporary interiors",
-    image:
-      "https://media.diy.com/is/image/Kingfisher/3-strip-wood-planks-oak-effect-smooth-straight-laminate-flooring-3-003m-~3663602997436_02bq?%24MOB_PREV%24=&%24height=600&%24width=600",
-    href: "/products/items/tiles/flooring",
+      "https://images.unsplash.com/photo-1661045327753-3f2a047d00a4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/kitchen/sinks",
   },
 ];
 
@@ -66,7 +58,7 @@ export default function TopCategories() {
               lg:text-5xl
             "
           >
-            Explore Our Range of Tiles
+            Shop Top Appliance Categories
           </h2>
 
           <p
@@ -80,9 +72,7 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore quality floor tiles, wall tiles and premium surface finishes
-            for living rooms, kitchens, bathrooms, balconies and modern interior
-            spaces.
+            Explore essential home appliances designed for modern kitchens, comfortable living and effortless everyday routines.
           </p>
         </div>
 
@@ -90,18 +80,13 @@ export default function TopCategories() {
 
         <div
           className="
-            mx-auto
-    grid
-    w-full
-    max-w-6xl
-
-    grid-cols-3
-    gap-3
-
-    sm:gap-5
-
-    md:grid-cols-3
-    lg:grid-cols-3
+            grid
+            grid-cols-2
+            gap-3
+            sm:gap-5
+            md:grid-cols-3
+            lg:grid-cols-4
+            justify-center
           "
         >
           {categories.map((category) => (
@@ -190,7 +175,10 @@ export default function TopCategories() {
                     group-hover:opacity-100
                   "
                 >
-                  <ArrowUpRight size={17} strokeWidth={2} />
+                  <ArrowUpRight
+                    size={17}
+                    strokeWidth={2}
+                  />
                 </div>
 
                 {/* CARD CONTENT */}

@@ -30,7 +30,7 @@ export default function PlywoodLaminatesHero() {
           <span className="text-gray-300">/</span>
 
           <span className="font-medium text-gray-900">
-            Lighting & Fans
+            Kitchen
           </span>
         </nav>
       </div>
@@ -64,7 +64,7 @@ export default function PlywoodLaminatesHero() {
 
             <div className="absolute inset-0 lg:hidden">
               <Image
-                src="https://images.unsplash.com/photo-1718221621618-e477ce33485a?q=80&w=1189&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src="https://images.unsplash.com/photo-1588854337236-6889d631faa8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority
@@ -159,7 +159,7 @@ export default function PlywoodLaminatesHero() {
                       sm:text-xs
                     "
                   >
-                    Explore Plywood & Laminates
+                    EXPLORE MODERN KITCHENS
                   </span>
                 </div>
 
@@ -181,7 +181,7 @@ export default function PlywoodLaminatesHero() {
                     xl:text-[58px]
                   "
                 >
-                  Eyecatching Light.
+                  Beautiful Kitchens.
                   <br />
 
                   <span
@@ -190,7 +190,7 @@ export default function PlywoodLaminatesHero() {
                       lg:text-[rgb(207,0,6)]
                     "
                   >
-                    Effortless Comfort.
+                    Made for Living.
                   </span>
                 </h1>
 
@@ -210,7 +210,7 @@ export default function PlywoodLaminatesHero() {
                     lg:text-gray-600
                   "
                 >
-                  From elegant lighting to high-performance fans, discover products designed to brighten your spaces and bring lasting comfort to modern interiors.
+                  From modern kitchen essentials to smart storage solutions, discover thoughtfully designed products that bring style, functionality and comfort to everyday cooking spaces.
                 </p>
 
                 {/* =================================================
@@ -302,7 +302,7 @@ export default function PlywoodLaminatesHero() {
               "
             >
               <Image
-                src="https://images.unsplash.com/photo-1718221621618-e477ce33485a?q=80&w=1189&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src="https://images.unsplash.com/photo-1588854337236-6889d631faa8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority

@@ -6,29 +6,29 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Vetrified Tiles",
-    description: "Strong, elegant surfaces for modern spaces",
+    name: "Living Room",
+    description: "Stylish comfort for modern living spaces.",
     image:
-      "https://s.alicdn.com/%40sc04/kf/H02918150098840729e1bd5b7259af1fbF/60x60-Low-Rate-for-Anti-dumping-Duty-to-Pakistan-Porcelanato-Polished-Vitrified-Interior-Tiles.jpg",
+      "https://static.vecteezy.com/system/resources/previews/048/161/962/non_2x/white-sofa-with-wooden-legs-isolated-on-white-background-free-photo.jpg",
 
     // Updated route
-    href: "/products/items/tiles/vetrified",
+    href: "/products/items/sofa-dining/living-room",
   },
   {
     id: 2,
-    name: "Ceramic Tiles",
-    description: "Durable and versatile tiles for stylish interiors",
+    name: "Dining",
+    description: "Elegant furniture for memorable meals.",
     image:
-      "https://98eda87788a287f6d084.cdn6.editmysite.com/uploads/b/98eda87788a287f6d0840d09cd1bee28c3a25ecfec22000db28f2dee86413fc2/2025-09-25_15-38-37_1758829147.png?optimize=medium&width=2400",
-    href: "/products/items/tiles/ceramic",
+      "https://images.unsplash.com/photo-1602872030490-4a484a7b3ba6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/sofa-dining/dining",
   },
   {
     id: 3,
-    name: "Laminate Flooring",
-    description: "Warm wood-look flooring for contemporary interiors",
+    name: "Furniture",
+    description: "Thoughtfully designed pieces for every space.",
     image:
-      "https://media.diy.com/is/image/Kingfisher/3-strip-wood-planks-oak-effect-smooth-straight-laminate-flooring-3-003m-~3663602997436_02bq?%24MOB_PREV%24=&%24height=600&%24width=600",
-    href: "/products/items/tiles/flooring",
+      "https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/sofa-dining/furniture",
   },
 ];
 
@@ -66,7 +66,7 @@ export default function TopCategories() {
               lg:text-5xl
             "
           >
-            Explore Our Range of Tiles
+            Shop Top Furniture Categories
           </h2>
 
           <p
@@ -80,9 +80,7 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore quality floor tiles, wall tiles and premium surface finishes
-            for living rooms, kitchens, bathrooms, balconies and modern interior
-            spaces.
+            Explore stylish sofas, dining sets and thoughtfully designed furniture for living rooms, dining spaces and modern homes.
           </p>
         </div>
 
@@ -90,18 +88,13 @@ export default function TopCategories() {
 
         <div
           className="
-            mx-auto
-    grid
-    w-full
-    max-w-6xl
-
-    grid-cols-3
-    gap-3
-
-    sm:gap-5
-
-    md:grid-cols-3
-    lg:grid-cols-3
+            grid
+            grid-cols-3
+            gap-3
+            sm:gap-5
+            md:grid-cols-3
+            lg:grid-cols-3
+            justify-center
           "
         >
           {categories.map((category) => (
@@ -190,7 +183,10 @@ export default function TopCategories() {
                     group-hover:opacity-100
                   "
                 >
-                  <ArrowUpRight size={17} strokeWidth={2} />
+                  <ArrowUpRight
+                    size={17}
+                    strokeWidth={2}
+                  />
                 </div>
 
                 {/* CARD CONTENT */}

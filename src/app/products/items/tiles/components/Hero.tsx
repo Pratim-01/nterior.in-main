@@ -64,7 +64,7 @@ export default function PlywoodLaminatesHero() {
 
             <div className="absolute inset-0 lg:hidden">
               <Image
-                src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d"
+                src="https://images.unsplash.com/photo-1682888818704-6dc91e9d7532?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority
@@ -302,7 +302,7 @@ export default function PlywoodLaminatesHero() {
               "
             >
               <Image
-                src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d"
+                src="https://images.unsplash.com/photo-1682888818704-6dc91e9d7532?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority
