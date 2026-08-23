@@ -59,7 +59,6 @@ import Stores from "./components/Stores";
 import WhyShopWithUs from "./components/WhyShopWithUs";
 import ContactUs from "./components/ContactUs";
 import NoProductsFound from "./components/NoProductsFound";
-import KayapalatProducts from "./components/KayapalatProducts";
 
 type ProductsPageProps = {
   searchParams: Promise<{
@@ -107,7 +106,6 @@ export default async function ProductsPage({
 
       <WhyShopWithUs />
 
-      <KayapalatProducts />
     </main>
   );
 }
