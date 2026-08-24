@@ -30,7 +30,7 @@ export default function PlywoodLaminatesHero() {
           <span className="text-gray-300">/</span>
 
           <span className="font-medium text-gray-900">
-            Lighting & Fans
+            Plumbing
           </span>
         </nav>
       </div>
@@ -64,7 +64,7 @@ export default function PlywoodLaminatesHero() {
 
             <div className="absolute inset-0 lg:hidden">
               <Image
-                src="https://images.unsplash.com/photo-1718221621618-e477ce33485a?q=80&w=1189&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src="https://images.unsplash.com/photo-1454988501794-2992f706932e?q=80&w=1174&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority
@@ -159,7 +159,7 @@ export default function PlywoodLaminatesHero() {
                       sm:text-xs
                     "
                   >
-                    Explore Lights & Accessories
+                    Explore Plumbing Accessories
                   </span>
                 </div>
 
@@ -181,7 +181,7 @@ export default function PlywoodLaminatesHero() {
                     xl:text-[58px]
                   "
                 >
-                  Eyecatching Light.
+                  Smart Fittings.
                   <br />
 
                   <span
@@ -190,7 +190,7 @@ export default function PlywoodLaminatesHero() {
                       lg:text-[rgb(207,0,6)]
                     "
                   >
-                    Effortless Comfort.
+                    Reliable Solutions.
                   </span>
                 </h1>
 
@@ -210,7 +210,7 @@ export default function PlywoodLaminatesHero() {
                     lg:text-gray-600
                   "
                 >
-                  From elegant lighting to high-performance fans, discover products designed to brighten your spaces and bring lasting comfort to modern interiors.
+                  Discover quality plumbing accessories designed for easy installation, dependable performance and efficient everyday use.
                 </p>
 
                 {/* =================================================
@@ -302,7 +302,7 @@ export default function PlywoodLaminatesHero() {
               "
             >
               <Image
-                src="https://images.unsplash.com/photo-1718221621618-e477ce33485a?q=80&w=1189&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src="https://images.unsplash.com/photo-1454988501794-2992f706932e?q=80&w=1174&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Modern interior featuring plywood cabinetry and laminate finishes"
                 fill
                 priority
