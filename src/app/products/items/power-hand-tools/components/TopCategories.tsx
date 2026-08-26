@@ -6,53 +6,53 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Fan",
+    name: "Power Tools",
     // description: "Stylish airflow for everyday comfort",
     image:
-      "https://images.unsplash.com/photo-1555470100-1728256970aa?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1540103711724-ebf833bde8d1?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/plywood-blockboards/plywood",
+    href: "/products/items/power-hand-tools/power-tools",
   },
   {
     id: 2,
-    name: "Decorative Lights",
+    name: "Hand Tools",
     // description: "Elegant lighting with character",
     image:
-      "https://images.unsplash.com/photo-1475783006851-1d68dd683eff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/laminates",
+      "https://images.unsplash.com/photo-1645639554326-6d738cf1695b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/power-hand-tools/hard-tools",
   },
   {
     id: 3,
-    name: "Celling Lights",
+    name: "Kitchenware",
     // description: "Modern lighting for bright spaces",
     image:
-      "https://images.unsplash.com/photo-1763060722627-e06bfa20faaf?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/eng-board",
+      "https://images.unsplash.com/photo-1547822050-fbb922ea9438?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/power-hand-tools/kitchenware",
   },
   {
     id: 4,
-    name: "Light Bulbs",
+    name: "Garden Tools",
     // description: "Efficient everyday illumination",
     image:
-      "https://images.unsplash.com/photo-1738512500209-c4be6b0e897c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1597764983031-60a74afb8692?q=80&w=1331&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/power-hand-tools/garden-tools",
   },
   {
     id: 5,
-    name: "Outdoor Lighting",
+    name: "House Hold Cleaning",
     // description: "Durable lighting for outdoor spaces",
     image:
-      "https://images.unsplash.com/photo-1735387155003-6982cc42c79b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1626379481874-3dc5678fa8ca?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/power-hand-tools/house-cleaning",
   },
   {
     id: 6,
-    name: "Lighting Accessories",
+    name: "Safety Equipment",
     // description: "Essentials for complete lighting setups",
     image:
-      "https://images.unsplash.com/photo-1579271346045-f518099813c3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1567954970774-58d6aa6c50dc?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/power-hand-tools/equipment",
   },
 ];
 
@@ -90,7 +90,7 @@ export default function TopCategories() {
               lg:text-5xl
             "
           >
-            Shop Lighting & Fans
+            Shop Tools & Essentials
           </h2>
 
           <p
@@ -104,7 +104,7 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore stylish lighting, ceiling fans and modern fixtures designed for living rooms, bedrooms, kitchens and contemporary interior spaces.
+            Explore power and hand tools, garden equipment, kitchenware, safety essentials, cleaning products and everyday household solutions for work and home.
           </p>
         </div>
 

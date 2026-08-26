@@ -6,53 +6,53 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Fan",
+    name: "Undercoats",
     // description: "Stylish airflow for everyday comfort",
     image:
-      "https://images.unsplash.com/photo-1555470100-1728256970aa?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1657186593846-8d3e67155468?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/plywood-blockboards/plywood",
+    href: "/products/items/paints/undercoats",
   },
   {
     id: 2,
-    name: "Decorative Lights",
+    name: "Waterproofing",
     // description: "Elegant lighting with character",
     image:
-      "https://images.unsplash.com/photo-1475783006851-1d68dd683eff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/laminates",
+      "https://images.unsplash.com/photo-1674485127842-7b63ac41db8c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/paints/waterproofing",
   },
   {
     id: 3,
-    name: "Celling Lights",
+    name: "Interior Paints",
     // description: "Modern lighting for bright spaces",
     image:
-      "https://images.unsplash.com/photo-1763060722627-e06bfa20faaf?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/eng-board",
+      "https://images.unsplash.com/photo-1599619585752-c3edb42a414c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/paints/interior-paints",
   },
   {
     id: 4,
-    name: "Light Bulbs",
+    name: "Wood Coating",
     // description: "Efficient everyday illumination",
     image:
-      "https://images.unsplash.com/photo-1738512500209-c4be6b0e897c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1768425232861-692518d7a8de?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/paints/wood-coating",
   },
   {
     id: 5,
-    name: "Outdoor Lighting",
+    name: "Paint Tools",
     // description: "Durable lighting for outdoor spaces",
     image:
-      "https://images.unsplash.com/photo-1735387155003-6982cc42c79b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1605201470550-f107ba6fdad3?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/paints/paint-tools",
   },
   {
     id: 6,
-    name: "Lighting Accessories",
+    name: "Tapes",
     // description: "Essentials for complete lighting setups",
     image:
-      "https://images.unsplash.com/photo-1579271346045-f518099813c3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1731575131336-9756ecd34dbc?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/paints/tapes",
   },
 ];
 
@@ -90,7 +90,7 @@ export default function TopCategories() {
               lg:text-5xl
             "
           >
-            Shop Lighting & Fans
+            Shop Paints & Finishes
           </h2>
 
           <p
@@ -104,7 +104,7 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore stylish lighting, ceiling fans and modern fixtures designed for living rooms, bedrooms, kitchens and contemporary interior spaces.
+            Explore paints, primers, waterproofing solutions, wood and metal coatings, colorants, sealants and essential tools for every painting and finishing project.
           </p>
         </div>
 

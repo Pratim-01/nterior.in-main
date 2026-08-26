@@ -6,53 +6,53 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Fan",
+    name: "Switches & Sockets",
     // description: "Stylish airflow for everyday comfort",
     image:
-      "https://images.unsplash.com/photo-1555470100-1728256970aa?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1698768144235-b5dbe3043bb2?q=80&w=1059&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/plywood-blockboards/plywood",
+    href: "/products/items/electricals/switch-sockets",
   },
   {
     id: 2,
-    name: "Decorative Lights",
+    name: "Circuit Breakers",
     // description: "Elegant lighting with character",
     image:
-      "https://images.unsplash.com/photo-1475783006851-1d68dd683eff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/laminates",
+      "https://images.unsplash.com/photo-1576446470246-499c738d1c8e?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/electricals/circuit",
   },
   {
     id: 3,
-    name: "Celling Lights",
+    name: "Electrical Tools & Accessories",
     // description: "Modern lighting for bright spaces",
     image:
-      "https://images.unsplash.com/photo-1763060722627-e06bfa20faaf?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/eng-board",
+      "https://images.unsplash.com/photo-1565049981953-379c9c2a5d48?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/electricals/e-tool-accessories",
   },
   {
     id: 4,
-    name: "Light Bulbs",
+    name: "Wires & Cables",
     // description: "Efficient everyday illumination",
     image:
-      "https://images.unsplash.com/photo-1738512500209-c4be6b0e897c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1764866085369-44c7ef1a18f3?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/electricals/wire-cables",
   },
   {
     id: 5,
-    name: "Outdoor Lighting",
+    name: "Conduit, Boxes & Fitting",
     // description: "Durable lighting for outdoor spaces",
     image:
-      "https://images.unsplash.com/photo-1735387155003-6982cc42c79b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1562034037-ba96b6312a80?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/electricals/conduit",
   },
   {
     id: 6,
-    name: "Lighting Accessories",
+    name: "Batteries & Torch",
     // description: "Essentials for complete lighting setups",
     image:
-      "https://images.unsplash.com/photo-1579271346045-f518099813c3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+      "https://images.unsplash.com/photo-1676337167752-2062c6ca7366?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/electricals/battery-torch",
   },
 ];
 
@@ -90,7 +90,7 @@ export default function TopCategories() {
               lg:text-5xl
             "
           >
-            Shop Lighting & Fans
+            Shop Electrical Essentials
           </h2>
 
           <p
@@ -104,7 +104,7 @@ export default function TopCategories() {
               sm:leading-7
             "
           >
-            Explore stylish lighting, ceiling fans and modern fixtures designed for living rooms, bedrooms, kitchens and contemporary interior spaces.
+            Explore switches and sockets, conduit fittings, circuit breakers, electrical accessories, power generation solutions, wires and cables, batteries, distribution boards and water heating essentials.
           </p>
         </div>
 

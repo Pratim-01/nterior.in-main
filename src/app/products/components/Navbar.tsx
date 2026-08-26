@@ -1319,7 +1319,7 @@ export default function Navbar() {
                                 </span>
                             </button>
 
-                            <button
+                            {/* <button
                                 type="button"
                                 aria-label="Wishlist"
                                 className="
@@ -1339,7 +1339,7 @@ export default function Navbar() {
                                 "
                             >
                                 <Heart size={20} />
-                            </button>
+                            </button> */}
 
                             <button
                                 type="button"
@@ -1863,7 +1863,7 @@ export default function Navbar() {
                             gap-1
                         "
                     >
-                        <button
+                        {/* <button
                             type="button"
                             aria-label="Wishlist"
                             className="
@@ -1879,7 +1879,7 @@ export default function Navbar() {
                             "
                         >
                             <Heart size={19} />
-                        </button>
+                        </button> */}
 
                         <button
                             type="button"
