@@ -1,13 +1,13 @@
 import Hero from "./components/Hero";
 import TopCategories from "./components/TopCategories";
-import FeaturedProducts from "./components/FeaturedProducts";
+import ProductListing from "../../listing/ProductListing";
 
-export default function PlywoodLaminatesPage() {
+export default function HardwarePage() {
   return (
     <main className="min-h-screen bg-white">
       <Hero />
       <TopCategories />
-      {/* <FeaturedProducts /> */}
+      <ProductListing category="Hardware" />
     </main>
   );
 }

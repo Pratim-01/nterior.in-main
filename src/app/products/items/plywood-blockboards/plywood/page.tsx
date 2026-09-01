@@ -1,4 +1,4 @@
-import ProductListing from "../components/ProductListing";
+import ProductListing from "../../../listing/ProductListing";
 
 export default function PlywoodPage() {
   return (
