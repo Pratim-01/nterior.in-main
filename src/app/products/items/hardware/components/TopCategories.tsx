@@ -12,7 +12,7 @@ const categories = [
       "https://images.unsplash.com/photo-1771908997880-72668985bb69?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/plywood-blockboards/plywood",
+    href: "/products/items/hardware/door-hardware",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const categories = [
     // description: "Elegant lighting with character",
     image:
       "https://images.unsplash.com/photo-1613849925580-8ef3bc1cf219?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/laminates",
+    href: "/products/items/hardware/cabinet-hardware",
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const categories = [
     // description: "Modern lighting for bright spaces",
     image:
       "https://images.unsplash.com/photo-1742280879518-ada47b660ccd?q=80&w=1193&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/eng-board",
+    href: "/products/items/hardware/kitchen-hardware",
   },
   {
     id: 4,
@@ -36,7 +36,7 @@ const categories = [
     // description: "Efficient everyday illumination",
     image:
       "https://images.unsplash.com/photo-1731694406471-0e7c03cc46f8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+    href: "/products/items/hardware/other-hardware",
   },
   {
     id: 5,
@@ -44,7 +44,7 @@ const categories = [
     // description: "Durable lighting for outdoor spaces",
     image:
       "https://images.unsplash.com/photo-1602503874881-c97c18856ae6?q=80&w=1182&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+    href: "/products/items/hardware/safes",
   },
   {
     id: 6,
@@ -52,15 +52,7 @@ const categories = [
     // description: "Essentials for complete lighting setups",
     image:
       "https://images.unsplash.com/photo-1782290547071-7f66838af202?q=80&w=1509&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
-  },
-  {
-    id: 7,
-    name: "Curtain Hardware",
-    // description: "Essentials for complete lighting setups",
-    image:
-      "https://images.unsplash.com/photo-1757382642762-e990760796d8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+    href: "/products/items/hardware/glass-fittings",
   },
 ];
 

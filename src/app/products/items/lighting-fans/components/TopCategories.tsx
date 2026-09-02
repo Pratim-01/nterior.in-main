@@ -12,7 +12,7 @@ const categories = [
       "https://images.unsplash.com/photo-1555470100-1728256970aa?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/plywood-blockboards/plywood",
+    href: "/products/items/lighting-fans/fan",
   },
   {
     id: 2,
@@ -20,15 +20,15 @@ const categories = [
     // description: "Elegant lighting with character",
     image:
       "https://images.unsplash.com/photo-1475783006851-1d68dd683eff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/laminates",
+    href: "/products/items/lighting-fans/decorative-lights",
   },
   {
     id: 3,
-    name: "Celling Lights",
+    name: "Ceiling Lights",
     // description: "Modern lighting for bright spaces",
     image:
       "https://images.unsplash.com/photo-1763060722627-e06bfa20faaf?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/eng-board",
+    href: "/products/items/lighting-fans/ceiling-lights",
   },
   {
     id: 4,
@@ -36,7 +36,7 @@ const categories = [
     // description: "Efficient everyday illumination",
     image:
       "https://images.unsplash.com/photo-1738512500209-c4be6b0e897c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+    href: "/products/items/lighting-fans/light-bulbs",
   },
   {
     id: 5,
@@ -44,7 +44,7 @@ const categories = [
     // description: "Durable lighting for outdoor spaces",
     image:
       "https://images.unsplash.com/photo-1735387155003-6982cc42c79b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+    href: "/products/items/lighting-fans/outdoor-lighting",
   },
   {
     id: 6,
@@ -52,7 +52,7 @@ const categories = [
     // description: "Essentials for complete lighting setups",
     image:
       "https://images.unsplash.com/photo-1579271346045-f518099813c3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/plywood-laminates/adhesives",
+    href: "/products/items/lighting-fans/lighting-accessories",
   },
 ];
 

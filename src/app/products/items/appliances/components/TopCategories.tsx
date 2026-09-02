@@ -6,21 +6,37 @@ import { ArrowUpRight } from "lucide-react";
 const categories = [
   {
     id: 1,
-    name: "Kitchen Faucets",
-    description: "Stylish, durable fittings for everyday use.",
+    name: "Small Appliances",
+    description: "Compact appliances for everyday use.",
     image:
-      "https://images.unsplash.com/photo-1757787697646-e84d5490add1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1666871701015-6fab56ecd4c8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/kitchen/faucets",
+    href: "/products/items/appliances/small-appliances",
   },
   {
     id: 2,
-    name: "Kitchen Sinks",
-    description: "Stylish, durable fittings for everyday use.",
+    name: "Hobs & Chimneys",
+    description: "Efficient cooking and kitchen ventilation.",
     image:
-      "https://images.unsplash.com/photo-1661045327753-3f2a047d00a4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/kitchen/sinks",
+      "https://images.unsplash.com/photo-1728976224749-f50c07a48603?q=80&w=1333&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/appliances/hobs-and-chimneys",
+  },
+  {
+    id: 3,
+    name: "Water Treatment",
+    description: "Solutions for clean, safe water.",
+    image:
+      "https://images.unsplash.com/photo-1589986005992-68bc7aa343c2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/appliances/water-treatment",
+  },
+  {
+    id: 4,
+    name: "Large Appliances",
+    description: "Essential appliances for modern homes.",
+    image:
+      "https://images.unsplash.com/photo-1762341123870-d706f257a12e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    href: "/products/items/appliances/large-appliances",
   },
 ];
 
