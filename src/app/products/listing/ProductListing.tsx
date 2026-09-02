@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import type { FilterState } from "@/types/products";
+import type { BreadcrumbCrumb } from "@/lib/category-taxonomy";
 import { buildQueryString } from "@/lib/product-query-params";
 import { useProductUrlState } from "./useProductUrlState";
 import { useProducts } from "./useProducts";
@@ -24,6 +25,11 @@ type ProductListingProps = {
   category?: string;
   title?: string;
   description?: string;
+  /** Trail shown after "Home", matching the real navbar's wording (see
+   *  src/lib/category-taxonomy.ts). Falls back to a generic "Home /
+   *  Products / <title>" trail when omitted, e.g. on the catalogue-wide
+   *  listing where there's no single fixed category. */
+  breadcrumb?: BreadcrumbCrumb[];
 };
 
 /* =========================================================
@@ -75,6 +81,7 @@ function ProductListingContent({
   category,
   title,
   description,
+  breadcrumb,
 }: ProductListingProps) {
   const { filters, minPrice, maxPrice, sort, page, pageSize, update } =
     useProductUrlState();
@@ -179,8 +186,10 @@ function ProductListingContent({
           <Breadcrumb
             items={[
               { label: "Home", href: "/products" },
-              { label: "Products", href: "/products" },
-              { label: displayTitle },
+              ...(breadcrumb ?? [
+                { label: "Products", href: "/products" },
+                { label: displayTitle },
+              ]),
             ]}
           />
         </div>

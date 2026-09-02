@@ -1,13 +1,17 @@
 import Hero from "./components/Hero";
 import TopCategories from "./components/TopCategories";
 import ProductListing from "../../listing/ProductListing";
+import { getFolderBreadcrumb } from "@/lib/category-taxonomy";
 
 export default function SofaDiningPage() {
   return (
     <main className="min-h-screen bg-white">
       <Hero />
       <TopCategories />
-      <ProductListing category="Sofa Dining" />
+      <ProductListing
+        category="Sofa Dining"
+        breadcrumb={getFolderBreadcrumb("sofa-dining")}
+      />
     </main>
   );
 }
