@@ -12,7 +12,7 @@ const categories = [
       "https://s.alicdn.com/%40sc04/kf/H02918150098840729e1bd5b7259af1fbF/60x60-Low-Rate-for-Anti-dumping-Duty-to-Pakistan-Porcelanato-Polished-Vitrified-Interior-Tiles.jpg",
 
     // Updated route
-    href: "/products/items/tiles/vetrified",
+    href: "/products/items/tiles/vitrified-tiles",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const categories = [
     description: "Durable and versatile tiles for stylish interiors",
     image:
       "https://98eda87788a287f6d084.cdn6.editmysite.com/uploads/b/98eda87788a287f6d0840d09cd1bee28c3a25ecfec22000db28f2dee86413fc2/2025-09-25_15-38-37_1758829147.png?optimize=medium&width=2400",
-    href: "/products/items/tiles/ceramic",
+    href: "/products/items/tiles/ceramic-tiles",
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const categories = [
     description: "Warm wood-look flooring for contemporary interiors",
     image:
       "https://media.diy.com/is/image/Kingfisher/3-strip-wood-planks-oak-effect-smooth-straight-laminate-flooring-3-003m-~3663602997436_02bq?%24MOB_PREV%24=&%24height=600&%24width=600",
-    href: "/products/items/tiles/flooring",
+    href: "/products/items/tiles/laminate-flooring",
   },
 ];
 

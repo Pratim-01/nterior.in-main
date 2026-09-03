@@ -36,7 +36,7 @@ const categories = [
     // description: "Efficient everyday illumination",
     image:
       "https://images.unsplash.com/photo-1768425232861-692518d7a8de?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/paints/wood-coating",
+    href: "/products/items/paints/wood-coatings",
   },
   {
     id: 5,

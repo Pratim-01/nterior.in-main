@@ -12,7 +12,7 @@ const categories = [
       "https://images.unsplash.com/photo-1666871701015-6fab56ecd4c8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/appliances/small-appliances",
+    href: "/products/items/appliances/small-domestic-appliances",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const categories = [
     description: "Efficient cooking and kitchen ventilation.",
     image:
       "https://images.unsplash.com/photo-1728976224749-f50c07a48603?q=80&w=1333&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/appliances/hobs-and-chimneys",
+    href: "/products/items/appliances/hobs-and-chimney",
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ const categories = [
     description: "Essential appliances for modern homes.",
     image:
       "https://images.unsplash.com/photo-1762341123870-d706f257a12e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/appliances/large-appliances",
+    href: "/products/items/appliances/large-domestic-appliances",
   },
 ];
 

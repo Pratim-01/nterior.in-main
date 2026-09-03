@@ -1,26 +1,73 @@
+import { NAV_CATEGORIES } from "@/lib/product-navigation";
+
 /**
- * Turns a URL slug like "plywood", "sofa-dining", "switch-socket", or
- * "power-hand-tools" into the Title Case value expected in
- * `product_details.category` ("Plywood", "Sofa Dining", "Switch Socket",
- * "Power Hand Tools"). This is only a display/routing heuristic — it never
- * touches the database.
+ * Turns a display name like "Engineered Board" or "HDHMR HDF Board" into a
+ * URL-safe slug: lowercase, spaces/punctuation collapsed to single hyphens,
+ * no leading/trailing hyphens. Used to build links to a specific category
+ * or item (see getCategorySwitcher in category-taxonomy.ts) — the inverse
+ * of `slugToCategory` below.
+ */
+export function categoryToSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Every group name, column title, and leaf item in the real navbar
+ * taxonomy (src/lib/product-navigation.ts), keyed by its slug — built once
+ * at module load. This is what lets `slugToCategory` round-trip exact
+ * capitalization and acronyms ("HDHMR HDF Board", "uPVC" if it's ever
+ * added, etc.) automatically, without hand-maintaining an override for
+ * every single one.
+ */
+const TAXONOMY_NAME_BY_SLUG: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const group of NAV_CATEGORIES) {
+    map[categoryToSlug(group.name)] = group.name;
+    for (const column of group.columns) {
+      map[categoryToSlug(column.title)] = column.title;
+      for (const item of column.items) {
+        map[categoryToSlug(item)] = item;
+      }
+    }
+  }
+  return map;
+})();
+
+/**
+ * Manual slug → exact category name overrides. Use this for:
+ * - Shorter/friendlier aliases you want to also work (e.g. "eng-board" as
+ *   a shortcut for "Engineered Board").
+ * - A category that isn't in the navbar taxonomy at all and doesn't
+ *   follow simple Title Case.
  *
- * Used by every dynamic category/subcategory route in the app, so a
- * product's `category` value in MySQL just needs to be the Title Case
- * version of whatever slug you want it to appear under — no code changes
- * needed to add a new category or subcategory.
- *
- * If a real category name doesn't follow simple Title Case (e.g. "uPVC
- * Pipes"), add the slug → exact name mapping here rather than special-
- * casing it in any individual page.
+ * Anything in the navbar taxonomy already round-trips correctly on its
+ * own (see TAXONOMY_NAME_BY_SLUG above) — you only need an entry here for
+ * exceptions on top of that.
  */
 const CATEGORY_OVERRIDES: Record<string, string> = {
   "eng-board": "Engineered Board",
 };
 
+/**
+ * Turns a URL slug like "plywood", "sofa-dining", "hdhmr-hdf-board", or
+ * "power-hand-tools" into the value expected in `product_details.category`
+ * ("Plywood", "Sofa Dining", "HDHMR HDF Board", "Power Hand Tools"). This
+ * is only a display/routing heuristic — it never touches the database.
+ *
+ * Resolution order: manual overrides → known navbar taxonomy name (exact
+ * casing) → generic Title Case fallback for anything not in the taxonomy
+ * at all (e.g. a category you added straight to the database that isn't
+ * in the mega menu).
+ */
 export function slugToCategory(slug: string): string {
   const normalized = slug.toLowerCase();
+
   if (CATEGORY_OVERRIDES[normalized]) return CATEGORY_OVERRIDES[normalized];
+  if (TAXONOMY_NAME_BY_SLUG[normalized]) return TAXONOMY_NAME_BY_SLUG[normalized];
 
   return normalized
     .split("-")

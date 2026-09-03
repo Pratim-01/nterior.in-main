@@ -20,7 +20,7 @@ const categories = [
     // description: "Elegant lighting with character",
     image:
       "https://images.unsplash.com/photo-1645639554326-6d738cf1695b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/power-hand-tools/hard-tools",
+    href: "/products/items/power-hand-tools/hand-tools",
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ const categories = [
     // description: "Durable lighting for outdoor spaces",
     image:
       "https://images.unsplash.com/photo-1626379481874-3dc5678fa8ca?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/power-hand-tools/house-cleaning",
+    href: "/products/items/power-hand-tools/household-cleaning",
   },
   {
     id: 6,
@@ -52,7 +52,7 @@ const categories = [
     // description: "Essentials for complete lighting setups",
     image:
       "https://images.unsplash.com/photo-1567954970774-58d6aa6c50dc?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/power-hand-tools/equipment",
+    href: "/products/items/power-hand-tools/safety-equipment",
   },
 ];
 

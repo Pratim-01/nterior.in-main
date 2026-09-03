@@ -61,24 +61,40 @@ function FilterCheckbox({
   count,
   checked,
   onChange,
+  variant = "checkbox",
+  name,
 }: {
   label: string;
   count?: number;
   checked: boolean;
   onChange: () => void;
+  /** "radio" renders a single-select circular control (same visual
+   *  language as the checkbox) for groups where only one option can be
+   *  active at a time, e.g. the Category switcher on a column landing
+   *  page — selecting one sibling category should replace the current
+   *  selection rather than add to it. */
+  variant?: "checkbox" | "radio";
+  /** Shared `name` for a "radio" group so the browser treats the options
+   *  as one exclusive set (keyboard arrow-key navigation, correct
+   *  screen-reader "1 of N" announcements) — checked state is still fully
+   *  controlled by `checked`/`onChange`, this only affects native/AT
+   *  grouping behaviour. Unused for "checkbox". */
+  name?: string;
 }) {
   return (
     <label className="flex min-h-[25px] w-full cursor-pointer items-center gap-2 py-[2px] text-[12px] leading-[18px]">
       <input
-        type="checkbox"
+        type={variant}
+        name={variant === "radio" ? name : undefined}
         checked={checked}
         onChange={onChange}
-        className="
-          h-[15px] w-[15px] shrink-0 appearance-none rounded-[3px] border
+        className={`
+          h-[15px] w-[15px] shrink-0 appearance-none border
           border-gray-300 bg-white p-0 outline-none transition-all
           checked:border-[rgb(207,0,6)] checked:bg-[rgb(207,0,6)]
           focus:outline-none focus:ring-2 focus:ring-red-100 focus:ring-offset-0
-        "
+          ${variant === "radio" ? "rounded-full" : "rounded-[3px]"}
+        `}
       />
 
       <span className="min-w-0 flex-1 truncate text-gray-700">{label}</span>
@@ -102,10 +118,14 @@ function ExpandableList({
   options,
   selected,
   onToggle,
+  variant = "checkbox",
+  name,
 }: {
   options: FacetOption[];
   selected: string[];
   onToggle: (value: string) => void;
+  variant?: "checkbox" | "radio";
+  name?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? options : options.slice(0, INITIAL_VISIBLE);
@@ -124,6 +144,8 @@ function ExpandableList({
           count={opt.count}
           checked={selected.includes(opt.value)}
           onChange={() => onToggle(opt.value)}
+          variant={variant}
+          name={name}
         />
       ))}
 
@@ -310,8 +332,18 @@ export default function ProductFilters({
   onPriceChange,
   onClearAll,
   /** When the page is already scoped to a single category (e.g. a
-   *  category landing page), hide the redundant Category group. */
+   *  category landing page), hide the redundant Category group. Ignored
+   *  when `categoryOptions` is passed — that case still wants a (narrowed)
+   *  Category group so the visitor can switch between sibling categories. */
   hideCategory = false,
+  /** Restricts the Category group to a fixed, known set of sibling
+   *  category values (e.g. ["Plywood", "Blockboards"]) instead of the
+   *  full catalogue-wide `facets.category` list — used by category
+   *  landing pages that belong to one navbar column, so only categories
+   *  in that column are offered. Live counts are still pulled from
+   *  `facets.category` when available; a sibling with no matching
+   *  products yet simply shows a count of 0 rather than disappearing. */
+  categoryOptions,
   /** Used inside the mobile full-screen drawer, which already provides its
    *  own header, close button, and scroll container — drop the fixed
    *  250px desktop width, the card border, and the duplicate "Filters"
@@ -332,6 +364,7 @@ export default function ProductFilters({
    *  and only the second one wins, silently dropping the first. */
   onClearAll: () => void;
   hideCategory?: boolean;
+  categoryOptions?: string[];
   fullWidth?: boolean;
 }) {
   const hasActiveFilters =
@@ -348,21 +381,51 @@ export default function ProductFilters({
     onFilterChange({ ...filters, [key]: next });
   }
 
-  const groupOrder: FacetKey[] = hideCategory
-    ? ["brand", "productType"]
-    : ["category", "brand", "productType"];
+  // The Category group on a column landing page (categoryOptions set) is
+  // single-select: picking "Blockboards" should show Blockboards, not
+  // Plywood + Blockboards together. Clicking the already-selected option
+  // is a no-op rather than deselecting it, so the page never ends up with
+  // nothing chosen.
+  function selectSingleCategory(value: string) {
+    onFilterChange({ ...filters, category: [value] });
+  }
+
+  const showCategory = Boolean(categoryOptions) || !hideCategory;
+  const groupOrder: FacetKey[] = showCategory
+    ? ["category", "brand", "productType"]
+    : ["brand", "productType"];
 
   const filterGroups = (
     <>
       {groupOrder.map((key) => {
-        const options = facets?.[key] ?? [];
+        // A category landing page tied to one navbar column (e.g.
+        // "Plywood & Blockboard") gets a fixed, known option list — its
+        // siblings in that column — rather than every category value in
+        // the whole catalogue. Counts still come from the live facet data
+        // when available; a sibling with 0 matching products keeps its
+        // spot instead of disappearing, since the set of columns is fixed
+        // regardless of current stock.
+        const options: FacetOption[] =
+          key === "category" && categoryOptions
+            ? categoryOptions.map((name) => ({
+                value: name,
+                label: name,
+                count: facets?.category.find((o) => o.value === name)?.count ?? 0,
+              }))
+            : facets?.[key] ?? [];
+
         if (facets && options.length === 0) return null;
+
+        const isSingleSelectCategory = key === "category" && Boolean(categoryOptions);
+
         return (
           <FilterSection key={key} title={FACET_LABELS[key]} collapsible={key !== "category"}>
             <ExpandableList
               options={options}
               selected={filters[key]}
-              onToggle={(v) => toggle(key, v)}
+              onToggle={isSingleSelectCategory ? selectSingleCategory : (v) => toggle(key, v)}
+              variant={isSingleSelectCategory ? "radio" : "checkbox"}
+              name={isSingleSelectCategory ? "category-filter" : undefined}
             />
           </FilterSection>
         );

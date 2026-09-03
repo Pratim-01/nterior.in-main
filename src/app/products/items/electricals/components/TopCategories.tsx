@@ -12,7 +12,7 @@ const categories = [
       "https://images.unsplash.com/photo-1698768144235-b5dbe3043bb2?q=80&w=1059&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/electricals/switch-sockets",
+    href: "/products/items/electricals/switches-and-sockets",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const categories = [
     // description: "Elegant lighting with character",
     image:
       "https://images.unsplash.com/photo-1576446470246-499c738d1c8e?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/electricals/circuit",
+    href: "/products/items/electricals/circuit-breakers",
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const categories = [
     // description: "Modern lighting for bright spaces",
     image:
       "https://images.unsplash.com/photo-1565049981953-379c9c2a5d48?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/electricals/e-tool-accessories",
+    href: "/products/items/electricals/electrical-tools-and-accessories",
   },
   {
     id: 4,
@@ -36,7 +36,7 @@ const categories = [
     // description: "Efficient everyday illumination",
     image:
       "https://images.unsplash.com/photo-1764866085369-44c7ef1a18f3?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/electricals/wire-cables",
+    href: "/products/items/electricals/wires-and-cables",
   },
   {
     id: 5,
@@ -44,7 +44,7 @@ const categories = [
     // description: "Durable lighting for outdoor spaces",
     image:
       "https://images.unsplash.com/photo-1562034037-ba96b6312a80?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/electricals/conduit",
+    href: "/products/items/electricals/conduit-boxes-and-fitting",
   },
   {
     id: 6,
@@ -52,7 +52,7 @@ const categories = [
     // description: "Essentials for complete lighting setups",
     image:
       "https://images.unsplash.com/photo-1676337167752-2062c6ca7366?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/electricals/battery-torch",
+    href: "/products/items/electricals/batteries-and-torch",
   },
 ];
 

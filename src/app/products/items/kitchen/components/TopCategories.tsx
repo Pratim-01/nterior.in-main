@@ -12,7 +12,7 @@ const categories = [
       "https://images.unsplash.com/photo-1757787697646-e84d5490add1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 
     // Updated route
-    href: "/products/items/kitchen/faucets",
+    href: "/products/items/kitchen/kitchen-faucets",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const categories = [
     description: "Stylish, durable fittings for everyday use.",
     image:
       "https://images.unsplash.com/photo-1661045327753-3f2a047d00a4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/kitchen/sinks",
+    href: "/products/items/kitchen/kitchen-sinks",
   },
 ];
 

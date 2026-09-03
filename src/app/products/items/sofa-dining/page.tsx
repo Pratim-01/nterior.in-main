@@ -1,7 +1,7 @@
 import Hero from "./components/Hero";
 import TopCategories from "./components/TopCategories";
 import ProductListing from "../../listing/ProductListing";
-import { getFolderBreadcrumb } from "@/lib/category-taxonomy";
+import { getColumnCategories, getFolderBreadcrumb } from "@/lib/category-taxonomy";
 
 export default function SofaDiningPage() {
   return (
@@ -11,6 +11,7 @@ export default function SofaDiningPage() {
       <ProductListing
         category="Sofa Dining"
         breadcrumb={getFolderBreadcrumb("sofa-dining")}
+        categoryOptions={getColumnCategories("sofa-dining", "Sofa Dining")}
       />
     </main>
   );

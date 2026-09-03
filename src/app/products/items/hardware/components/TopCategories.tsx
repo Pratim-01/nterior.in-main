@@ -52,7 +52,7 @@ const categories = [
     // description: "Essentials for complete lighting setups",
     image:
       "https://images.unsplash.com/photo-1782290547071-7f66838af202?q=80&w=1509&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/hardware/glass-fittings",
+    href: "/products/items/hardware/glass-fittings-and-hardware",
   },
 ];
 

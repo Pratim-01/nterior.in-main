@@ -30,6 +30,15 @@ type ProductListingProps = {
    *  Products / <title>" trail when omitted, e.g. on the catalogue-wide
    *  listing where there's no single fixed category. */
   breadcrumb?: BreadcrumbCrumb[];
+  /** Sibling category values from the same navbar column as `category`
+   *  (see `getColumnCategories` in src/lib/category-taxonomy.ts), e.g.
+   *  ["Plywood", "Blockboards"]. When set, `category` is only the
+   *  *default* selection rather than a hard lock: the filter sidebar
+   *  shows a Category group scoped to just these siblings, above Brand,
+   *  and the visitor can switch between them (or select more than one)
+   *  without leaving the page. Leave undefined for pages that should
+   *  stay locked to a single category. */
+  categoryOptions?: string[];
 };
 
 /* =========================================================
@@ -82,6 +91,7 @@ function ProductListingContent({
   title,
   description,
   breadcrumb,
+  categoryOptions,
 }: ProductListingProps) {
   const { filters, minPrice, maxPrice, sort, page, pageSize, update } =
     useProductUrlState();
@@ -91,10 +101,24 @@ function ProductListingContent({
   // over whatever is in the URL, so /products/plywood can never show
   // anything but Plywood, while still letting brand/size/thickness/grade/
   // price/sort/page vary freely via the query string.
-  const effectiveFilters: FilterState = useMemo(
-    () => (category ? { ...filters, category: [category] } : filters),
-    [filters, category]
-  );
+  //
+  // When `categoryOptions` is set, `category` is only a *default* — the
+  // visitor picks exactly one sibling from `categoryOptions` via the
+  // single-select Category group instead (see ProductFilters). Only the
+  // first valid, in-column value from the URL is kept (guards against a
+  // stray multi-value ?category= from elsewhere or an older link), and no
+  // valid selection falls back to the page's own default category rather
+  // than silently expanding to the entire catalogue.
+  const effectiveFilters: FilterState = useMemo(() => {
+    if (categoryOptions && categoryOptions.length > 0) {
+      const selected = filters.category.find((c) => categoryOptions.includes(c));
+      return {
+        ...filters,
+        category: selected ? [selected] : category ? [category] : [categoryOptions[0]],
+      };
+    }
+    return category ? { ...filters, category: [category] } : filters;
+  }, [filters, category, categoryOptions]);
 
   const queryString = useMemo(
     () =>
@@ -137,12 +161,13 @@ function ProductListingContent({
       (sum, key) => sum + filters[key].length,
       0
     ) +
-    (category ? 0 : filters.category.length) +
+    (category && !categoryOptions ? 0 : filters.category.length) +
     (minPrice !== null ? 1 : 0) +
     (maxPrice !== null ? 1 : 0);
 
   function handleFilterChange(next: FilterState) {
-    update({ filters: category ? { ...next, category: [category] } : next, page: 1 });
+    const nextFilters = category && !categoryOptions ? { ...next, category: [category] } : next;
+    update({ filters: nextFilters, page: 1 });
   }
 
   function handlePriceChange(next: { minPrice: number | null; maxPrice: number | null }) {
@@ -175,8 +200,18 @@ function ProductListingContent({
   const totalPages = pagination?.totalPages ?? 1;
   const safeCurrentPage = pagination?.page ?? page;
 
-  const displayTitle =
-    title ?? category ?? (filters.category.length === 1 ? filters.category[0] : "All Products");
+  // On a column landing page (categoryOptions set), switching to a
+  // sibling category should update the heading to match what's actually
+  // showing — the static `title` prop was written for the page's default
+  // category and would otherwise go stale the moment the visitor picks a
+  // different sibling.
+  const isDefaultCategorySelection =
+    !categoryOptions ||
+    (category ? effectiveFilters.category.length === 1 && effectiveFilters.category[0] === category : false);
+
+  const displayTitle = isDefaultCategorySelection
+    ? title ?? category ?? (filters.category.length === 1 ? filters.category[0] : "All Products")
+    : effectiveFilters.category.join(" & ");
 
   return (
     <main className="min-h-screen w-full bg-white">
@@ -250,6 +285,7 @@ function ProductListingContent({
                 onPriceChange={handlePriceChange}
                 onClearAll={clearAllFilters}
                 hideCategory={Boolean(category)}
+                categoryOptions={categoryOptions}
               />
             </div>
           </div>
@@ -288,6 +324,7 @@ function ProductListingContent({
                     onPriceChange={handlePriceChange}
                     onClearAll={clearAllFilters}
                     hideCategory={Boolean(category)}
+                    categoryOptions={categoryOptions}
                     fullWidth
                   />
                 </div>

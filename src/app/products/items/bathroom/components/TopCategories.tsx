@@ -28,7 +28,7 @@ const categories = [
     description: "Reliable parts for lasting performance",
     image:
       "https://images.unsplash.com/photo-1689893265427-d7da200eff05?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/bathroom/spares-fittings",
+    href: "/products/items/bathroom/spares-and-fittings",
   },
   {
     id: 4,
@@ -36,7 +36,7 @@ const categories = [
     description: "Essential tools for bathroom projects",
     image:
       "https://images.unsplash.com/photo-1737372805905-be0b91ec86fb?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    href: "/products/items/bathroom/tiles-tools-accessories",
+    href: "/products/items/bathroom/tiles-tools-and-accessories",
   },
 ];
 

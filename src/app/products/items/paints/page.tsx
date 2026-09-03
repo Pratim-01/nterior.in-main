@@ -1,7 +1,7 @@
 import Hero from "./components/Hero";
 import TopCategories from "./components/TopCategories";
 import ProductListing from "../../listing/ProductListing";
-import { getFolderBreadcrumb } from "@/lib/category-taxonomy";
+import { getColumnCategories, getFolderBreadcrumb } from "@/lib/category-taxonomy";
 
 export default function PaintsPage() {
   return (
@@ -11,6 +11,7 @@ export default function PaintsPage() {
       <ProductListing
         category="Paints"
         breadcrumb={getFolderBreadcrumb("paints")}
+        categoryOptions={getColumnCategories("paints", "Paints")}
       />
     </main>
   );
