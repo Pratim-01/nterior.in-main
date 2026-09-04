@@ -365,6 +365,8 @@ function ProductListingContent({
                   products={products}
                   isLoading={isLoading}
                   hasLoadedOnce={data !== null}
+                  category={displayTitle}
+                  hasActiveFilters={activeFilterCount > 0}
                   onClearFilters={clearAllFilters}
                 />
 

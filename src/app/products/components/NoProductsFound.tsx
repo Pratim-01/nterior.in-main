@@ -1,347 +1,120 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-    ArrowLeft,
-    ArrowRight,
-    SearchX,
-    ShoppingBag,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, SlidersHorizontal, Search } from "lucide-react";
 
 type NoProductsFoundProps = {
-    category?: string;
+  /** Category / page context to show, e.g. "Plywood" or "Gas Stove". */
+  category?: string;
+  /** True when the empty result is caused by the visitor's own filter
+   *  selection (brand/size/price/etc.) rather than the category itself
+   *  having no catalogue yet — swaps in filter-specific copy and gives a
+   *  working "Clear filters" action instead of just "Go back". */
+  hasActiveFilters?: boolean;
+  /** Clears every active filter in one step. Required to show the "Clear
+   *  filters" action — without it, only "Go back" / "Browse all products"
+   *  are shown. */
+  onClearFilters?: () => void;
 };
 
+// Three empty "shelf slots" shaped exactly like a real ProductCard
+// (src/app/products/listing/ProductCard.tsx) — same radius, same border
+// color — so the empty state reads as "this shelf has nothing on it yet"
+// rather than a generic system icon unrelated to what's missing. Fades in
+// once on mount; reduced-motion visitors see it appear instantly instead.
+function EmptyShelf() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  return (
+    <div
+      aria-hidden="true"
+      className={`mb-8 flex items-end justify-center gap-3 transition-opacity duration-500 motion-reduce:duration-0 ${
+        mounted ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div className="h-[88px] w-[64px] rounded-[10px] border-2 border-dashed border-[#e2e2e2] bg-[#fafafa] opacity-70 sm:h-[104px] sm:w-[76px]" />
+
+      <div className="flex h-[112px] w-[80px] items-center justify-center rounded-[10px] border-2 border-dashed border-[rgb(207,0,6)]/35 bg-[#fbeae6] sm:h-[132px] sm:w-[96px]">
+        <Search size={26} strokeWidth={1.75} className="text-[rgb(207,0,6)]" />
+      </div>
+
+      <div className="h-[88px] w-[64px] rounded-[10px] border-2 border-dashed border-[#e2e2e2] bg-[#fafafa] opacity-70 sm:h-[104px] sm:w-[76px]" />
+    </div>
+  );
+}
+
 export default function NoProductsFound({
-    category,
+  category,
+  hasActiveFilters = false,
+  onClearFilters,
 }: NoProductsFoundProps) {
-    const router = useRouter();
+  const router = useRouter();
 
-    return (
-        <section className="w-full px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
-            <div
-                className="
-                    relative
-                    mx-auto
-                    flex
-                    w-full
-                    max-w-4xl
-                    flex-col
-                    items-center
-                    overflow-hidden
-                    rounded-3xl
-                    border
-                    border-gray-100
-                    bg-white
-                    px-5
-                    py-10
-                    text-center
-                    shadow-[0_12px_40px_rgba(24,34,53,0.07)]
-                    sm:px-10
-                    sm:py-14
-                "
+  const heading = hasActiveFilters
+    ? "No products match your filters"
+    : "No products found";
+
+  const description = hasActiveFilters
+    ? category
+      ? `None of the ${category} products match your current filters.`
+      : "None of the products match your current filters."
+    : category
+      ? `We're still adding ${category} to our catalogue. Check back soon.`
+      : "We couldn't find any products here right now. Check back soon.";
+
+  const showClearFilters = hasActiveFilters && Boolean(onClearFilters);
+
+  return (
+    <section className="flex w-full items-center justify-center px-4 py-14 sm:px-6 sm:py-0">
+      <div className="flex w-full max-w-md flex-col items-center text-center">
+        <EmptyShelf />
+
+        {category && (
+          <span className="mb-4 inline-flex max-w-full items-center truncate rounded-full border border-[#dedede] bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#27304a]">
+            {category}
+          </span>
+        )}
+
+        <h1 className="text-2xl font-bold tracking-tight text-[#111827] sm:text-[26px]">
+          {heading}
+        </h1>
+
+        <p className="mx-auto mt-3 max-w-xs text-[15px] leading-relaxed text-[#4b5563]">
+          {description}
+        </p>
+
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+          {showClearFilters ? (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[rgb(207,0,6)] px-6 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[rgb(170,0,5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(207,0,6)]"
             >
-                {/* Decorative gradient */}
+              <SlidersHorizontal size={15} />
+              Clear filters
+            </button>
+          ) : (
+            <Link
+              href="/products"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[rgb(207,0,6)] px-6 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[rgb(170,0,5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(207,0,6)]"
+            >
+              Go to home
+            </Link>
+          )}
 
-                <div
-                    className="
-                        pointer-events-none
-                        absolute
-                        left-1/2
-                        top-0
-                        h-1
-                        w-32
-                        -translate-x-1/2
-                        rounded-b-full
-                        bg-gradient-to-r
-                        from-[rgb(255,170,0)]
-                        to-[rgb(207,0,6)]
-                    "
-                />
-
-                {/* Soft background decoration */}
-
-                <div
-                    className="
-                        pointer-events-none
-                        absolute
-                        -right-20
-                        -top-20
-                        h-48
-                        w-48
-                        rounded-full
-                        bg-orange-50
-                        opacity-70
-                        blur-3xl
-                    "
-                />
-
-                <div
-                    className="
-                        pointer-events-none
-                        absolute
-                        -bottom-20
-                        -left-20
-                        h-48
-                        w-48
-                        rounded-full
-                        bg-red-50
-                        opacity-60
-                        blur-3xl
-                    "
-                />
-
-                {/* Illustration */}
-
-                <div
-                    className="
-                        relative
-                        z-10
-                        mb-6
-                        flex
-                        h-20
-                        w-20
-                        items-center
-                        justify-center
-                        rounded-2xl
-                        border
-                        border-red-100
-                        bg-gradient-to-br
-                        from-red-50
-                        to-orange-50
-                        shadow-sm
-                    "
-                >
-                    <SearchX
-                        size={36}
-                        strokeWidth={1.7}
-                        className="text-[rgb(207,0,6)]"
-                    />
-
-                    <span
-                        className="
-                            absolute
-                            -right-1
-                            -top-1
-                            h-3
-                            w-3
-                            rounded-full
-                            bg-[rgb(255,170,0)]
-                            shadow-sm
-                        "
-                    />
-                </div>
-
-                {/* Small label */}
-
-                <span
-                    className="
-                        relative
-                        z-10
-                        mb-2
-                        text-[11px]
-                        font-bold
-                        uppercase
-                        tracking-[0.22em]
-                        text-[rgb(207,0,6)]
-                    "
-                >
-                    Product Search
-                </span>
-
-                {/* Heading */}
-
-                <h1
-                    className="
-                        relative
-                        z-10
-                        max-w-2xl
-                        text-2xl
-                        font-bold
-                        tracking-tight
-                        text-[#182235]
-                        sm:text-3xl
-                    "
-                >
-                    No products found
-                </h1>
-
-                {/* Category */}
-
-                {category && (
-                    <div
-                        className="
-                            relative
-                            z-10
-                            mt-3
-                            inline-flex
-                            max-w-full
-                            items-center
-                            rounded-full
-                            border
-                            border-orange-100
-                            bg-orange-50/60
-                            px-4
-                            py-1.5
-                        "
-                    >
-                        <span
-                            className="
-                                truncate
-                                text-sm
-                                font-semibold
-                                text-[#182235]
-                            "
-                        >
-                            {category}
-                        </span>
-                    </div>
-                )}
-
-                {/* Description */}
-
-                <p
-                    className="
-                        relative
-                        z-10
-                        mt-5
-                        max-w-xl
-                        text-sm
-                        leading-6
-                        text-gray-500
-                        sm:text-base
-                    "
-                >
-                    We couldn't find any products in this
-                    category right now. Try another
-                    category or browse all available
-                    products.
-                </p>
-
-                {/* Actions */}
-
-                <div
-                    className="
-                        relative
-                        z-10
-                        mt-8
-                        flex
-                        w-full
-                        flex-col
-                        items-center
-                        justify-center
-                        gap-3
-                        sm:w-auto
-                        sm:flex-row
-                    "
-                >
-                    {/* Browse products */}
-
-                    <Link
-                        href="/products"
-                        className="
-                            group
-                            inline-flex
-                            h-11
-                            w-full
-                            items-center
-                            justify-center
-                            gap-2
-                            rounded-full
-                            bg-gradient-to-r
-                            from-[rgb(255,170,0)]
-                            to-[rgb(207,0,6)]
-                            px-6
-                            text-sm
-                            font-bold
-                            text-white
-                            shadow-[0_8px_20px_rgba(207,0,6,0.18)]
-                            transition-all
-                            duration-200
-                            hover:-translate-y-0.5
-                            hover:shadow-[0_12px_25px_rgba(207,0,6,0.25)]
-                            sm:w-auto
-                        "
-                    >
-                        <ShoppingBag
-                            size={17}
-                        />
-
-                        Browse all products
-
-                        <ArrowRight
-                            size={16}
-                            className="
-                                transition-transform
-                                duration-200
-                                group-hover:translate-x-1
-                            "
-                        />
-                    </Link>
-
-                    {/* Back */}
-
-                    <button
-                        type="button"
-                        onClick={() => router.back()}
-                        className="
-                            inline-flex
-                            h-11
-                            w-full
-                            items-center
-                            justify-center
-                            gap-2
-                            rounded-full
-                            border
-                            border-gray-200
-                            bg-white
-                            px-6
-                            text-sm
-                            font-semibold
-                            text-[#182235]
-                            transition-all
-                            duration-200
-                            hover:border-gray-300
-                            hover:bg-gray-50
-                            sm:w-auto
-                        "
-                    >
-                        <ArrowLeft
-                            size={16}
-                        />
-
-                        Go back
-                    </button>
-                </div>
-
-                {/* Bottom hint */}
-
-                <div
-                    className="
-                        relative
-                        z-10
-                        mt-7
-                        flex
-                        items-center
-                        gap-2
-                        text-xs
-                        text-gray-400
-                    "
-                >
-                    <span
-                        className="
-                            h-1.5
-                            w-1.5
-                            rounded-full
-                            bg-[rgb(255,170,0)]
-                        "
-                    />
-
-                    More products are being added
-                        regularly.
-                </div>
-            </div>
-        </section>
-    );
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#dedede] bg-white px-6 text-sm font-semibold text-[#374151] transition-colors duration-150 hover:border-[#c7c7c7] hover:bg-[#fafafa] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9ca3af]"
+          >
+            <ArrowLeft size={15} />
+            Go back
+          </button>
+        </div>
+      </div>
+    </section>
+  );
 }

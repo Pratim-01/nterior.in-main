@@ -74,13 +74,19 @@ export default async function ProductsPage({
   const category = params.category;
 
   /*
-   * Show "No Products Found" when a category
-   * is selected from the navbar.
+   * Every real navbar leaf item (e.g. "Plywood", "LED Bulb", "Overhead
+   * Tank") now links straight to its own `/products/items/<folder>/...`
+   * listing page — see getLeafItemHref in lib/category-taxonomy.ts — which
+   * has its own heading, sort, filters, and empty state. This
+   * `/products?category=<name>` route only gets hit for a stray/unknown
+   * category name that isn't in the navbar taxonomy at all, so it just
+   * shows a plain "not found" message — no heading, sort, or filters to
+   * show for a category that doesn't really exist.
    *
    * Navbar and the 108px top spacing are already
    * handled by products/layout.tsx.
    */
-  if (category === "Ceramic Wall Tile") {
+  if (category) {
     return (
       <main className="min-h-screen overflow-x-hidden bg-white">
         <NoProductsFound category={category} />

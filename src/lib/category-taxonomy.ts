@@ -1,4 +1,5 @@
 import { NAV_CATEGORIES } from "@/lib/product-navigation";
+import { categoryToSlug } from "@/lib/category-slug";
 
 /**
  * Maps each `/products/items/<folder>` route to the breadcrumb trail that
@@ -39,6 +40,14 @@ interface FolderTaxonomy {
    *  "hardware" → "Hardware"); `plywood-blockboards` is the one exception,
    *  nested inside "Plywood & Laminates". */
   groupName: string;
+  /** Restricts this folder, for leaf-item routing (see
+   *  `LEAF_ITEM_TO_FOLDER` below), to ONLY these column titles within its
+   *  group — used for a folder that represents one specific column of a
+   *  bigger group (e.g. plywood-blockboards is the "Plywood & Blockboard"
+   *  column inside the "Plywood & Laminates" group). Leave undefined for a
+   *  folder that IS its whole group: it then claims every column not
+   *  already claimed by another folder's `claimedColumns`. */
+  claimedColumns?: string[];
 }
 
 export const FOLDER_TAXONOMY: Record<string, FolderTaxonomy> = {
@@ -115,6 +124,7 @@ export const FOLDER_TAXONOMY: Record<string, FolderTaxonomy> = {
     ],
     subcategoryAddsOwnCrumb: false,
     groupName: "Plywood & Laminates",
+    claimedColumns: ["Plywood & Blockboard"],
   },
 };
 
@@ -187,4 +197,72 @@ export function getFolderBreadcrumb(
   }
 
   return taxonomy.parentTrail;
+}
+
+/**
+ * Every leaf item in the navbar taxonomy, mapped to the folder slug whose
+ * `/products/items/<folder>/...` pages actually serve it — built once at
+ * module load from `FOLDER_TAXONOMY` + `NAV_CATEGORIES` so a new folder or
+ * a new item in an existing column is picked up automatically, with no
+ * per-item list to maintain by hand.
+ *
+ * Two passes handle folders that share a group (today, only
+ * "Plywood & Laminates" → `plywood-laminates` + `plywood-blockboards`):
+ * 1. Folders with `claimedColumns` grab exactly those columns first.
+ * 2. Every other folder for that group (the group's own default/catch-all
+ *    folder) picks up whatever columns are left.
+ */
+const LEAF_ITEM_TO_FOLDER: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  const claimed = new Set<string>(); // `${groupName}::${columnTitle}`
+
+  const folderEntries = Object.entries(FOLDER_TAXONOMY);
+
+  for (const [folderSlug, taxonomy] of folderEntries) {
+    if (!taxonomy.claimedColumns) continue;
+    const group = NAV_CATEGORIES.find((g) => g.name === taxonomy.groupName);
+    if (!group) continue;
+
+    for (const column of group.columns) {
+      if (!taxonomy.claimedColumns.includes(column.title)) continue;
+      claimed.add(`${taxonomy.groupName}::${column.title}`);
+      for (const item of column.items) map[item] = folderSlug;
+    }
+  }
+
+  for (const [folderSlug, taxonomy] of folderEntries) {
+    if (taxonomy.claimedColumns) continue;
+    const group = NAV_CATEGORIES.find((g) => g.name === taxonomy.groupName);
+    if (!group) continue;
+
+    for (const column of group.columns) {
+      const key = `${taxonomy.groupName}::${column.title}`;
+      if (claimed.has(key)) continue;
+      claimed.add(key);
+      for (const item of column.items) map[item] = folderSlug;
+    }
+  }
+
+  return map;
+})();
+
+/**
+ * The URL a navbar leaf item (e.g. "Plywood", "LED Bulb", "Overhead Tank")
+ * should link to. Every leaf item in `NAV_CATEGORIES` already has a real
+ * page to land on — either its folder's own dedicated static page (e.g.
+ * `/products/items/plywood-blockboards/plywood`) or that folder's generic
+ * `[subcategory]` catch-all — so this always resolves to a proper
+ * `/products/items/<folder>/<slug>` listing page (with its own filters,
+ * facets, etc.) rather than the bare `/products?category=` fallback.
+ *
+ * Only a category that isn't in the navbar taxonomy at all (shouldn't
+ * happen for a real menu click, but possible for an ad-hoc/legacy link)
+ * falls back to `/products?category=<name>`.
+ */
+export function getLeafItemHref(itemName: string): string {
+  const folderSlug = LEAF_ITEM_TO_FOLDER[itemName];
+  if (!folderSlug) {
+    return `/products?category=${encodeURIComponent(itemName)}`;
+  }
+  return `/products/items/${folderSlug}/${categoryToSlug(itemName)}`;
 }

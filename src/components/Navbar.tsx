@@ -1,372 +1,1590 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+
+import { useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Menu, X, User, LayoutDashboard, LogOut } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
-import { useSession, signOut } from "next-auth/react";
-export default function Navbar() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const isProduct = pathname === "/products";
-  const { data: session, status } = useSession();
-  const isAuthenticated = status === "authenticated";
-  const user = session?.user;
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const lastScrollY = useRef(0);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  // Navbar hide/show on scroll
-  useEffect(() => {
-    const controlNavbar = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY < lastScrollY.current || currentScrollY < 100) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-      lastScrollY.current = currentScrollY;
+import { usePathname } from "next/navigation";
+
+import {
+    Search,
+    User,
+    Heart,
+    ShoppingCart,
+    ChevronDown,
+    ChevronRight,
+    Menu,
+    X,
+} from "lucide-react";
+
+import {
+    NAV_CATEGORIES,
+    type NavCategoryGroup as Category,
+    type NavCategoryColumn as MegaMenuColumn,
+} from "@/lib/product-navigation";
+import { getLeafItemHref } from "@/lib/category-taxonomy";
+
+/* =========================================================
+   CATEGORY DATA — see src/lib/product-navigation.ts
+========================================================= */
+
+const categories: Category[] = NAV_CATEGORIES;
+
+/* =========================================================
+   CATEGORY PAGE URL
+========================================================= */
+
+function getCategoryHref(categoryName: string) {
+    const slugMap: Record<string, string> = {
+        "Tiles": "tiles",
+        "Electricals": "electricals",
+        "Power & Hand Tools": "power-hand-tools",
+        "Plywood & Laminates": "plywood-laminates",
+        "Hardware": "hardware",
+        "Paints": "paints",
+        "Lighting & Fans": "lighting-fans",
+        "Bathroom": "bathroom",
+        "Sofa and Dining": "sofa-dining",
+        "Plumbing": "plumbing",
+        "Kitchen": "kitchen",
+        "Appliances": "appliances",
     };
-    window.addEventListener("scroll", controlNavbar);
-    return () => window.removeEventListener("scroll", controlNavbar);
-  }, []);
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownOpen]);
-  const handleLogout = async () => {
-    try {
-      await signOut({ callbackUrl: "/" });
-      toast.success("Logged out successfully");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      toast.error("Logout failed");
-    }
-  };
-  const getDashboardPath = (role: string | undefined) => {
-    if (!role) return "/";
-    const routes: Record<string, string> = {
-      admin: "/admin",
-      superadmin: "/superadmin",
-      client: "/client",
-      designer: "/designer",
-    };
-    return routes[role] || "/dashboard";
-  };
-  if (!isClient) return null;
-  return (
-    <>
-      <nav
-        className={`fixed top-0 z-50 w-full bg-white/95 shadow-sm backdrop-blur-md transition-transform duration-300 ease-out ${isVisible ? "translate-y-0" : "-translate-y-full"
-          }`}
-      >{/* ================= DESKTOP ================= */}
-        {/* ================= DESKTOP ================= */}
-        <div className="relative hidden h-16 w-full items-center px-4 lg:flex">
 
-          {/* ================= LEFT SECTION ================= */}
-          <div className="flex items-center gap-8">
+    const slug =
+        slugMap[categoryName] ??
+        categoryName
+            .toLowerCase()
+            .replace(/&/g, "and")
+            .replace(/\s+/g, "-");
 
-            {/* LOGO */}
-            <Link href="/" className="group flex items-center">
-              <div className="relative mr-1 -top-2 flex items-center justify-center">
-                <span className="absolute inline-flex h-4 w-4 animate-ping rounded-full bg-[rgb(255,193,0)] opacity-80"></span>
+    return `/products/items/${slug}`;
+}
 
-                <span className="relative inline-flex h-4 w-4 rounded-full bg-[rgb(255,193,0)] shadow-[0_0_15px_rgba(255,193,0,.8)] transition group-hover:scale-110"></span>
-              </div>
+/* =========================================================
+   PRODUCT CATEGORY URL
+========================================================= */
 
-              <span
-                className="text-2xl font-bold tracking-tight text-[rgb(207,0,6)]"
-                style={{ fontFamily: "Candal, sans-serif" }}
-              >
-                nterior
-              </span>
-            </Link>
+// Every leaf item already has a real `/products/items/<folder>/...` page —
+// its folder's dedicated page or that folder's generic subcategory
+// catch-all (see getLeafItemHref in category-taxonomy.ts) — so this always
+// lands on a real listing with its own filters, not the bare
+// `/products?category=` fallback. That fallback only kicks in for a name
+// that isn't in the navbar taxonomy at all.
+function getProductCategoryHref(
+    category: string
+) {
+    return getLeafItemHref(category);
+}
 
-            {/* TOGGLE */}
-            <div className="hidden lg:flex rounded-full bg-gray-100 p-1 shadow-sm">
-              <Link
-                href="/products"
-                className={`rounded-full px-7 py-2.5 text-sm font-bold transition ${isProduct
-                    ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                    : "text-gray-600"
-                  }`}
-              >
-                E-Commerce
-              </Link>
+/* =========================================================
+   MEGA MENU COLUMN DISTRIBUTION
+========================================================= */
 
-              <Link
-                href="/crm"
-                className={`rounded-full px-7 py-2.5 text-sm font-bold transition ${!isProduct
-                    ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                    : "text-gray-600"
-                  }`}
-              >
-                CRM
-              </Link>
-            </div>
+function distributeMegaMenuColumns(
+    groups: MegaMenuColumn[],
+    columnCount: number
+): MegaMenuColumn[][] {
+    const columns: MegaMenuColumn[][] =
+        Array.from(
+            { length: columnCount },
+            () => []
+        );
 
-          </div>
+    const heights = Array.from(
+        { length: columnCount },
+        () => 0
+    );
 
+    const sortedGroups = [...groups].sort(
+        (a, b) =>
+            b.items.length - a.items.length
+    );
 
-          {/* ================= CENTER NAVIGATION ================= */}
-          <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:flex h-14 items-center rounded-full border border-gray-100 bg-gray-50/70 px-2 shadow-sm">
+    sortedGroups.forEach((group) => {
+        let shortestColumn = 0;
 
-            {[
-              { name: "Features", href: "/#features" },
-              { name: "Pricing", href: "/pricing" },
-              { name: "About", href: "/about" },
-              { name: "Contact", href: "/contact-us" },
-            ].map((item) => {
+        for (
+            let index = 1;
+            index < columnCount;
+            index++
+        ) {
+            if (
+                heights[index] <
+                heights[shortestColumn]
+            ) {
+                shortestColumn = index;
+            }
+        }
 
-              const isActive =
-                pathname === item.href ||
-                (item.href.includes("#") && pathname === "/");
+        columns[shortestColumn].push(group);
 
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group relative flex h-11 items-center rounded-full px-6 text-sm font-bold transition-all duration-300 ${isActive
-                      ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                      : "text-gray-700 hover:bg-orange-50 hover:text-[rgb(207,0,6)]"
-                    }`}
+        heights[shortestColumn] +=
+            group.items.length + 2.5;
+    });
+
+    return columns;
+}
+
+/* =========================================================
+   MEGA MENU COLUMN
+========================================================= */
+
+function MegaMenuColumnStack({
+    groups,
+}: {
+    groups: MegaMenuColumn[];
+}) {
+    return (
+        <div
+            className="
+                flex
+                min-w-0
+                flex-col
+                gap-4
+            "
+        >
+            {groups.map((group) => (
+                <div
+                    key={group.title}
+                    className="min-w-0"
                 >
-                  <span>{item.name}</span>
-
-                  {!isActive && (
-                    <span className="absolute bottom-2 left-1/2 h-[2px] w-0 -translate-x-1/2 rounded-full bg-[rgb(207,0,6)] transition-all duration-300 group-hover:w-10"></span>
-                  )}
-                </Link>
-              );
-            })}
-
-          </div>
-
-
-          {/* ================= RIGHT SECTION ================= */}
-          <div className="ml-auto flex items-center gap-3">
-
-            {isAuthenticated && user ? (
-
-              <div className="relative" ref={dropdownRef}>
-
-                <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-slate-100 transition-colors hover:bg-slate-200"
-                >
-                  <User size={20} className="text-slate-600" />
-                </button>
-
-                <AnimatePresence>
-                  {dropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-3 w-48 overflow-hidden rounded-2xl border border-slate-100 bg-white py-2 text-sm shadow-xl"
+                    <h4
+                        className="
+                            mb-1
+                            text-[13px]
+                            font-bold
+                            leading-5
+                            text-[rgb(207,0,6)]
+                        "
                     >
+                        {group.title}
+                    </h4>
 
-                      <Link
-                        href={getDashboardPath(user?.role as string)}
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-slate-700 transition-colors hover:bg-slate-50"
-                      >
-                        <LayoutDashboard size={16} />
-                        Dashboard
-                      </Link>
+                    <div className="flex flex-col">
+                        {group.items.map(
+                            (item) => (
+                                <Link
+                                    key={item}
+                                    href={getProductCategoryHref(
+                                        item
+                                    )}
+                                    className="
+                                        group/item
+                                        flex
+                                        min-h-6
+                                        items-center
+                                        rounded-md
+                                        px-2
+                                        py-0.5
+                                        text-[13px]
+                                        leading-5
+                                        text-gray-500
+                                        transition-all
+                                        duration-150
+                                        hover:bg-red-50
+                                        hover:text-[rgb(207,0,6)]
+                                    "
+                                >
+                                    <span>
+                                        {item}
+                                    </span>
 
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          handleLogout();
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition-colors hover:bg-red-50"
-                      >
-                        <LogOut size={16} />
-                        Sign Out
-                      </button>
+                                    <ChevronRight
+                                        size={12}
+                                        className="
+                                            ml-1
+                                            shrink-0
+                                            opacity-0
+                                            transition-all
+                                            duration-150
+                                            group-hover/item:translate-x-0.5
+                                            group-hover/item:opacity-100
+                                        "
+                                    />
+                                </Link>
+                            )
+                        )}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
 
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+/* =========================================================
+   NAVBAR
+========================================================= */
 
-              </div>
+export default function Navbar() {
+    const pathname = usePathname();
 
-            ) : (
+    const isProduct =
+        pathname === "/products" ||
+        pathname.startsWith("/products/");
 
-              <div className="flex items-center gap-2">
+    const [mobileMenu, setMobileMenu] =
+        useState(false);
 
-                <Link
-                  href="/login"
-                  className="hidden px-4 py-2 text-sm font-bold text-slate-600 transition hover:text-[rgb(207,0,6)] sm:block"
+    const [
+        openMobileCategory,
+        setOpenMobileCategory,
+    ] = useState<string | null>(null);
+
+    const [
+        desktopCategory,
+        setDesktopCategory,
+    ] = useState<string | null>(null);
+
+    const desktopMenuCloseTimer =
+        useRef<ReturnType<
+            typeof setTimeout
+        > | null>(null);
+
+    /* =======================================================
+       DESKTOP MENU HELPERS
+    ======================================================= */
+
+    const clearDesktopMenuCloseTimer =
+        () => {
+            if (
+                desktopMenuCloseTimer.current
+            ) {
+                clearTimeout(
+                    desktopMenuCloseTimer.current
+                );
+
+                desktopMenuCloseTimer.current =
+                    null;
+            }
+        };
+
+    const closeDesktopMenuWithDelay =
+        () => {
+            clearDesktopMenuCloseTimer();
+
+            desktopMenuCloseTimer.current =
+                setTimeout(() => {
+                    setDesktopCategory(null);
+                }, 140);
+        };
+
+    const openDesktopCategory = (
+        categoryName: string
+    ) => {
+        clearDesktopMenuCloseTimer();
+
+        setDesktopCategory(
+            categoryName
+        );
+    };
+
+    const toggleDesktopCategory = (
+        categoryName: string
+    ) => {
+        clearDesktopMenuCloseTimer();
+
+        setDesktopCategory(
+            (current) =>
+                current === categoryName
+                    ? null
+                    : categoryName
+        );
+    };
+
+    const activeDesktopCategory =
+        categories.find(
+            (category) =>
+                category.name ===
+                desktopCategory
+        );
+
+    /* =======================================================
+       MOBILE CATEGORY
+    ======================================================= */
+
+    const toggleMobileCategory = (
+        categoryName: string
+    ) => {
+        setOpenMobileCategory(
+            (current) =>
+                current === categoryName
+                    ? null
+                    : categoryName
+        );
+    };
+
+    return (
+        <>
+            {/* =========================================================
+                MAIN NAVBAR
+            ========================================================= */}
+
+            <header
+                className="
+                    fixed
+                    inset-x-0
+                    top-0
+                    z-50
+                    border-b
+                    border-gray-100
+                    bg-white/95
+                    shadow-sm
+                    backdrop-blur-xl
+                "
+            >
+                <div className="mx-auto w-full max-w-[1920px]">
+
+                    {/* =================================================
+                        DESKTOP MAIN BAR
+                    ================================================= */}
+
+                    <div
+                        className="
+                            hidden
+                            h-16
+                            min-w-0
+                            items-center
+                            px-4
+                            lg:grid
+                            lg:grid-cols-[auto_minmax(240px,1fr)_auto]
+                            lg:gap-5
+                            xl:px-6
+                        "
+                    >
+                        <div
+                            className="
+                                flex
+                                min-w-0
+                                shrink-0
+                                items-center
+                                gap-4
+                                xl:gap-5
+                            "
+                        >
+                            <Link
+                                href="/"
+                                className="
+                                    group
+                                    flex
+                                    shrink-0
+                                    items-center
+                                "
+                            >
+                                <div
+                                    className="
+                                        relative
+                                        -top-2
+                                        mr-1
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+                                    <span
+                                        className="
+                                            absolute
+                                            inline-flex
+                                            h-4
+                                            w-4
+                                            animate-ping
+                                            rounded-full
+                                            bg-[rgb(255,193,0)]
+                                            opacity-80
+                                        "
+                                    />
+
+                                    <span
+                                        className="
+                                            relative
+                                            inline-flex
+                                            h-4
+                                            w-4
+                                            rounded-full
+                                            bg-[rgb(255,193,0)]
+                                            shadow-[0_0_15px_rgba(255,193,0,.8)]
+                                            transition
+                                            group-hover:scale-110
+                                        "
+                                    />
+                                </div>
+
+                                <span
+                                    className="
+                                        text-2xl
+                                        font-bold
+                                        tracking-tight
+                                        text-[rgb(207,0,6)]
+                                    "
+                                    style={{
+                                        fontFamily:
+                                            "Candal, sans-serif",
+                                    }}
+                                >
+                                    nterior
+                                </span>
+                            </Link>
+
+                            <div
+                                className="
+                                    flex
+                                    shrink-0
+                                    items-center
+                                    rounded-full
+                                    bg-gray-100
+                                    p-1
+                                "
+                            >
+                                <Link
+                                    href="/products"
+                                    className={`
+                                        whitespace-nowrap
+                                        rounded-full
+                                        px-4
+                                        py-2
+                                        text-xs
+                                        font-bold
+                                        transition-all
+                                        duration-300
+                                        xl:px-6
+                                        xl:py-2.5
+                                        xl:text-sm
+                                        ${isProduct
+                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                            : "text-gray-600 hover:text-gray-900"
+                                        }
+                                    `}
+                                >
+                                    E-Commerce
+                                </Link>
+
+                                <Link
+                                    href="/crm"
+                                    className={`
+                                        whitespace-nowrap
+                                        rounded-full
+                                        px-4
+                                        py-2
+                                        text-xs
+                                        font-bold
+                                        transition-all
+                                        duration-300
+                                        xl:px-6
+                                        xl:py-2.5
+                                        xl:text-sm
+                                        ${!isProduct
+                                            ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
+                                            : "text-gray-600 hover:text-gray-900"
+                                        }
+                                    `}
+                                >
+                                    CRM
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* SEARCH */}
+
+                        <div className="min-w-0">
+                            <div className="relative">
+                                <Search
+                                    size={19}
+                                    className="
+                                        absolute
+                                        left-4
+                                        top-1/2
+                                        -translate-y-1/2
+                                        text-[rgb(255,170,0)]
+                                    "
+                                />
+
+                                <input
+                                    type="search"
+                                    placeholder="Search furniture, wardrobes, kitchens..."
+                                    className="
+                                        h-12
+                                        w-full
+                                        min-w-0
+                                        rounded-full
+                                        border
+                                        border-orange-100
+                                        bg-orange-50/20
+                                        pl-11
+                                        pr-4
+                                        text-sm
+                                        text-gray-800
+                                        outline-none
+                                        placeholder:text-gray-400
+                                        transition
+                                        focus:border-[rgb(255,170,0)]
+                                        focus:bg-white
+                                        focus:ring-4
+                                        focus:ring-yellow-200/40
+                                    "
+                                />
+                            </div>
+                        </div>
+
+                        {/* ACTIONS */}
+
+                        <div
+                            className="
+                                flex
+                                shrink-0
+                                items-center
+                                gap-2
+                            "
+                        >
+                            <button
+                                type="button"
+                                className="
+                                    flex
+                                    h-11
+                                    items-center
+                                    gap-2
+                                    rounded-full
+                                    border
+                                    border-gray-200
+                                    bg-white
+                                    px-5
+                                    text-sm
+                                    font-semibold
+                                    text-gray-700
+                                    transition
+                                    hover:border-[rgb(255,170,0)]
+                                    hover:bg-orange-50
+                                "
+                            >
+                                <User size={18} />
+
+                                <span className="hidden xl:inline">
+                                    Login
+                                </span>
+                            </button>
+
+                            {/* <button
+                                type="button"
+                                aria-label="Wishlist"
+                                className="
+                                    flex
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    border
+                                    border-gray-200
+                                    bg-white
+                                    text-gray-700
+                                    transition
+                                    hover:border-[rgb(255,170,0)]
+                                    hover:bg-orange-50
+                                "
+                            >
+                                <Heart size={20} />
+                            </button> */}
+
+                            <button
+                                type="button"
+                                aria-label="Cart"
+                                className="
+                                    relative
+                                    flex
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    border
+                                    border-gray-200
+                                    bg-white
+                                    text-gray-700
+                                    transition
+                                    hover:border-[rgb(255,170,0)]
+                                    hover:bg-orange-50
+                                "
+                            >
+                                <ShoppingCart
+                                    size={20}
+                                />
+
+                                <span
+                                    className="
+                                        absolute
+                                        -right-1
+                                        -top-1
+                                        flex
+                                        h-5
+                                        w-5
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-[rgb(207,0,6)]
+                                        text-[10px]
+                                        font-bold
+                                        text-white
+                                    "
+                                >
+                                    0
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* =================================================
+                        DESKTOP CATEGORY BAR
+                    ================================================= */}
+
+                    <div
+                        className="
+                            relative
+                            hidden
+                            h-11
+                            min-w-0
+                            items-center
+                            border-t
+                            border-gray-100
+                            lg:flex
+                        "
+                        onMouseLeave={
+                            closeDesktopMenuWithDelay
+                        }
+                    >
+                        <div
+                            className="
+                                flex
+                                min-w-0
+                                w-full
+                                items-center
+                                gap-2
+                                overflow-x-auto
+                                px-3
+                                py-1
+                                xl:gap-5.5
+                                xl:px-5
+                                [scrollbar-width:none]
+                                [&::-webkit-scrollbar]:hidden
+                            "
+                        >
+                            {categories.map(
+                                (category) => {
+                                    const isActive =
+                                        desktopCategory ===
+                                        category.name;
+
+                                    const categoryHref =
+                                        getCategoryHref(
+                                            category.name
+                                        );
+
+                                    return (
+                                        <div
+                                            key={
+                                                category.name
+                                            }
+                                            className="
+                                                relative
+                                                flex
+                                                shrink-0
+                                                items-center
+                                            "
+                                            onMouseEnter={() =>
+                                                openDesktopCategory(
+                                                    category.name
+                                                )
+                                            }
+                                        >
+                                            {/* CATEGORY NAME */}
+
+                                            <Link
+                                                href={
+                                                    categoryHref
+                                                }
+                                                onClick={() =>
+                                                    setDesktopCategory(
+                                                        null
+                                                    )
+                                                }
+                                                onFocus={() =>
+                                                    openDesktopCategory(
+                                                        category.name
+                                                    )
+                                                }
+                                                className={`
+                                                    group
+                                                    relative
+                                                    flex
+                                                    items-center
+                                                    whitespace-nowrap
+                                                    py-1.5
+                                                    text-xs
+                                                    font-semibold
+                                                    transition-all
+                                                    duration-200
+                                                    xl:text-sm
+                                                    ${isActive
+                                                        ? "text-[rgb(207,0,6)]"
+                                                        : "text-gray-700 hover:text-[rgb(207,0,6)]"
+                                                    }
+                                                `}
+                                            >
+                                                <span>
+                                                    {
+                                                        category.name
+                                                    }
+                                                </span>
+
+                                                <span
+                                                    className={`
+                                                        absolute
+                                                        bottom-0
+                                                        left-0
+                                                        h-0.5
+                                                        rounded-full
+                                                        bg-[rgb(207,0,6)]
+                                                        transition-all
+                                                        duration-300
+                                                        ${isActive
+                                                            ? "w-full"
+                                                            : "w-0"
+                                                        }
+                                                    `}
+                                                />
+                                            </Link>
+
+                                            {/* DROPDOWN ARROW */}
+
+                                            <button
+                                                type="button"
+                                                aria-label={`Open ${category.name} menu`}
+                                                aria-expanded={
+                                                    isActive
+                                                }
+                                                aria-haspopup="true"
+                                                onClick={(
+                                                    event
+                                                ) => {
+                                                    event.stopPropagation();
+
+                                                    toggleDesktopCategory(
+                                                        category.name
+                                                    );
+                                                }}
+                                                className={`
+                                                    ml-1
+                                                    flex
+                                                    h-7
+                                                    w-6
+                                                    shrink-0
+                                                    items-center
+                                                    justify-center
+                                                    rounded-md
+                                                    text-gray-600
+                                                    transition-all
+                                                    duration-200
+                                                    hover:bg-red-50
+                                                    hover:text-[rgb(207,0,6)]
+                                                    ${isActive
+                                                        ? "text-[rgb(207,0,6)]"
+                                                        : ""
+                                                    }
+                                                `}
+                                            >
+                                                <ChevronDown
+                                                    size={14}
+                                                    className="
+                                                        transition-transform
+                                                        duration-300
+                                                    "
+                                                    style={{
+                                                        transform:
+                                                            isActive
+                                                                ? "rotate(180deg)"
+                                                                : "rotate(0deg)",
+                                                    }}
+                                                />
+                                            </button>
+                                        </div>
+                                    );
+                                }
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* =========================================================
+                DESKTOP MEGA MENU
+            ========================================================= */}
+
+            {activeDesktopCategory && (
+                <div
+                    className="
+                        fixed
+                        inset-x-0
+                        top-[108px]
+                        z-[70]
+                        border-b
+                        border-gray-200
+                        bg-white
+                        shadow-[0_16px_40px_rgba(24,34,53,0.10)]
+                        animate-[megaMenuIn_180ms_ease-out]
+                    "
+                    onMouseEnter={
+                        clearDesktopMenuCloseTimer
+                    }
+                    onMouseLeave={
+                        closeDesktopMenuWithDelay
+                    }
                 >
-                  Log in
-                </Link>
+                    <div
+                        className="
+                            h-1
+                            w-full
+                            bg-gradient-to-r
+                            from-[rgb(255,170,0)]
+                            via-orange-500
+                            to-[rgb(207,0,6)]
+                        "
+                    />
 
-                <Link
-                  href="/register"
-                  className="rounded-xl bg-[rgb(207,0,6)] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-900/10 transition-all hover:bg-[rgb(180,0,5)] active:scale-95"
-                >
-                  Start Free Trial
-                </Link>
+                    <div
+                        className="
+                            mx-auto
+                            w-full
+                            max-w-[1920px]
+                            px-5
+                            py-3
+                            xl:px-8
+                            xl:py-4
+                            2xl:px-10
+                        "
+                    >
+                        {/* 4 COLUMNS */}
 
-              </div>
+                        <div
+                            className="
+                                grid
+                                grid-cols-4
+                                gap-x-6
+                                lg:gap-x-7
+                                xl:hidden
+                            "
+                        >
+                            {distributeMegaMenuColumns(
+                                activeDesktopCategory.columns,
+                                4
+                            ).map(
+                                (
+                                    column,
+                                    index
+                                ) => (
+                                    <MegaMenuColumnStack
+                                        key={index}
+                                        groups={column}
+                                    />
+                                )
+                            )}
+                        </div>
 
+                        {/* 6 COLUMNS */}
+
+                        <div
+                            className="
+                                hidden
+                                grid-cols-6
+                                gap-x-7
+                                xl:grid
+                                2xl:hidden
+                            "
+                        >
+                            {distributeMegaMenuColumns(
+                                activeDesktopCategory.columns,
+                                6
+                            ).map(
+                                (
+                                    column,
+                                    index
+                                ) => (
+                                    <MegaMenuColumnStack
+                                        key={index}
+                                        groups={column}
+                                    />
+                                )
+                            )}
+                        </div>
+
+                        {/* 7 COLUMNS */}
+
+                        <div
+                            className="
+                                hidden
+                                grid-cols-7
+                                gap-x-8
+                                2xl:grid
+                            "
+                        >
+                            {distributeMegaMenuColumns(
+                                activeDesktopCategory.columns,
+                                7
+                            ).map(
+                                (
+                                    column,
+                                    index
+                                ) => (
+                                    <MegaMenuColumnStack
+                                        key={index}
+                                        groups={column}
+                                    />
+                                )
+                            )}
+                        </div>
+                    </div>
+                </div>
             )}
 
-          </div>
+            {/* =========================================================
+                MOBILE NAVBAR
+            ========================================================= */}
 
-        </div>
-        {/* ================= MOBILE ================= */}
-        <div className="lg:hidden">
-          <div className="flex h-16 items-center justify-between px-4">
+            <div
+                className="
+                    fixed
+                    inset-x-0
+                    top-0
+                    z-50
+                    border-b
+                    border-gray-100
+                    bg-white/95
+                    shadow-sm
+                    backdrop-blur-xl
+                    lg:hidden
+                "
+            >
+                {/* MOBILE FIRST ROW */}
 
-            {/* Logo */}
-            <Link href="/" className="group flex items-center">
-              <div className="relative mr-1 -top-2 flex h-3 w-3 items-center justify-center">
-                <span className="absolute inline-flex h-4 w-4 animate-ping rounded-full bg-yellow-400 opacity-80"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-yellow-400"></span>
-              </div>
+                <div
+                    className="
+                        flex
+                        h-16
+                        min-w-0
+                        items-center
+                        gap-2
+                        px-3
+                        sm:px-4
+                    "
+                >
+                    {/* LOGO */}
 
-              <span
-                className="text-xl font-bold text-[rgb(207,0,6)]"
-                style={{ fontFamily: "Candal, sans-serif" }}
-              >
-                nterior
-              </span>
-            </Link>
+                    <Link
+                        href="/"
+                        className="
+                            group
+                            flex
+                            min-w-0
+                            shrink-0
+                            items-center
+                        "
+                    >
+                        <div
+                            className="
+                                relative
+                                -top-1
+                                mr-1
+                                flex
+                                h-3
+                                w-3
+                                items-center
+                                justify-center
+                            "
+                        >
+                            <span
+                                className="
+                                    absolute
+                                    inline-flex
+                                    h-3
+                                    w-3
+                                    animate-ping
+                                    rounded-full
+                                    bg-[rgb(255,193,0)]
+                                    opacity-70
+                                "
+                            />
 
-            {/* Toggle */}
-            <div className="flex items-center rounded-full bg-gray-100 p-1 shadow-sm">
-              <Link
-                href="/products"
-                className={`rounded-full px-5 py-2 text-xs font-bold transition-all duration-300 ${isProduct
-                  ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                  : "text-gray-600 hover:text-gray-900"
-                  }`}
-              >
-                E-Commerce
-              </Link>
+                            <span
+                                className="
+                                    relative
+                                    inline-flex
+                                    h-3
+                                    w-3
+                                    rounded-full
+                                    bg-[rgb(255,193,0)]
+                                "
+                            />
+                        </div>
 
-              <Link
-                href="/crm"
-                className={`rounded-full px-5 py-2 text-xs font-bold transition-all duration-300 ${!isProduct
-                  ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-lg"
-                  : "text-gray-600 hover:text-gray-900"
-                  }`}
-              >
-                CRM
-              </Link>
+                        <span
+                            className="
+                                text-lg
+                                font-bold
+                                tracking-tight
+                                text-[rgb(207,0,6)]
+                                sm:text-xl
+                            "
+                            style={{
+                                fontFamily:
+                                    "Candal, sans-serif",
+                            }}
+                        >
+                            nterior
+                        </span>
+                    </Link>
+
+                    {/* MODE SWITCH */}
+
+                    <div
+                        className="
+                            mx-auto
+                            flex
+                            min-w-0
+                            max-w-[220px]
+                            flex-1
+                            items-center
+                            rounded-full
+                            bg-gray-100
+                            p-1
+                        "
+                    >
+                        <Link
+                            href="/products"
+                            className={`
+                                flex-1
+                                rounded-full
+                                px-2
+                                py-2
+                                text-center
+                                text-[11px]
+                                font-bold
+                                transition
+                                ${isProduct
+                                    ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
+                                    : "text-gray-600"
+                                }
+                            `}
+                        >
+                            E-Commerce
+                        </Link>
+
+                        <Link
+                            href="/crm"
+                            className={`
+                                flex-1
+                                rounded-full
+                                px-2
+                                py-2
+                                text-center
+                                text-[11px]
+                                font-bold
+                                transition
+                                ${!isProduct
+                                    ? "bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-md"
+                                    : "text-gray-600"
+                                }
+                            `}
+                        >
+                            CRM
+                        </Link>
+                    </div>
+
+                    {/* MOBILE ACTIONS */}
+
+                    <div
+                        className="
+                            flex
+                            shrink-0
+                            items-center
+                            gap-1
+                        "
+                    >
+                        {/* <button
+                            type="button"
+                            aria-label="Wishlist"
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            <Heart size={19} />
+                        </button> */}
+
+                        <button
+                            type="button"
+                            aria-label="Cart"
+                            className="
+                                relative
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            <ShoppingCart size={19} />
+
+                            <span
+                                className="
+                                    absolute
+                                    -right-0.5
+                                    -top-0.5
+                                    flex
+                                    h-4
+                                    w-4
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-[rgb(207,0,6)]
+                                    text-[9px]
+                                    font-bold
+                                    text-white
+                                "
+                            >
+                                0
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            aria-label="Open menu"
+                            onClick={() =>
+                                setMobileMenu(true)
+                            }
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-lg
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            <Menu size={23} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* MOBILE SEARCH */}
+
+                <div className="px-3 pb-3 sm:px-4">
+                    <div className="relative">
+                        <Search
+                            size={18}
+                            className="
+                                absolute
+                                left-4
+                                top-1/2
+                                -translate-y-1/2
+                                text-[rgb(255,170,0)]
+                            "
+                        />
+
+                        <input
+                            type="search"
+                            placeholder="Search products..."
+                            className="
+                                h-11
+                                w-full
+                                rounded-full
+                                border
+                                border-orange-100
+                                bg-orange-50/30
+                                pl-11
+                                pr-4
+                                text-sm
+                                text-gray-800
+                                outline-none
+                                placeholder:text-gray-400
+                                transition
+                                focus:border-[rgb(255,170,0)]
+                                focus:bg-white
+                                focus:ring-4
+                                focus:ring-yellow-200/40
+                            "
+                        />
+                    </div>
+                </div>
             </div>
 
-            {/* Menu */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="rounded-lg p-2 hover:bg-gray-100"
-            >
-              <Menu size={24} />
-            </button>
+            {/* =========================================================
+                MOBILE DRAWER
+            ========================================================= */}
 
-          </div>
-        </div>
-      </nav>
-      {/* SIDEBAR */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md"
-          >
-            <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              onClick={(e: React.MouseEvent) => e.stopPropagation()}
-              className="fixed left-0 top-0 flex h-screen w-[85%] flex-col gap-6 overflow-y-auto border-r border-white/20 bg-white/15 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.25)] backdrop-blur-3xl sm:w-80"
-            >
-              {/* TOP */}
-              <div className="mb-8 flex items-center justify-between">
-                <Link href="/" className="group flex items-center">
-                  <div className="relative mr-2 -top-1 flex items-center justify-center">
-                    <span className="absolute inline-flex h-5 w-5 animate-ping rounded-full bg-[rgb(255,193,0)] opacity-70"></span>
-                    <span className="relative inline-flex h-5 w-5 rounded-full bg-[rgb(255,193,0)] shadow-[0_0_25px_rgba(255,193,0,0.95)]"></span>
-                  </div>
-                  <span
-                    className="text-3xl font-bold tracking-tight text-[rgb(207,0,6)] drop-shadow-lg"
-                    style={{ fontFamily: "Candal, sans-serif" }}
-                  >
-                    nterior
-                  </span>
-                </Link>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="rounded-full bg-white/10 p-2 text-white backdrop-blur-md transition-all duration-300 hover:bg-[rgb(255,193,0)]/30 hover:text-[rgb(255,193,0)] hover:border-[rgb(255,193,0)]/40"
+            {mobileMenu && (
+                <div
+                    className="
+                        fixed
+                        inset-0
+                        z-[100]
+                        bg-black/45
+                        backdrop-blur-sm
+                        lg:hidden
+                    "
+                    onClick={() =>
+                        setMobileMenu(false)
+                    }
                 >
-                  <X size={24} />
-                </button>
-              </div>
+                    <div
+                        className="
+                            absolute
+                            right-0
+                            top-0
+                            flex
+                            h-full
+                            w-[88%]
+                            max-w-[420px]
+                            flex-col
+                            bg-white
+                            shadow-2xl
+                        "
+                        onClick={(event) =>
+                            event.stopPropagation()
+                        }
+                    >
+                        {/* DRAWER HEADER */}
 
-              {/* MENU */}
-              <ul className="flex flex-col gap-1">
-                {["Features", "Pricing", "About", "Contact Us"].map(
-                  (name) => {
-                    const mobilePathMap: Record<string, string> = {
-                      Features: "/#features",
-                      Pricing: "/pricing",
-                      About: "/about",
-                      "Contact Us": "/contact-us",
-                    };
-                    const linkPath = mobilePathMap[name];
-                    return (
-                      <li key={name}>
-                        <Link
-                          href={linkPath}
-                          onClick={() => setSidebarOpen(false)}
-                          className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-lg font-semibold text-white backdrop-blur-md transition-all duration-300 hover:translate-x-2 hover:bg-[rgb(255,193,0)]/25 hover:text-[rgb(255,193,0)] hover:border-[rgb(255,193,0)]/40 hover:shadow-[0_0_25px_rgba(255,193,0,0.35)]"
+                        <div
+                            className="
+                                flex
+                                h-16
+                                shrink-0
+                                items-center
+                                justify-between
+                                border-b
+                                border-gray-100
+                                px-5
+                            "
                         >
-                          {name}
-                        </Link>
-                      </li>
-                    );
-                  }
-                )}
-              </ul>
-              {/* CTA */}
-              <div className="mt-auto border-t border-slate-200/50 pt-6">
-                <Link
-                  href="/register"
-                  onClick={() => setSidebarOpen(false)}
-                  className="block w-full rounded-2xl bg-[rgb(207,0,6)] py-4 text-center font-bold text-white shadow-[0_10px_30px_rgba(207,0,6,0.45)] transition-all duration-300 hover:scale-[1.03] hover:bg-[rgb(180,0,5)]"
-                >
-                  Start Free Trial
-                </Link>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
+                            <div>
+                                <p
+                                    className="
+                                        text-[10px]
+                                        font-bold
+                                        uppercase
+                                        tracking-[0.24em]
+                                        text-[rgb(207,0,6)]
+                                    "
+                                >
+                                    Explore
+                                </p>
+
+                                <h2
+                                    className="
+                                        text-lg
+                                        font-bold
+                                        text-[#182235]
+                                    "
+                                >
+                                    Categories
+                                </h2>
+                            </div>
+
+                            <button
+                                type="button"
+                                aria-label="Close menu"
+                                onClick={() =>
+                                    setMobileMenu(false)
+                                }
+                                className="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-gray-50
+                                    text-gray-700
+                                    transition
+                                    hover:bg-red-50
+                                    hover:text-[rgb(207,0,6)]
+                                "
+                            >
+                                <X size={22} />
+                            </button>
+                        </div>
+
+                        {/* CATEGORY LIST */}
+
+                        <div
+                            className="
+                                flex-1
+                                overflow-y-auto
+                                px-4
+                                py-4
+                            "
+                        >
+                            <div className="space-y-2">
+                                {categories.map(
+                                    (category) => {
+                                        const isOpen =
+                                            openMobileCategory ===
+                                            category.name;
+
+                                        const categoryHref =
+                                            getCategoryHref(
+                                                category.name
+                                            );
+
+                                        return (
+                                            <div
+                                                key={
+                                                    category.name
+                                                }
+                                                className="
+                                                    overflow-hidden
+                                                    rounded-2xl
+                                                    border
+                                                    border-gray-100
+                                                    bg-white
+                                                "
+                                            >
+                                                {/* MOBILE CATEGORY HEADER */}
+
+                                                <div
+                                                    className={`
+                                                        flex
+                                                        w-full
+                                                        items-center
+                                                        transition
+                                                        ${isOpen
+                                                            ? "bg-red-50"
+                                                            : "bg-white"
+                                                        }
+                                                    `}
+                                                >
+                                                    {/* CATEGORY LINK */}
+
+                                                    <Link
+                                                        href={
+                                                            categoryHref
+                                                        }
+                                                        onClick={() =>
+                                                            setMobileMenu(
+                                                                false
+                                                            )
+                                                        }
+                                                        className={`
+                                                            flex
+                                                            min-w-0
+                                                            flex-1
+                                                            items-center
+                                                            px-4
+                                                            py-3.5
+                                                            text-left
+                                                            text-sm
+                                                            font-semibold
+                                                            transition
+                                                            ${isOpen
+                                                                ? "text-[rgb(207,0,6)]"
+                                                                : "text-gray-800"
+                                                            }
+                                                        `}
+                                                    >
+                                                        {
+                                                            category.name
+                                                        }
+                                                    </Link>
+
+                                                    {/* SUBMENU ARROW */}
+
+                                                    <button
+                                                        type="button"
+                                                        aria-label={`Toggle ${category.name} submenu`}
+                                                        aria-expanded={
+                                                            isOpen
+                                                        }
+                                                        onClick={() =>
+                                                            toggleMobileCategory(
+                                                                category.name
+                                                            )
+                                                        }
+                                                        className={`
+                                                            mr-2
+                                                            flex
+                                                            h-9
+                                                            w-9
+                                                            shrink-0
+                                                            items-center
+                                                            justify-center
+                                                            rounded-full
+                                                            transition
+                                                            ${isOpen
+                                                                ? "text-[rgb(207,0,6)]"
+                                                                : "text-gray-600"
+                                                            }
+                                                        `}
+                                                    >
+                                                        <ChevronDown
+                                                            size={17}
+                                                            className="
+                                                                transition-transform
+                                                                duration-300
+                                                            "
+                                                            style={{
+                                                                transform:
+                                                                    isOpen
+                                                                        ? "rotate(180deg)"
+                                                                        : "rotate(0deg)",
+                                                            }}
+                                                        />
+                                                    </button>
+                                                </div>
+
+                                                {/* MOBILE SUBMENU */}
+
+                                                <div
+                                                    className={`
+                                                        grid
+                                                        transition-all
+                                                        duration-300
+                                                        ${isOpen
+                                                            ? "grid-rows-[1fr]"
+                                                            : "grid-rows-[0fr]"
+                                                        }
+                                                    `}
+                                                >
+                                                    <div className="overflow-hidden">
+                                                        <div
+                                                            className="
+                                                                border-t
+                                                                border-gray-100
+                                                                bg-gray-50/60
+                                                                px-4
+                                                                py-3
+                                                            "
+                                                        >
+                                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                                {category.columns.map(
+                                                                    (
+                                                                        column
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                column.title
+                                                                            }
+                                                                        >
+                                                                            <h4
+                                                                                className="
+                                                                                    mb-1.5
+                                                                                    text-xs
+                                                                                    font-bold
+                                                                                    text-[rgb(207,0,6)]
+                                                                                "
+                                                                            >
+                                                                                {
+                                                                                    column.title
+                                                                                }
+                                                                            </h4>
+
+                                                                            <div className="flex flex-col">
+                                                                                {column.items.map(
+                                                                                    (
+                                                                                        item
+                                                                                    ) => (
+                                                                                        <Link
+                                                                                            key={
+                                                                                                item
+                                                                                            }
+                                                                                            href={getProductCategoryHref(
+                                                                                                item
+                                                                                            )}
+                                                                                            onClick={() =>
+                                                                                                setMobileMenu(
+                                                                                                    false
+                                                                                                )
+                                                                                            }
+                                                                                            className="
+                                                                                                rounded-md
+                                                                                                py-1.5
+                                                                                                text-sm
+                                                                                                text-gray-600
+                                                                                                transition
+                                                                                                hover:bg-white
+                                                                                                hover:text-[rgb(207,0,6)]
+                                                                                            "
+                                                                                        >
+                                                                                            {
+                                                                                                item
+                                                                                            }
+                                                                                        </Link>
+                                                                                    )
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </div>
+                        </div>
+
+                        {/* DRAWER FOOTER */}
+
+                        <div
+                            className="
+                                shrink-0
+                                border-t
+                                border-gray-100
+                                p-4
+                            "
+                        >
+                            <Link
+                                href="/contact-us"
+                                onClick={() =>
+                                    setMobileMenu(false)
+                                }
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    rounded-xl
+                                    bg-gradient-to-r
+                                    from-[rgb(255,170,0)]
+                                    to-[rgb(207,0,6)]
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    font-bold
+                                    text-white
+                                    shadow-md
+                                "
+                            >
+                                Need help?
+
+                                <ChevronRight
+                                    size={16}
+                                />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
 }

@@ -1,4 +1,5 @@
 import type { Product } from "@/types/products";
+import NoProductsFound from "../components/NoProductsFound";
 import ProductCard from "./ProductCard";
 
 interface ProductGridProps {
@@ -8,6 +9,14 @@ interface ProductGridProps {
    *  "first load" skeletons apart from "refetching after a filter change"
    *  (where the previous grid stays visible, dimmed). */
   hasLoadedOnce: boolean;
+  /** Category/page context shown in the empty state, e.g. "Plywood". */
+  category?: string;
+  /** Whether the empty result is caused by the visitor's own filter
+   *  selection rather than the category having no catalogue at all —
+   *  swaps in filter-specific copy in the empty state. */
+  hasActiveFilters?: boolean;
+  /** Clears every active filter in one step — enables the empty state's
+   *  "Clear filters" action when `hasActiveFilters` is true. */
   onClearFilters?: () => void;
 }
 
@@ -25,6 +34,8 @@ export default function ProductGrid({
   products,
   isLoading,
   hasLoadedOnce,
+  category,
+  hasActiveFilters = false,
   onClearFilters,
 }: ProductGridProps) {
   if (isLoading && !hasLoadedOnce) {
@@ -39,23 +50,11 @@ export default function ProductGrid({
 
   if (products.length === 0) {
     return (
-      <div className="flex min-h-[350px] items-center justify-center rounded-[10px] border border-dashed border-[#dedede] bg-[#fafafa] px-6 text-center">
-        <div>
-          <h2 className="text-[20px] font-semibold text-[#111]">No products found</h2>
-          <p className="mt-2 text-[14px] text-[#777]">
-            There are currently no products available with these filters.
-          </p>
-          {onClearFilters && (
-            <button
-              type="button"
-              onClick={onClearFilters}
-              className="mt-6 inline-flex items-center gap-2 rounded-[8px] bg-[#CF0006] px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#aa0005]"
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
-      </div>
+      <NoProductsFound
+        category={category}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={onClearFilters}
+      />
     );
   }
 

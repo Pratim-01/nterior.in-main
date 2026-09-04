@@ -20,6 +20,7 @@ import {
     type NavCategoryGroup as Category,
     type NavCategoryColumn as MegaMenuColumn,
 } from "@/lib/product-navigation";
+import { getLeafItemHref } from "@/lib/category-taxonomy";
 
 /* =========================================================
    CATEGORY DATA — see src/lib/product-navigation.ts
@@ -61,12 +62,16 @@ function getCategoryHref(categoryName: string) {
    PRODUCT CATEGORY URL
 ========================================================= */
 
+// Every leaf item already has a real `/products/items/<folder>/...` page —
+// its folder's dedicated page or that folder's generic subcategory
+// catch-all (see getLeafItemHref in category-taxonomy.ts) — so this always
+// lands on a real listing with its own filters, not the bare
+// `/products?category=` fallback. That fallback only kicks in for a name
+// that isn't in the navbar taxonomy at all.
 function getProductCategoryHref(
     category: string
 ) {
-    return `/products?category=${encodeURIComponent(
-        category
-    )}`;
+    return getLeafItemHref(category);
 }
 
 /* =========================================================
