@@ -100,7 +100,7 @@ function buildWhereClause(
 }
 
 /** Resolves a stored image path to a fully-qualified URL, same convention
- *  used by the existing kayapalat-products / plywood-blockboards routes. */
+ *  used by the existing kayapalat-products route. */
 function resolveImageUrl(imageUrl: string | null): string | null {
   if (!imageUrl) return null;
   if (imageUrl.startsWith("http")) return imageUrl;

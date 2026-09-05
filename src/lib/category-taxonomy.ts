@@ -7,10 +7,9 @@ import { categoryToSlug } from "@/lib/category-slug";
  * exactly — same wording, same "&"s, same "and"s — rather than a generic
  * "Products" crumb or an auto-slugified guess.
  *
- * Every folder here is a top-level entry in the mega menu EXCEPT
- * `plywood-blockboards`, which the navbar actually nests as the
- * "Plywood & Blockboard" column inside the "Plywood & Laminates" group —
- * so its breadcrumb parent is that group, not itself.
+ * Every folder here corresponds to exactly one top-level group in the mega
+ * menu, and serves every column/item within that group generically via
+ * `[subcategory]/page.tsx` — no per-category folder needed.
  *
  * If you rename a group in the navbar, update `groupName` here to match —
  * both the breadcrumb and the category switcher (getColumnCategories
@@ -29,24 +28,20 @@ interface FolderTaxonomy {
   parentTrail: BreadcrumbCrumb[];
   /** Whether a subcategory page under this folder (e.g.
    *  /products/items/hardware/door-hardware) should add its own extra
-   *  crumb on top of `parentTrail`. False for folders — today, only
-   *  plywood-blockboards — that already represent one specific column of
-   *  a bigger group, where drilling into "Plywood" specifically would be
-   *  more detail than the navbar's own hierarchy shows. */
+   *  crumb on top of `parentTrail`. True for every folder today — each
+   *  one IS its own top-level group in the navbar. */
   subcategoryAddsOwnCrumb: boolean;
   /** The exact `NAV_CATEGORIES[].name` this folder corresponds to in the
    *  real navbar — used by `getColumnCategories` to find the right
-   *  group's columns. Most folders ARE a top-level group (e.g.
-   *  "hardware" → "Hardware"); `plywood-blockboards` is the one exception,
-   *  nested inside "Plywood & Laminates". */
+   *  group's columns (e.g. "hardware" → "Hardware"). */
   groupName: string;
   /** Restricts this folder, for leaf-item routing (see
    *  `LEAF_ITEM_TO_FOLDER` below), to ONLY these column titles within its
-   *  group — used for a folder that represents one specific column of a
-   *  bigger group (e.g. plywood-blockboards is the "Plywood & Blockboard"
-   *  column inside the "Plywood & Laminates" group). Leave undefined for a
-   *  folder that IS its whole group: it then claims every column not
-   *  already claimed by another folder's `claimedColumns`. */
+   *  group — for a folder that should represent just one column of a
+   *  bigger group rather than the whole thing. Leave undefined (the
+   *  normal case) for a folder that IS its whole group: it then claims
+   *  every column not already claimed by another folder's
+   *  `claimedColumns`. */
   claimedColumns?: string[];
 }
 
@@ -115,24 +110,13 @@ export const FOLDER_TAXONOMY: Record<string, FolderTaxonomy> = {
     subcategoryAddsOwnCrumb: true,
     groupName: "Appliances",
   },
-  // Legacy folder: nested under "Plywood & Laminates" in the real navbar as
-  // the "Plywood & Blockboard" column, not a top-level group of its own.
-  "plywood-blockboards": {
-    parentTrail: [
-      { label: "Plywood & Laminates", href: "/products/items/plywood-laminates" },
-      { label: "Plywood & Blockboard" },
-    ],
-    subcategoryAddsOwnCrumb: false,
-    groupName: "Plywood & Laminates",
-    claimedColumns: ["Plywood & Blockboard"],
-  },
 };
 
 /**
  * Returns the sibling category values that live in the same navbar column
  * as `categoryName`, for use as `ProductListing`'s `categoryOptions` prop
  * (see ProductListing.tsx / ProductFilters.tsx) — e.g.
- * `getColumnCategories("plywood-blockboards", "Plywood")` returns
+ * `getColumnCategories("plywood-laminates", "Plywood")` returns
  * `["Plywood", "Blockboards"]`, both from the "Plywood & Blockboard"
  * column; `getColumnCategories("hardware", "Door Hardware")` returns
  * whatever other items sit in Hardware's own matching column.
@@ -172,7 +156,7 @@ export function getColumnCategories(
  * Builds the breadcrumb trail (everything after "Home") for a given
  * `items/<folder>` page.
  *
- * @param folderSlug     e.g. "hardware", "plywood-blockboards"
+ * @param folderSlug     e.g. "hardware", "plywood-laminates"
  * @param ownLabel       the current page's own display name, e.g. "Door
  *                        Hardware" — added as a final crumb only when the
  *                        folder's taxonomy says to (see
@@ -206,8 +190,9 @@ export function getFolderBreadcrumb(
  * a new item in an existing column is picked up automatically, with no
  * per-item list to maintain by hand.
  *
- * Two passes handle folders that share a group (today, only
- * "Plywood & Laminates" → `plywood-laminates` + `plywood-blockboards`):
+ * Two passes handle folders that share a group, if that's ever needed
+ * again (no folder uses `claimedColumns` today — every folder claims its
+ * whole group):
  * 1. Folders with `claimedColumns` grab exactly those columns first.
  * 2. Every other folder for that group (the group's own default/catch-all
  *    folder) picks up whatever columns are left.
@@ -249,11 +234,10 @@ const LEAF_ITEM_TO_FOLDER: Record<string, string> = (() => {
 /**
  * The URL a navbar leaf item (e.g. "Plywood", "LED Bulb", "Overhead Tank")
  * should link to. Every leaf item in `NAV_CATEGORIES` already has a real
- * page to land on — either its folder's own dedicated static page (e.g.
- * `/products/items/plywood-blockboards/plywood`) or that folder's generic
- * `[subcategory]` catch-all — so this always resolves to a proper
- * `/products/items/<folder>/<slug>` listing page (with its own filters,
- * facets, etc.) rather than the bare `/products?category=` fallback.
+ * page to land on via its folder's generic `[subcategory]` catch-all — so
+ * this always resolves to a proper `/products/items/<folder>/<slug>`
+ * listing page (with its own filters, facets, etc.) rather than the bare
+ * `/products?category=` fallback.
  *
  * Only a category that isn't in the navbar taxonomy at all (shouldn't
  * happen for a real menu click, but possible for an ad-hoc/legacy link)
