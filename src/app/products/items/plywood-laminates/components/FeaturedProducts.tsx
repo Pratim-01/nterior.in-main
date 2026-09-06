@@ -1,37 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { Product, ProductsResponse } from "@/types/products";
+import ProductCard from "../../../listing/ProductCard";
 
-type Product = {
-  product_id: number;
-  product_name: string;
-  category: string;
-  product_type: "sqft" | "unit";
-  short_description: string | null;
-  sell_mrp: number | string;
-  mrp: number | string;
-  gst_percentage: number | string;
-  gst_exclude: number;
-  image_url: string | null;
-  image_alt_text: string | null;
-};
-
-type ApiResponse = {
-  success: boolean;
-  products: Product[];
-  message?: string;
-};
-
-function formatPrice(price: number | string) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(Number(price));
+function SkeletonCard() {
+  return (
+    <div className="h-[380px] animate-pulse rounded-[10px] border border-[#eee] bg-[#f7f7f7]" />
+  );
 }
 
+// Uses the exact same ProductCard used by the full listing (src/app/
+// products/listing/ProductCard.tsx) and the exact same /api/products
+// endpoint, just capped to 5 results sorted newest-first — so this strip
+// always looks and behaves identically to the dynamic catalogue below it,
+// with zero duplicated card markup or fetch logic.
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,24 +29,18 @@ export default function FeaturedProducts() {
         setError("");
 
         const response = await fetch(
-          "/api/kayapalat-products?category=Plywood"
+          "/api/products?category=Plywood&sort=newest&pageSize=5"
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch tile products");
+          throw new Error("Failed to fetch plywood products");
         }
 
-        const data: ApiResponse = await response.json();
-
-        if (!data.success) {
-          throw new Error(
-            data.message || "Failed to fetch tile products"
-          );
-        }
+        const data: ProductsResponse = await response.json();
 
         setProducts(data.products || []);
       } catch (error) {
-        console.error("Tile products fetch error:", error);
+        console.error("Plywood products fetch error:", error);
 
         setError("Unable to load products right now.");
       } finally {
@@ -73,8 +52,8 @@ export default function FeaturedProducts() {
   }, []);
 
   return (
-    <section className="w-full bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-10 lg:py-20">
-      <div className="mx-auto w-full max-w-[1500px]">
+    <section className="w-full bg-[#FFF5F5] px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-16 lg:px-10 lg:pt-8 lg:pb-20">
+      <div className="mx-auto w-full max-w-[1400px]">
         {/* =====================================================
             SECTION HEADER
         ===================================================== */}
@@ -104,33 +83,16 @@ export default function FeaturedProducts() {
 
             <h2
               className="
+                font-[Candal]
                 text-2xl
-                font-black
                 tracking-tight
                 text-[#202020]
                 sm:text-3xl
                 lg:text-4xl
               "
             >
-              Explore Our Range of Ply Woods
+              Explore Our Range of Plywood
             </h2>
-
-            {/* DESCRIPTION */}
-
-            <p
-              className="
-                mt-2
-                hidden
-                max-w-xl
-                text-sm
-                leading-6
-                text-gray-500
-                sm:block
-              "
-            >
-              Discover premium Ply Wood selected to bring style,
-              durability and character to every interior space.
-            </p>
           </div>
 
           {/* ===================================================
@@ -138,7 +100,7 @@ export default function FeaturedProducts() {
           =================================================== */}
 
           <Link
-            href="/products/items/tiles"
+            href="/products/items/plywood-laminates/plywood"
             className="
               group
               flex
@@ -194,40 +156,29 @@ export default function FeaturedProducts() {
         {loading && (
           <div
             className="
-              grid
-              grid-cols-2
-              gap-3
+              flex
+              gap-4
+              overflow-x-auto
+              pb-1
+              snap-x
+              snap-mandatory
+              [&::-webkit-scrollbar]:hidden
+              sm:grid
               sm:grid-cols-3
               sm:gap-5
+              sm:overflow-visible
+              sm:pb-0
+              sm:snap-none
               lg:grid-cols-5
             "
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
-                className="
-                  overflow-hidden
-                  rounded-2xl
-                  border
-                  border-gray-100
-                  bg-white
-                "
+                className="w-[44%] max-w-[220px] shrink-0 snap-start sm:w-auto sm:max-w-none sm:shrink"
               >
-                <div
-                  className="
-                    aspect-square
-                    animate-pulse
-                    bg-gray-100
-                  "
-                />
-
-                <div className="space-y-3 p-4 sm:p-5">
-                  <div className="h-3 w-1/3 animate-pulse rounded bg-gray-100" />
-
-                  <div className="h-4 w-4/5 animate-pulse rounded bg-gray-100" />
-
-                  <div className="h-5 w-2/5 animate-pulse rounded bg-gray-100" />
-                </div>
+                <SkeletonCard />
               </div>
             ))}
           </div>
@@ -273,293 +224,43 @@ export default function FeaturedProducts() {
             "
           >
             <p className="text-sm font-medium text-gray-500">
-              No tile products are available right now.
+              No plywood products are available right now.
             </p>
           </div>
         )}
 
         {/* =====================================================
-            PRODUCT GRID
+            PRODUCT GRID — same ProductCard the dynamic listing uses
         ===================================================== */}
 
         {!loading && !error && products.length > 0 && (
           <div
             className="
-              grid
-              grid-cols-2
-              gap-3
+              flex
+              gap-4
+              overflow-x-auto
+              pb-1
+              snap-x
+              snap-mandatory
+              [&::-webkit-scrollbar]:hidden
+              sm:grid
               sm:grid-cols-3
               sm:gap-5
+              sm:overflow-visible
+              sm:pb-0
+              sm:snap-none
               lg:grid-cols-5
             "
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {products.slice(0, 5).map((product) => {
-              const price = Number(product.sell_mrp);
-              const mrp = Number(product.mrp);
-
-              return (
-                <Link
-                  key={product.product_id}
-                  href={`/products/${product.product_id}`}
-                  className="
-                    group
-                    relative
-                    flex
-                    min-w-0
-                    flex-col
-                    overflow-hidden
-                    rounded-2xl
-                    border
-                    border-gray-200
-                    bg-white
-                    shadow-sm
-                    transition-all
-                    duration-300
-                    hover:-translate-y-1
-                    hover:border-red-100
-                    hover:shadow-[0_14px_35px_rgba(0,0,0,0.10)]
-                    focus:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-[rgb(207,0,6)]
-                    focus-visible:ring-offset-2
-                  "
-                >
-                  {/* =================================================
-                      PRODUCT IMAGE
-                  ================================================= */}
-
-                  <div
-                    className="
-                      relative
-                      aspect-square
-                      overflow-hidden
-                      bg-[#f7f7f7]
-                    "
-                  >
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={
-                          product.image_alt_text ||
-                          product.product_name
-                        }
-                        loading="lazy"
-                        className="
-                          absolute
-                          inset-0
-                          h-full
-                          w-full
-                          object-contain
-                          p-4
-                          transition-transform
-                          duration-500
-                          ease-out
-                          group-hover:scale-[1.05]
-                          sm:p-6
-                        "
-                      />
-                    ) : (
-                      <div
-                        className="
-                          flex
-                          h-full
-                          items-center
-                          justify-center
-                        "
-                      >
-                        <span className="text-xs text-gray-400">
-                          No image available
-                        </span>
-                      </div>
-                    )}
-
-                    {/* IMAGE OVERLAY */}
-
-                    <div
-                      aria-hidden="true"
-                      className="
-                        pointer-events-none
-                        absolute
-                        inset-0
-                        bg-gradient-to-t
-                        from-black/5
-                        to-transparent
-                      "
-                    />
-
-                    {/* PRODUCT TYPE */}
-
-                    <span
-                      className="
-                        absolute
-                        left-3
-                        top-3
-                        rounded-full
-                        bg-white/95
-                        px-2.5
-                        py-1
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-wide
-                        text-gray-700
-                        shadow-sm
-                        backdrop-blur-sm
-                      "
-                    >
-                      {product.product_type}
-                    </span>
-
-                    {/* SHOP ICON */}
-
-                    <span
-                      className="
-                        absolute
-                        right-3
-                        top-3
-                        flex
-                        h-9
-                        w-9
-                        translate-y-1
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-white/95
-                        text-[rgb(207,0,6)]
-                        opacity-0
-                        shadow-md
-                        backdrop-blur-sm
-                        transition-all
-                        duration-300
-                        group-hover:translate-y-0
-                        group-hover:opacity-100
-                      "
-                    >
-                      <ShoppingBag
-                        size={16}
-                        strokeWidth={1.8}
-                      />
-                    </span>
-                  </div>
-
-                  {/* =================================================
-                      PRODUCT INFORMATION
-                  ================================================= */}
-
-                  <div className="flex flex-1 flex-col p-4 sm:p-5">
-                    {/* CATEGORY */}
-
-                    <p
-                      className="
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-[0.12em]
-                        text-[rgb(207,0,6)]
-                        sm:text-xs
-                      "
-                    >
-                      {product.category}
-                    </p>
-
-                    {/* PRODUCT NAME */}
-
-                    <h3
-                      className="
-                        mt-1
-                        line-clamp-2
-                        min-h-[40px]
-                        text-sm
-                        font-bold
-                        leading-5
-                        text-gray-900
-                        transition-colors
-                        duration-200
-                        group-hover:text-[rgb(207,0,6)]
-                        sm:text-base
-                        sm:leading-6
-                      "
-                    >
-                      {product.product_name}
-                    </h3>
-
-                    {/* DESCRIPTION */}
-
-                    {product.short_description && (
-                      <p
-                        className="
-                          mt-2
-                          hidden
-                          line-clamp-2
-                          text-xs
-                          leading-5
-                          text-gray-500
-                          sm:block
-                        "
-                      >
-                        {product.short_description}
-                      </p>
-                    )}
-
-                    {/* PRICE */}
-
-                    <div className="mt-auto pt-4">
-                      <div className="flex flex-wrap items-baseline gap-2">
-                        <span
-                          className="
-                            text-lg
-                            font-black
-                            text-[rgb(207,0,6)]
-                            sm:text-xl
-                          "
-                        >
-                          {formatPrice(price)}
-                        </span>
-
-                        {mrp > price && (
-                          <span
-                            className="
-                              text-xs
-                              text-gray-400
-                              line-through
-                              sm:text-sm
-                            "
-                          >
-                            {formatPrice(mrp)}
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="mt-1 text-[11px] text-gray-500 sm:text-xs">
-                        {product.gst_exclude
-                          ? `GST ${product.gst_percentage}% extra`
-                          : `Incl. GST ${product.gst_percentage}%`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* =================================================
-                      BOTTOM ACCENT
-                  ================================================= */}
-
-                  <div
-                    aria-hidden="true"
-                    className="
-                      h-1
-                      w-full
-                      bg-gradient-to-r
-                      from-[rgb(255,170,0)]
-                      via-[rgb(255,110,0)]
-                      to-[rgb(207,0,6)]
-                      opacity-0
-                      transition-opacity
-                      duration-300
-                      group-hover:opacity-100
-                    "
-                  />
-                </Link>
-              );
-            })}
+            {products.map((product) => (
+              <div
+                key={product.productId}
+                className="w-[44%] max-w-[220px] shrink-0 snap-start sm:w-auto sm:max-w-none sm:shrink"
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
           </div>
         )}
       </div>
