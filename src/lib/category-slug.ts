@@ -50,6 +50,15 @@ const TAXONOMY_NAME_BY_SLUG: Record<string, string> = (() => {
  */
 const CATEGORY_OVERRIDES: Record<string, string> = {
   "eng-board": "Engineered Board",
+
+  // Ebco brand showcase (src/app/products/items/hardware/components/
+  // EbcoShowcase.tsx) — these 7 category lines aren't in the navbar
+  // taxonomy, so most already round-trip fine through the generic Title
+  // Case fallback below (e.g. "digital-locks" -> "Digital Locks"). Only
+  // the three with a comma or "&" need an explicit override here.
+  "drawer-slides-hinges": "Drawer Slides & Hinges",
+  "joinery-fittings-screws": "Joinery, Fittings & Screws",
+  "window-door-glass-hardware": "Window, Door & Glass Hardware",
 };
 
 /**

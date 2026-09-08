@@ -2,13 +2,42 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
-import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+
+/* ==========================================================
+   CATEGORY PAGE URL
+   Same slug map + `/products/items/<slug>` pattern as the
+   Navbar, so clicking a card opens the exact same page as
+   clicking the matching item in the Navbar.
+========================================================== */
+
+function getCategoryHref(categoryName: string) {
+  const slugMap: Record<string, string> = {
+    Tiles: "tiles",
+    Electricals: "electricals",
+    "Power & Hand Tools": "power-hand-tools",
+    "Plywood & Laminates": "plywood-laminates",
+    Hardware: "hardware",
+    Paints: "paints",
+    "Lighting & Fans": "lighting-fans",
+    Bathroom: "bathroom",
+    "Sofa and Dining": "sofa-dining",
+    Plumbing: "plumbing",
+    Kitchen: "kitchen",
+    Appliances: "appliances",
+  };
+
+  const slug =
+    slugMap[categoryName] ??
+    categoryName
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/\s+/g, "-");
+
+  return `/products/items/${slug}`;
+}
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -41,8 +70,7 @@ const categoryGroups: Category[][] = [
     {
       id: 1,
       title: "Tiles",
-      description:
-        "Premium tiles for floors, walls and modern interiors.",
+      description: "Premium tiles for floors, walls and modern interiors.",
       slug: "tiles",
       image:
         "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=85",
@@ -50,26 +78,23 @@ const categoryGroups: Category[][] = [
     {
       id: 2,
       title: "Electricals",
-      description:
-        "Reliable electrical solutions for modern homes.",
+      description: "Reliable electrical solutions for modern homes.",
       slug: "electricals",
       image:
         "https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=1000&q=85",
     },
     {
       id: 3,
-      title: "Panels & Boards",
-      description:
-        "Quality panels and boards for stylish interiors.",
-      slug: "panels-boards",
+      title: "Power & Hand Tools",
+      description: "Reliable power and hand tools for every job.",
+      slug: "power-hand-tools",
       image:
         "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85",
     },
     {
       id: 4,
       title: "Plywood & Laminates",
-      description:
-        "Durable plywood and premium laminates.",
+      description: "Durable plywood and premium laminates.",
       slug: "plywood-laminates",
       image:
         "https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=1000&q=85",
@@ -84,8 +109,7 @@ const categoryGroups: Category[][] = [
     {
       id: 5,
       title: "Hardware",
-      description:
-        "Functional hardware for furniture and interiors.",
+      description: "Functional hardware for furniture and interiors.",
       slug: "hardware",
       image:
         "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1400&q=85",
@@ -93,8 +117,7 @@ const categoryGroups: Category[][] = [
     {
       id: 6,
       title: "Paints",
-      description:
-        "Premium colours and finishes for every room.",
+      description: "Premium colours and finishes for every room.",
       slug: "paints",
       image:
         "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1000&q=85",
@@ -102,8 +125,7 @@ const categoryGroups: Category[][] = [
     {
       id: 7,
       title: "Lighting & Fans",
-      description:
-        "Lighting and ceiling fans for comfortable living.",
+      description: "Lighting and ceiling fans for comfortable living.",
       slug: "lighting-fans",
       image:
         "https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=1000&q=85",
@@ -111,8 +133,7 @@ const categoryGroups: Category[][] = [
     {
       id: 8,
       title: "Bathroom",
-      description:
-        "Modern bathroom fixtures and interior essentials.",
+      description: "Modern bathroom fixtures and interior essentials.",
       slug: "bathroom",
       image:
         "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=1000&q=85",
@@ -127,8 +148,7 @@ const categoryGroups: Category[][] = [
     {
       id: 9,
       title: "Sofa and Dining",
-      description:
-        "Comfortable seating and elegant dining furniture.",
+      description: "Comfortable seating and elegant dining furniture.",
       slug: "sofa-dining",
       image:
         "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1400&q=85",
@@ -136,8 +156,7 @@ const categoryGroups: Category[][] = [
     {
       id: 10,
       title: "Kitchen",
-      description:
-        "Modern kitchen solutions for everyday living.",
+      description: "Modern kitchen solutions for everyday living.",
       slug: "kitchen",
       image:
         "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=85",
@@ -145,18 +164,16 @@ const categoryGroups: Category[][] = [
     {
       id: 11,
       title: "Appliances",
-      description:
-        "Smart appliances designed for modern homes.",
+      description: "Smart appliances designed for modern homes.",
       slug: "appliances",
       image:
         "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",
     },
     {
       id: 12,
-      title: "Rugs & Curtains",
-      description:
-        "Finishing touches for beautiful and comfortable spaces.",
-      slug: "rugs-curtains",
+      title: "Plumbing",
+      description: "Pipes, fittings and plumbing essentials that last.",
+      slug: "plumbing",
       image:
         "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=85",
     },
@@ -176,7 +193,7 @@ function CategoryCard({
 }) {
   return (
     <Link
-      href={`/category/${category.slug}`}
+      href={getCategoryHref(category.title)}
       className="
         group
         relative
@@ -184,14 +201,20 @@ function CategoryCard({
         h-full
         w-full
         overflow-hidden
-        rounded-[18px]
+        rounded-2xl
         bg-gray-200
-        shadow-sm
+
+        ring-1
+        ring-black/5
+
+        shadow-[0_1px_2px_rgba(0,0,0,0.06)]
+
         transition-all
         duration-500
+
         hover:-translate-y-1
-        hover:shadow-2xl
-        sm:rounded-[22px]
+        hover:shadow-[0_16px_32px_-8px_rgba(207,0,6,0.25)]
+        hover:ring-black/0
       "
     >
       {/* IMAGE */}
@@ -221,12 +244,41 @@ function CategoryCard({
           absolute
           inset-0
           bg-gradient-to-t
-          from-black/85
-          via-black/20
+          from-black/80
+          via-black/10
           to-transparent
           transition-all
           duration-500
           group-hover:from-black/90
+        "
+      />
+
+      {/* TOP-LEFT ACCENT DOT — small brand touch */}
+
+      <div
+        className="
+          absolute
+          left-3
+          top-3
+
+          h-1.5
+          w-1.5
+
+          rounded-full
+
+          bg-[rgb(255,170,0)]
+
+          opacity-0
+
+          shadow-[0_0_0_3px_rgba(255,170,0,0.25)]
+
+          transition-opacity
+          duration-500
+
+          group-hover:opacity-100
+
+          sm:left-4
+          sm:top-4
         "
       />
 
@@ -249,9 +301,10 @@ function CategoryCard({
             tracking-tight
             text-white
 
-            ${featured
-              ? "text-xl sm:text-2xl lg:text-4xl"
-              : "text-sm sm:text-lg lg:text-xl"
+            ${
+              featured
+                ? "text-xl sm:text-2xl lg:text-4xl"
+                : "text-sm sm:text-lg lg:text-xl"
             }
           `}
         >
@@ -262,11 +315,12 @@ function CategoryCard({
           className={`
             max-w-md
             overflow-hidden
-            text-white/75
+            text-white/80
 
-            ${featured
-              ? "mt-1 max-h-10 text-[10px] leading-4 sm:mt-2 sm:max-h-12 sm:text-sm sm:leading-5"
-              : "hidden sm:mt-2 sm:max-h-12 sm:text-xs sm:leading-5 sm:opacity-0 sm:transition-all sm:duration-500 sm:group-hover:max-h-12 sm:group-hover:opacity-100"
+            ${
+              featured
+                ? "mt-1 max-h-10 text-[10px] leading-4 sm:mt-2 sm:max-h-12 sm:text-sm sm:leading-5"
+                : "hidden sm:mt-2 sm:max-h-12 sm:text-xs sm:leading-5 sm:opacity-0 sm:transition-all sm:duration-500 sm:group-hover:max-h-12 sm:group-hover:opacity-100"
             }
           `}
         >
@@ -275,66 +329,59 @@ function CategoryCard({
 
         <div
           className="
-            mt-1
-            flex
+            mt-1.5
+
+            inline-flex
             items-center
             gap-1
+
+            rounded-full
+
+            bg-white/10
+
+            px-2
+            py-0.5
+
             text-[8px]
             font-bold
             uppercase
             tracking-[0.12em]
             text-white
-            transition-transform
+
+            backdrop-blur-sm
+
+            transition-all
             duration-300
-            group-hover:translate-x-1
+
+            group-hover:gap-1.5
+            group-hover:bg-[rgb(207,0,6)]
+
             sm:mt-3
+            sm:px-2.5
+            sm:py-1
             sm:text-[10px]
           "
         >
           Explore
-
           <ChevronRight
             size={12}
             className="
               transition-transform
               duration-300
-              group-hover:translate-x-1
+              group-hover:translate-x-0.5
             "
           />
         </div>
       </div>
-
-      {/* HOVER BORDER */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          rounded-[18px]
-          border
-          border-white/0
-          transition-all
-          duration-500
-          group-hover:border-white/30
-          sm:rounded-[22px]
-        "
-      />
     </Link>
   );
 }
 
 /* ==========================================================
-   SLIDE 1
-   LARGE LEFT
-   3 SUPPORTING CARDS RIGHT
+   SLIDE 1 — LARGE LEFT, 3 SUPPORTING CARDS RIGHT
 ========================================================== */
 
-function SlideOne({
-  categories,
-}: {
-  categories: Category[];
-}) {
+function SlideOne({ categories }: { categories: Category[] }) {
   return (
     <div
       className="
@@ -351,79 +398,19 @@ function SlideOne({
         lg:gap-4
       "
     >
-      {/* ELECTRICALS */}
-
-      <div
-        className="
-          order-1
-          h-[105px]
-
-          sm:h-[125px]
-
-          lg:col-start-3
-          lg:row-start-1
-          lg:h-auto
-        "
-      >
+      <div className="order-1 h-[105px] sm:h-[125px] lg:col-start-3 lg:row-start-1 lg:h-auto">
         <CategoryCard category={categories[1]} />
       </div>
 
-      {/* PANELS & BOARDS */}
-
-      <div
-        className="
-          order-2
-          h-[105px]
-
-          sm:h-[125px]
-
-          lg:col-start-4
-          lg:row-start-1
-          lg:h-auto
-        "
-      >
+      <div className="order-2 h-[105px] sm:h-[125px] lg:col-start-4 lg:row-start-1 lg:h-auto">
         <CategoryCard category={categories[2]} />
       </div>
 
-      {/* TILES */}
-
-      <div
-        className="
-          order-3
-          col-span-2
-          h-[205px]
-
-          sm:h-[240px]
-
-          lg:col-start-1
-          lg:col-span-2
-          lg:row-start-1
-          lg:row-span-2
-          lg:h-auto
-        "
-      >
-        <CategoryCard
-          category={categories[0]}
-          featured
-        />
+      <div className="order-3 col-span-2 h-[205px] sm:h-[240px] lg:col-start-1 lg:col-span-2 lg:row-start-1 lg:row-span-2 lg:h-auto">
+        <CategoryCard category={categories[0]} featured />
       </div>
 
-      {/* PLYWOOD */}
-
-      <div
-        className="
-          order-4
-          col-span-2
-          h-[110px]
-
-          sm:h-[135px]
-
-          lg:col-start-3
-          lg:col-span-2
-          lg:row-start-2
-          lg:h-auto
-        "
-      >
+      <div className="order-4 col-span-2 h-[110px] sm:h-[135px] lg:col-start-3 lg:col-span-2 lg:row-start-2 lg:h-auto">
         <CategoryCard category={categories[3]} />
       </div>
     </div>
@@ -431,29 +418,10 @@ function SlideOne({
 }
 
 /* ==========================================================
-   SLIDE 2
-   LARGE CENTER
-   LEFT STACK
-   RIGHT FULL HEIGHT
-
-   DESKTOP:
-
-   ┌───────────┬───────────────┬───────────┐
-   │           │               │           │
-   │   PAINTS  │               │           │
-   ├───────────┤   HARDWARE    │ LIGHTING  │
-   │ BATHROOM  │               │     &     │
-   │           │               │   FANS    │
-   └───────────┴───────────────┴───────────┘
-
-   NO EMPTY GRID AREA
+   SLIDE 2 — LARGE CENTER
 ========================================================== */
 
-function SlideTwo({
-  categories,
-}: {
-  categories: Category[];
-}) {
+function SlideTwo({ categories }: { categories: Category[] }) {
   return (
     <div
       className="
@@ -470,83 +438,19 @@ function SlideTwo({
         lg:gap-4
       "
     >
-      {/* PAINTS */}
-
-      <div
-        className="
-          order-1
-          h-[105px]
-
-          sm:h-[125px]
-
-          lg:col-start-1
-          lg:row-start-1
-          lg:h-auto
-        "
-      >
+      <div className="order-1 h-[105px] sm:h-[125px] lg:col-start-1 lg:row-start-1 lg:h-auto">
         <CategoryCard category={categories[1]} />
       </div>
 
-      {/* LIGHTING & FANS
-          FIXED:
-          SPANS BOTH DESKTOP ROWS
-      */}
-
-      <div
-        className="
-          order-2
-          h-[105px]
-
-          sm:h-[125px]
-
-          lg:col-start-4
-          lg:row-start-1
-          lg:row-span-2
-          lg:h-auto
-        "
-      >
+      <div className="order-2 h-[105px] sm:h-[125px] lg:col-start-4 lg:row-start-1 lg:row-span-2 lg:h-auto">
         <CategoryCard category={categories[2]} />
       </div>
 
-      {/* HARDWARE */}
-
-      <div
-        className="
-          order-3
-          col-span-2
-          h-[205px]
-
-          sm:h-[240px]
-
-          lg:col-start-2
-          lg:col-span-2
-          lg:row-start-1
-          lg:row-span-2
-          lg:h-auto
-        "
-      >
-        <CategoryCard
-          category={categories[0]}
-          featured
-        />
+      <div className="order-3 col-span-2 h-[205px] sm:h-[240px] lg:col-start-2 lg:col-span-2 lg:row-start-1 lg:row-span-2 lg:h-auto">
+        <CategoryCard category={categories[0]} featured />
       </div>
 
-      {/* BATHROOM */}
-
-      <div
-        className="
-          order-4
-          col-span-2
-          h-[110px]
-
-          sm:h-[135px]
-
-          lg:col-start-1
-          lg:col-span-1
-          lg:row-start-2
-          lg:h-auto
-        "
-      >
+      <div className="order-4 col-span-2 h-[110px] sm:h-[135px] lg:col-start-1 lg:col-span-1 lg:row-start-2 lg:h-auto">
         <CategoryCard category={categories[3]} />
       </div>
     </div>
@@ -554,16 +458,10 @@ function SlideTwo({
 }
 
 /* ==========================================================
-   SLIDE 3
-   LARGE RIGHT
-   SMALL LEFT
+   SLIDE 3 — LARGE RIGHT
 ========================================================== */
 
-function SlideThree({
-  categories,
-}: {
-  categories: Category[];
-}) {
+function SlideThree({ categories }: { categories: Category[] }) {
   return (
     <div
       className="
@@ -580,81 +478,19 @@ function SlideThree({
         lg:gap-4
       "
     >
-      {/* KITCHEN */}
-
-      <div
-        className="
-          order-1
-          h-[105px]
-
-          sm:h-[125px]
-
-          lg:col-start-1
-          lg:col-span-1
-          lg:row-start-1
-          lg:h-auto
-        "
-      >
+      <div className="order-1 h-[105px] sm:h-[125px] lg:col-start-1 lg:col-span-1 lg:row-start-1 lg:h-auto">
         <CategoryCard category={categories[1]} />
       </div>
 
-      {/* APPLIANCES */}
-
-      <div
-        className="
-          order-2
-          h-[105px]
-
-          sm:h-[125px]
-
-          lg:col-start-2
-          lg:col-span-1
-          lg:row-start-1
-          lg:h-auto
-        "
-      >
+      <div className="order-2 h-[105px] sm:h-[125px] lg:col-start-2 lg:col-span-1 lg:row-start-1 lg:h-auto">
         <CategoryCard category={categories[2]} />
       </div>
 
-      {/* SOFA & DINING */}
-
-      <div
-        className="
-          order-3
-          col-span-2
-          h-[205px]
-
-          sm:h-[240px]
-
-          lg:col-start-3
-          lg:col-span-2
-          lg:row-start-1
-          lg:row-span-2
-          lg:h-auto
-        "
-      >
-        <CategoryCard
-          category={categories[0]}
-          featured
-        />
+      <div className="order-3 col-span-2 h-[205px] sm:h-[240px] lg:col-start-3 lg:col-span-2 lg:row-start-1 lg:row-span-2 lg:h-auto">
+        <CategoryCard category={categories[0]} featured />
       </div>
 
-      {/* RUGS & CURTAINS */}
-
-      <div
-        className="
-          order-4
-          col-span-2
-          h-[110px]
-
-          sm:h-[135px]
-
-          lg:col-start-1
-          lg:col-span-2
-          lg:row-start-2
-          lg:h-auto
-        "
-      >
+      <div className="order-4 col-span-2 h-[110px] sm:h-[135px] lg:col-start-1 lg:col-span-2 lg:row-start-2 lg:h-auto">
         <CategoryCard category={categories[3]} />
       </div>
     </div>
@@ -667,6 +503,9 @@ function SlideThree({
 
 export default function Categories() {
   const swiperRef = useRef<SwiperType | null>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const slideCount = categoryGroups.length;
 
   return (
     <section
@@ -675,7 +514,9 @@ export default function Categories() {
         overflow-hidden
         bg-[#FFF5F5]
         py-10
+
         sm:py-14
+
         md:py-16
       "
     >
@@ -685,6 +526,7 @@ export default function Categories() {
           w-full
           max-w-7xl
           px-4
+
           sm:px-6
         "
       >
@@ -695,10 +537,13 @@ export default function Categories() {
         <div
           className="
             mb-6
+
             flex
+            flex-wrap
             items-end
             justify-between
             gap-4
+
             sm:mb-8
           "
         >
@@ -706,13 +551,7 @@ export default function Categories() {
             {/* LABEL */}
 
             <div className="mb-2 flex items-center gap-2">
-              <span
-                className="
-                  h-px
-                  w-7
-                  bg-[rgb(255,170,0)]
-                "
-              />
+              <span className="h-px w-7 bg-[rgb(255,170,0)]" />
 
               <span
                 className="
@@ -721,6 +560,7 @@ export default function Categories() {
                   uppercase
                   tracking-[0.2em]
                   text-[rgb(255,170,0)]
+
                   sm:text-[11px]
                 "
               >
@@ -732,33 +572,39 @@ export default function Categories() {
 
             <h2
               className="
-    text-3xl
-    font-black
-    leading-none
-    tracking-tight
-    text-[rgb(207,0,6)]
-    sm:text-4xl
-    lg:text-5xl
-  "
+                text-3xl
+                font-black
+                leading-none
+                tracking-tight
+                text-[rgb(207,0,6)]
+
+                sm:text-4xl
+
+                lg:text-5xl
+              "
             >
               Building Materials &amp; Essentials
-      
             </h2>
 
             {/* PARAGRAPH */}
 
             <p
               className="
-    mt-2
-    max-w-3xl
-    text-xs
-    leading-5
-    text-[rgb(120,90,0)]
-    sm:text-lg
-    sm:leading-6
-  "
+                mt-2
+
+                max-w-3xl
+
+                text-xs
+                leading-5
+
+                text-[rgb(120,90,0)]
+
+                sm:text-lg
+                sm:leading-6
+              "
             >
-              Discover quality products for building, interiors, and everyday living.
+              Discover quality products for building, interiors, and everyday
+              living.
             </p>
           </div>
 
@@ -774,18 +620,26 @@ export default function Categories() {
                 flex
                 items-center
                 gap-2
+
                 rounded-full
+
                 border
                 border-gray-200
+
                 bg-white
+
                 px-5
                 py-3
+
                 text-sm
                 font-semibold
                 text-gray-900
+
                 shadow-sm
+
                 transition-all
                 duration-300
+
                 hover:-translate-y-0.5
                 hover:border-gray-900
                 hover:bg-[rgb(207,0,6)]
@@ -794,7 +648,6 @@ export default function Categories() {
               "
             >
               View All
-
               <ArrowRight
                 size={17}
                 className="
@@ -805,65 +658,79 @@ export default function Categories() {
               />
             </Link>
 
-            <button
-              type="button"
-              aria-label="Previous category slide"
-              onClick={() =>
-                swiperRef.current?.slidePrev()
-              }
-              className="
-                flex
-                h-11
-                w-11
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                text-gray-900
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-gray-900
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-              "
-            >
-              <ChevronLeft size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                aria-label="Previous category slide"
+                onClick={() => swiperRef.current?.slidePrev()}
+                className="
+                  flex
+                  h-11
+                  w-11
 
-            <button
-              type="button"
-              aria-label="Next category slide"
-              onClick={() =>
-                swiperRef.current?.slideNext()
-              }
-              className="
-                flex
-                h-11
-                w-11
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-gray-200
-                bg-white
-                text-gray-900
-                shadow-sm
-                transition-all
-                duration-300
-                hover:-translate-y-0.5
-                hover:border-gray-900
-                hover:bg-[rgb(207,0,6)]
-                hover:text-white
-                hover:shadow-lg
-              "
-            >
-              <ChevronRight size={20} />
-            </button>
+                  items-center
+                  justify-center
+
+                  rounded-full
+
+                  border
+                  border-gray-200
+
+                  bg-white
+
+                  text-gray-900
+
+                  shadow-sm
+
+                  transition-all
+                  duration-300
+
+                  hover:-translate-y-0.5
+                  hover:border-gray-900
+                  hover:bg-[rgb(207,0,6)]
+                  hover:text-white
+                  hover:shadow-lg
+                "
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <button
+                type="button"
+                aria-label="Next category slide"
+                onClick={() => swiperRef.current?.slideNext()}
+                className="
+                  flex
+                  h-11
+                  w-11
+
+                  items-center
+                  justify-center
+
+                  rounded-full
+
+                  border
+                  border-gray-200
+
+                  bg-white
+
+                  text-gray-900
+
+                  shadow-sm
+
+                  transition-all
+                  duration-300
+
+                  hover:-translate-y-0.5
+                  hover:border-gray-900
+                  hover:bg-[rgb(207,0,6)]
+                  hover:text-white
+                  hover:shadow-lg
+                "
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -877,13 +744,16 @@ export default function Categories() {
             onSwiper={(swiper) => {
               swiperRef.current = swiper;
             }}
+            onSlideChange={(swiper) => {
+              setActiveSlide(swiper.realIndex);
+            }}
             slidesPerView={1}
             spaceBetween={0}
             speed={900}
             loop
             allowTouchMove
             autoplay={{
-              delay: 2300,
+              delay: 3800,
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
@@ -904,17 +774,78 @@ export default function Categories() {
         </div>
 
         {/* ====================================================
+            PILL DOT PAGINATION — same visual language as Hero
+        ==================================================== */}
+
+        <div className="mt-4 flex items-center justify-center sm:mt-6">
+          <div
+            className="
+              flex
+              items-center
+              gap-1.5
+
+              rounded-full
+
+              border
+              border-gray-200
+
+              bg-white
+
+              px-2.5
+              py-1.5
+
+              shadow-sm
+            "
+          >
+            {Array.from({ length: slideCount }).map((_, index) => {
+              const isActive = activeSlide === index;
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  aria-label={`Go to slide ${index + 1}`}
+                  aria-current={isActive ? "true" : undefined}
+                  onClick={() => swiperRef.current?.slideToLoop(index)}
+                  className="flex h-3 items-center justify-center"
+                >
+                  <span
+                    className={`
+                      block
+                      h-1.5
+
+                      rounded-full
+
+                      transition-all
+                      duration-300
+
+                      ${
+                        isActive
+                          ? "w-7 bg-[rgb(255,170,0)] sm:w-9"
+                          : "w-1.5 bg-gray-300"
+                      }
+                    `}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ====================================================
             MOBILE CONTROLS
         ==================================================== */}
 
         <div
           className="
             mt-5
+
             flex
             w-full
             items-center
             justify-between
             gap-4
+
             sm:hidden
           "
         >
@@ -924,25 +855,34 @@ export default function Categories() {
               group
               inline-flex
               h-10
+
               items-center
               justify-center
+
               gap-2
+
               rounded-full
+
               border
               border-gray-200
+
               bg-white
+
               px-5
+
               text-sm
               font-semibold
               text-gray-900
+
               shadow-sm
+
               transition-all
               duration-300
+
               active:scale-95
             "
           >
             View All
-
             <ArrowRight
               size={15}
               className="
@@ -957,23 +897,29 @@ export default function Categories() {
             <button
               type="button"
               aria-label="Previous category slide"
-              onClick={() =>
-                swiperRef.current?.slidePrev()
-              }
+              onClick={() => swiperRef.current?.slidePrev()}
               className="
                 flex
                 h-10
                 w-10
+
                 items-center
                 justify-center
+
                 rounded-full
+
                 border
                 border-gray-200
+
                 bg-white
+
                 text-gray-900
+
                 shadow-sm
+
                 transition-all
                 duration-300
+
                 active:scale-90
               "
             >
@@ -983,23 +929,29 @@ export default function Categories() {
             <button
               type="button"
               aria-label="Next category slide"
-              onClick={() =>
-                swiperRef.current?.slideNext()
-              }
+              onClick={() => swiperRef.current?.slideNext()}
               className="
                 flex
                 h-10
                 w-10
+
                 items-center
                 justify-center
+
                 rounded-full
+
                 border
                 border-gray-200
+
                 bg-white
+
                 text-gray-900
+
                 shadow-sm
+
                 transition-all
                 duration-300
+
                 active:scale-90
               "
             >

@@ -51,20 +51,17 @@ export default function Hero() {
 
   /* ==========================================================
      MOBILE DETECTION
+     (mobile shows only the active slide — the peeking side
+     images are a desktop/tablet effect, like the reference)
   ========================================================== */
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
 
     checkScreenSize();
-
     window.addEventListener("resize", checkScreenSize);
 
-    return () => {
-      window.removeEventListener("resize", checkScreenSize);
-    };
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   /* ==========================================================
@@ -75,50 +72,31 @@ export default function Hero() {
     if (isPaused) return;
 
     const interval = window.setInterval(() => {
-      setCurrentSlide((prev) => {
-        return (prev + 1) % banners.length;
-      });
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, AUTO_SLIDE_TIME);
 
-    return () => {
-      window.clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [isPaused]);
 
-  /* ==========================================================
-     NEXT SLIDE
-  ========================================================== */
-
   const nextSlide = () => {
-    setCurrentSlide((prev) => {
-      return (prev + 1) % banners.length;
-    });
+    setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
-
-  /* ==========================================================
-     PREVIOUS SLIDE
-  ========================================================== */
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => {
-      return (prev - 1 + banners.length) % banners.length;
-    });
+    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
   /* ==========================================================
-     GET RELATIVE SLIDE POSITION
+     RELATIVE SLIDE POSITION
+     0 = active, -1 = previous (peeks on the left),
+     +1 = next (peeks on the right)
   ========================================================== */
 
   const getRelativePosition = (index: number) => {
     let position = index - currentSlide;
 
-    if (position > banners.length / 2) {
-      position -= banners.length;
-    }
-
-    if (position < -banners.length / 2) {
-      position += banners.length;
-    }
+    if (position > banners.length / 2) position -= banners.length;
+    if (position < -banners.length / 2) position += banners.length;
 
     return position;
   };
@@ -126,14 +104,11 @@ export default function Hero() {
   return (
     <section
       aria-label="Featured interior products"
-      className="
-        w-full
-        overflow-hidden
-        bg-white
-      "
+      className="w-full overflow-hidden bg-white"
     >
       {/* ======================================================
-          FULL WIDTH HERO WRAPPER
+          FULL WIDTH WRAPPER — lets the side slides peek in
+          from beyond the centered content column.
       ====================================================== */}
 
       <div
@@ -143,82 +118,46 @@ export default function Hero() {
           w-screen
           -translate-x-1/2
 
-          pt-[20px]
+          pt-[76px]
 
-          sm:pt-[86px]
+          sm:pt-[96px]
 
-          lg:pt-[20px]
+          lg:pt-[24px]
         "
       >
         {/* ====================================================
-            HERO IMAGE SLIDER
+            HERO SLIDER — center slide + peeking prev/next
         ==================================================== */}
 
         <div
           className="
             relative
-            h-[178px]
+            h-[190px]
             w-full
 
-            sm:h-[280px]
+            sm:h-[300px]
 
-            md:h-[340px]
+            md:h-[360px]
 
-            lg:h-[390px]
+            lg:h-[400px]
 
-            xl:h-[420px]
+            xl:h-[430px]
           "
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* ==================================================
-              SLIDES
-          ================================================== */}
-
           {banners.map((banner, index) => {
             const position = getRelativePosition(index);
-
             const isActive = position === 0;
 
-            /*
-             * On mobile:
-             * Only show the active image.
-             *
-             * This prevents the next/previous image from
-             * appearing as a clipped strip on the sides.
-             */
+            /* On mobile only the active slide is rendered —
+               no peeking strips on small screens. */
+            if (isMobile && !isActive) return null;
 
-            if (isMobile && !isActive) {
-              return null;
-            }
-
-            /*
-             * DESKTOP
-             *
-             * Main image:
-             * left edge  = 15vw
-             * right edge = 85vw
-             *
-             * Previous image:
-             * ends around 11vw
-             *
-             * Next image:
-             * starts around 89vw
-             *
-             * Therefore the white gaps are approximately:
-             *
-             * 11vw → 15vw
-             *
-             * and
-             *
-             * 85vw → 89vw
-             *
-             * The arrows are placed at 13% and 87%.
-             */
-
-            const centerPosition = isMobile
-              ? 50
-              : 50 + position * 74;
+            /* Desktop: active slide spans ~70vw, centered.
+               Previous/next slides sit ~74% further out,
+               so a sliver of each peeks in from the edges. */
+            const centerPosition = isMobile ? 50 : 50 + position * 74;
 
             return (
               <div
@@ -233,27 +172,22 @@ export default function Hero() {
 
                   rounded-xl
 
-                  sm:rounded-2xl
+                  border
+                  border-gray-200
 
-                  lg:rounded-3xl
+                  shadow-md
+
+                  sm:rounded-2xl
 
                   transition-all
                   duration-700
                   ease-[cubic-bezier(0.22,1,0.36,1)]
 
-                  ${
-                    isActive
-                      ? "z-20 opacity-100"
-                      : "z-10 opacity-100"
-                  }
+                  ${isActive ? "z-20" : "z-10"}
                 `}
                 style={{
                   left: `${centerPosition}%`,
-
-                  width: isMobile
-                    ? "calc(100vw - 16px)"
-                    : "70vw",
-
+                  width: isMobile ? "calc(100vw - 16px)" : "70vw",
                   transform: "translateX(-50%)",
                 }}
               >
@@ -262,43 +196,23 @@ export default function Hero() {
                   alt={banner.alt}
                   fill
                   priority={index === 0}
-                  sizes="
-                    (max-width: 767px) calc(100vw - 16px),
-                    70vw
-                  "
-                  className="
-                    select-none
-                    object-cover
-                    object-center
-                  "
+                  sizes="(max-width: 767px) calc(100vw - 16px), 70vw"
+                  className="select-none object-cover object-center"
                   draggable={false}
                 />
 
-                {/* ==================================================
-                    SIDE IMAGE OVERLAY
-                ================================================== */}
-
+                {/* dim the peeking side slides */}
                 {!isActive && (
-                  <div
-                    className="
-                      absolute
-                      inset-0
-                      bg-black/15
-                    "
-                  />
+                  <div className="absolute inset-0 bg-black/25" />
                 )}
               </div>
             );
           })}
 
           {/* ==================================================
-              PREVIOUS ARROW
-
-              DESKTOP:
-              Positioned in the white gap.
-
-              MOBILE:
-              Positioned inside the image.
+              ARROWS — sit in the gap between the active slide
+              and the peeking side slides on desktop; sit inside
+              the image on mobile.
           ================================================== */}
 
           <button
@@ -312,8 +226,8 @@ export default function Hero() {
               z-40
 
               flex
-              h-12
-              w-12
+              h-11
+              w-11
 
               -translate-x-1/2
               -translate-y-1/2
@@ -340,32 +254,15 @@ export default function Hero() {
 
               active:scale-95
 
-              max-md:left-3
+              max-md:left-2
               max-md:h-8
               max-md:w-8
 
               max-md:translate-x-0
             "
           >
-            <ChevronLeft
-              size={20}
-              strokeWidth={2}
-              className="
-                max-md:h-4
-                max-md:w-4
-              "
-            />
+            <ChevronLeft size={20} strokeWidth={2} className="max-md:h-4 max-md:w-4" />
           </button>
-
-          {/* ==================================================
-              NEXT ARROW
-
-              DESKTOP:
-              Positioned in the white gap.
-
-              MOBILE:
-              Positioned inside the image.
-          ================================================== */}
 
           <button
             type="button"
@@ -378,8 +275,8 @@ export default function Hero() {
               z-40
 
               flex
-              h-12
-              w-12
+              h-11
+              w-11
 
               translate-x-1/2
               -translate-y-1/2
@@ -406,40 +303,23 @@ export default function Hero() {
 
               active:scale-95
 
-              max-md:right-3
+              max-md:right-2
               max-md:h-8
               max-md:w-8
 
               max-md:translate-x-0
             "
           >
-            <ChevronRight
-              size={20}
-              strokeWidth={2}
-              className="
-                max-md:h-4
-                max-md:w-4
-              "
-            />
+            <ChevronRight size={20} strokeWidth={2} className="max-md:h-4 max-md:w-4" />
           </button>
         </div>
 
         {/* ====================================================
-            PAGINATION
+            PILL DOT PAGINATION — below the slider, like the
+            reference screenshot.
         ==================================================== */}
 
-        <div
-          className="
-            flex
-            h-9
-            w-full
-
-            items-center
-            justify-center
-
-            sm:h-12
-          "
-        >
+        <div className="flex h-8 w-full items-center justify-center sm:h-10">
           <div
             className="
               flex
@@ -460,29 +340,16 @@ export default function Hero() {
             "
           >
             {banners.map((banner, index) => {
-              const isActive =
-                currentSlide === index;
+              const isActive = currentSlide === index;
 
               return (
                 <button
                   key={banner.src}
                   type="button"
-                  onClick={() =>
-                    setCurrentSlide(index)
-                  }
-                  aria-label={`Go to banner ${
-                    index + 1
-                  }`}
-                  aria-current={
-                    isActive ? "true" : undefined
-                  }
-                  className="
-                    flex
-                    h-3
-
-                    items-center
-                    justify-center
-                  "
+                  onClick={() => setCurrentSlide(index)}
+                  aria-label={`Go to banner ${index + 1}`}
+                  aria-current={isActive ? "true" : undefined}
+                  className="flex h-3 items-center justify-center"
                 >
                   <span
                     className={`
@@ -508,7 +375,8 @@ export default function Hero() {
         </div>
 
         {/* ====================================================
-            EXPRESS DELIVERY
+            EXPRESS DELIVERY — compact strip, always inside
+            the first viewport (no extra scroll needed).
         ==================================================== */}
 
         <div
@@ -517,8 +385,7 @@ export default function Hero() {
 
             mx-auto
 
-            mt-2
-            mb-5
+            mb-3
 
             w-[calc(100%-16px)]
 
@@ -538,78 +405,45 @@ export default function Hero() {
 
             shadow-sm
 
-            sm:mt-3
-            sm:mb-14
+            sm:mb-5
 
             sm:w-[calc(100%-48px)]
 
             sm:rounded-2xl
           "
         >
-          {/* ==================================================
-              DECORATIVE GLOW
-          ================================================== */}
-
-          <div
-            className="
-              pointer-events-none
-
-              absolute
-              -right-8
-              -top-8
-
-              h-20
-              w-20
-
-              rounded-full
-
-              bg-[#ffb000]/10
-
-              blur-2xl
-
-              sm:h-32
-              sm:w-32
-            "
-          />
-
-          {/* ==================================================
-              DELIVERY CONTENT
-          ================================================== */}
-
           <div
             className="
               relative
 
               flex
-              min-h-[64px]
+              min-h-[52px]
 
               items-center
 
               gap-2
 
               px-2.5
-              py-2
+              py-1.5
 
-              sm:min-h-[88px]
+              sm:min-h-[68px]
 
               sm:gap-4
 
               sm:px-5
-              sm:py-4
+              sm:py-3
 
               lg:px-8
             "
           >
-            {/* ==================================================
-                TRUCK ICON
-            ================================================== */}
+            {/* TRUCK ICON */}
 
             <div
               className="
                 flex
 
-                h-8
-                w-8
+                h-7
+                w-7
 
                 shrink-0
 
@@ -624,37 +458,21 @@ export default function Hero() {
 
                 shadow-sm
 
-                sm:h-12
-                sm:w-12
+                sm:h-10
+                sm:w-10
               "
             >
               <Truck
-                size={16}
+                size={14}
                 strokeWidth={2}
-                className="
-                  sm:h-[22px]
-                  sm:w-[22px]
-                "
+                className="sm:h-[18px] sm:w-[18px]"
               />
             </div>
 
-            {/* ==================================================
-                DELIVERY TEXT
-            ================================================== */}
+            {/* DELIVERY TEXT */}
 
             <div className="min-w-0 flex-1">
-              <div
-                className="
-                  flex
-                  flex-wrap
-
-                  items-center
-
-                  gap-x-1
-
-                  sm:gap-x-1.5
-                "
-              >
+              <div className="flex flex-wrap items-center gap-x-1 sm:gap-x-1.5">
                 <div
                   className="
                     flex
@@ -668,38 +486,23 @@ export default function Hero() {
 
                     text-[#cf0006]
 
-                    sm:gap-1.5
+                    sm:gap-1
 
-                    sm:text-lg
+                    sm:text-sm
 
-                    lg:text-xl
+                    lg:text-base
                   "
                 >
                   <Zap
                     size={10}
                     fill="currentColor"
                     strokeWidth={2}
-                    className="
-                      sm:h-[17px]
-                      sm:w-[17px]
-                    "
+                    className="sm:h-[14px] sm:w-[14px]"
                   />
-
-                  <span>
-                    Express Delivery
-                  </span>
+                  <span>Express Delivery</span>
                 </div>
 
-                <span
-                  className="
-                    text-[8px]
-                    text-gray-300
-
-                    sm:text-base
-                  "
-                >
-                  •
-                </span>
+                <span className="text-[8px] text-gray-300 sm:text-sm">•</span>
 
                 <span
                   className="
@@ -708,7 +511,7 @@ export default function Hero() {
 
                     text-[#a76d00]
 
-                    sm:text-base
+                    sm:text-sm
                   "
                 >
                   In 4 hours
@@ -717,20 +520,17 @@ export default function Hero() {
 
               <p
                 className="
-                  mt-0.5
+                  hidden
 
-                  text-[8px]
+                  text-xs
                   leading-tight
 
                   text-gray-600
 
-                  sm:mt-1
-
-                  sm:text-sm
+                  sm:block
                 "
               >
-                Order before 4 PM to receive your
-                order in 4 hours.
+                Order before 4 PM to receive your order the same day.
               </p>
 
               <div
@@ -747,32 +547,17 @@ export default function Hero() {
 
                   text-gray-400
 
-                  sm:mt-1
-
                   sm:gap-1
 
-                  sm:text-xs
+                  sm:text-[11px]
                 "
               >
-                <MapPin
-                  size={8}
-                  strokeWidth={2}
-                  className="
-                    sm:h-3
-                    sm:w-3
-                  "
-                />
-
-                <span>
-                  Available on select pincodes &
-                  products
-                </span>
+                <MapPin size={8} strokeWidth={2} className="sm:h-3 sm:w-3" />
+                <span>Available on select pincodes &amp; products</span>
               </div>
             </div>
 
-            {/* ==================================================
-                DELIVERY TIME BADGE
-            ================================================== */}
+            {/* DELIVERY TIME BADGE (desktop) */}
 
             <div
               className="
@@ -791,35 +576,20 @@ export default function Hero() {
 
                 bg-white
 
-                px-4
-                py-2
+                px-3.5
+                py-1.5
 
                 shadow-sm
 
                 md:flex
               "
             >
-              <Clock3
-                size={17}
-                className="text-[#ffab00]"
-              />
-
-              <span
-                className="
-                  text-sm
-                  font-semibold
-
-                  text-gray-700
-                "
-              >
+              <Clock3 size={15} className="text-[#ffab00]" />
+              <span className="text-xs font-semibold text-gray-700">
                 4 Hour Delivery
               </span>
             </div>
           </div>
-
-          {/* ==================================================
-              BOTTOM ACCENT
-          ================================================== */}
 
           <div
             className="
