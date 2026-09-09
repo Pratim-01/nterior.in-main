@@ -8,16 +8,12 @@
    Brand logos are stored locally inside:
    public/brands/
 
-   The logos scroll automatically.
+   The logos scroll continuously (a true seamless marquee,
+   not a step-by-step autoplay slider).
    Brand cards are display-only and are not clickable.
 ========================================================== */
 
 import Image from "next/image";
-
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
-
-import "swiper/css";
 
 /* ==========================================================
    Brand Data
@@ -72,6 +68,10 @@ const brands = [
     logo: "/brands/vir.png",
   },
 ];
+
+/* Duplicated once so the marquee loops seamlessly at
+   translateX(-50%) — see .animate-scroll in globals.css. */
+const marqueeBrands = [...brands, ...brands];
 
 /* ==========================================================
    Top Brands Component
@@ -179,150 +179,106 @@ export default function TopBrands() {
         </div>
 
         {/* ======================================================
-            BRAND SLIDER
+            BRAND SLIDER — continuous seamless marquee
+            Kept inside the same max-w-7xl container as the
+            header above, instead of bleeding full viewport width.
         ====================================================== */}
 
-        <div
-          className="
-            w-full
-            overflow-hidden
-          "
-        >
-          <Swiper
-            modules={[Autoplay]}
-            autoplay={{
-              delay: 1200,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: false,
-            }}
-            loop={true}
-            speed={1600}
-            spaceBetween={10}
-            slidesPerView={2}
-            breakpoints={{
-              /* ==================================================
-                 MOBILE
-              ================================================== */
+        {/* accessible list for screen readers — the marquee track
+            below is decorative/duplicated and hidden from assistive tech */}
+        <span className="sr-only">
+          Brands we work with: {brands.map((brand) => brand.name).join(", ")}.
+        </span>
 
-              0: {
-                slidesPerView: 2,
-                spaceBetween: 10,
-              },
+        <div className="group relative w-full overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="
+              animate-scroll
 
-              /* ==================================================
-                 SMALL MOBILE
-              ================================================== */
+              flex
+              w-max
+              items-stretch
 
-              480: {
-                slidesPerView: 2,
-                spaceBetween: 12,
-              },
+              gap-3
 
-              /* ==================================================
-                 TABLET
-              ================================================== */
+              will-change-transform
 
-              640: {
-                slidesPerView: 3,
-                spaceBetween: 14,
-              },
+              group-hover:[animation-play-state:paused]
 
-              768: {
-                slidesPerView: 4,
-                spaceBetween: 16,
-              },
+              motion-reduce:animate-none
 
-              /* ==================================================
-                 DESKTOP
-              ================================================== */
-
-              1024: {
-                slidesPerView: 5,
-                spaceBetween: 18,
-              },
-
-              1280: {
-                slidesPerView: 6,
-                spaceBetween: 18,
-              },
-            }}
-            className="!overflow-hidden"
+              sm:gap-4
+            "
+            style={{ animationDuration: "40s" }}
           >
-            {brands.map((brand) => (
-              <SwiperSlide key={brand.id}>
+            {marqueeBrands.map((brand, index) => (
+              <div
+                key={`${brand.id}-${index}`}
+                className="
+                  flex
+                  w-[150px]
+                  shrink-0
+                  flex-col
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  border
+                  border-gray-100
+                  bg-white
+                  px-4
+                  py-5
+                  text-center
+                  shadow-sm
+                  sm:w-[180px]
+                  sm:rounded-3xl
+                "
+              >
                 {/* ==================================================
-                    BRAND CARD
-                    --------------------------------------------------
-                    Display only.
-                    No link.
-                    No hover animation.
+                    BRAND LOGO
                 ================================================== */}
 
                 <div
                   className="
-                    flex
-                    min-h-[150px]
-                    flex-col
-                    items-center
-                    justify-center
-                    rounded-2xl
-                    border
-                    border-gray-100
-                    bg-white
-                    px-4
-                    py-5
-                    text-center
-                    shadow-sm
-                    sm:min-h-[165px]
-                    sm:rounded-3xl
+                    relative
+                    h-16
+                    w-32
+                    sm:h-20
+                    sm:w-36
                   "
                 >
-                  {/* ==================================================
-                      BRAND LOGO
-                  ================================================== */}
-
-                  <div
-                    className="
-                      relative
-                      h-16
-                      w-32
-                      sm:h-20
-                      sm:w-36
+                  <Image
+                    src={brand.logo}
+                    alt={`${brand.name} logo`}
+                    fill
+                    sizes="
+                      (max-width: 640px) 128px,
+                      144px
                     "
-                  >
-                    <Image
-                      src={brand.logo}
-                      alt={`${brand.name} logo`}
-                      fill
-                      sizes="
-                        (max-width: 640px) 128px,
-                        144px
-                      "
-                      className="
-                        object-contain
-                      "
-                    />
-                  </div>
-
-                  {/* ==================================================
-                      BRAND NAME
-                  ================================================== */}
-
-                  <h3
                     className="
-                      mt-3
-                      text-xs
-                      font-semibold
-                      text-gray-800
-                      sm:text-sm
+                      object-contain
                     "
-                  >
-                    {brand.name}
-                  </h3>
+                  />
                 </div>
-              </SwiperSlide>
+
+                {/* ==================================================
+                    BRAND NAME
+                ================================================== */}
+
+                <h3
+                  className="
+                    mt-3
+                    text-xs
+                    font-semibold
+                    text-gray-800
+                    sm:text-sm
+                  "
+                >
+                  {brand.name}
+                </h3>
+              </div>
             ))}
-          </Swiper>
+          </div>
         </div>
       </div>
     </section>

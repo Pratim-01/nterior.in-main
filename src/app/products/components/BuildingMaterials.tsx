@@ -73,7 +73,7 @@ const categoryGroups: Category[][] = [
       description: "Premium tiles for floors, walls and modern interiors.",
       slug: "tiles",
       image:
-        "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=85",
+        "https://images.unsplash.com/photo-1682888818704-6dc91e9d7532?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 2,
@@ -81,7 +81,7 @@ const categoryGroups: Category[][] = [
       description: "Reliable electrical solutions for modern homes.",
       slug: "electricals",
       image:
-        "https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1607631755187-298a3f9a640a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 3,
@@ -89,7 +89,7 @@ const categoryGroups: Category[][] = [
       description: "Reliable power and hand tools for every job.",
       slug: "power-hand-tools",
       image:
-        "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1683115098516-9b8d5c643b5b?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 4,
@@ -97,7 +97,7 @@ const categoryGroups: Category[][] = [
       description: "Durable plywood and premium laminates.",
       slug: "plywood-laminates",
       image:
-        "https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1632969722694-8b158f876904?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ],
 
@@ -112,7 +112,7 @@ const categoryGroups: Category[][] = [
       description: "Functional hardware for furniture and interiors.",
       slug: "hardware",
       image:
-        "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1400&q=85",
+        "https://images.unsplash.com/photo-1722348673537-2681be7b4b88?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 6,
@@ -120,7 +120,7 @@ const categoryGroups: Category[][] = [
       description: "Premium colours and finishes for every room.",
       slug: "paints",
       image:
-        "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1674376360445-2996327553e7?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 7,
@@ -128,7 +128,7 @@ const categoryGroups: Category[][] = [
       description: "Lighting and ceiling fans for comfortable living.",
       slug: "lighting-fans",
       image:
-        "https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1718221621618-e477ce33485a?q=80&w=1189&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 8,
@@ -136,7 +136,7 @@ const categoryGroups: Category[][] = [
       description: "Modern bathroom fixtures and interior essentials.",
       slug: "bathroom",
       image:
-        "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ],
 
@@ -151,7 +151,7 @@ const categoryGroups: Category[][] = [
       description: "Comfortable seating and elegant dining furniture.",
       slug: "sofa-dining",
       image:
-        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1400&q=85",
+        "https://images.unsplash.com/photo-1560185007-5f0bb1866cab?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 10,
@@ -159,7 +159,7 @@ const categoryGroups: Category[][] = [
       description: "Modern kitchen solutions for everyday living.",
       slug: "kitchen",
       image:
-        "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1588854337236-6889d631faa8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 11,
@@ -167,7 +167,7 @@ const categoryGroups: Category[][] = [
       description: "Smart appliances designed for modern homes.",
       slug: "appliances",
       image:
-        "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 12,
@@ -175,7 +175,7 @@ const categoryGroups: Category[][] = [
       description: "Pipes, fittings and plumbing essentials that last.",
       slug: "plumbing",
       image:
-        "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1454988501794-2992f706932e?q=80&w=1174&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ],
 ];
@@ -613,7 +613,7 @@ export default function Categories() {
           ================================================== */}
 
           <div className="hidden shrink-0 items-center gap-3 sm:flex">
-            <Link
+            {/* <Link
               href="/categories"
               className="
                 group
@@ -656,7 +656,7 @@ export default function Categories() {
                   group-hover:translate-x-1
                 "
               />
-            </Link>
+            </Link> */}
 
             <div className="flex items-center gap-2">
               <button
@@ -849,7 +849,7 @@ export default function Categories() {
             sm:hidden
           "
         >
-          <Link
+          {/* <Link
             href="/categories"
             className="
               group
@@ -891,9 +891,9 @@ export default function Categories() {
                 group-hover:translate-x-1
               "
             />
-          </Link>
+          </Link> */}
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               type="button"
               aria-label="Previous category slide"
@@ -957,7 +957,7 @@ export default function Categories() {
             >
               <ChevronRight size={18} />
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
