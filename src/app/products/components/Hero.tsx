@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,26 +13,55 @@ import {
 
 /* ==========================================================
    HERO BANNERS
+   type: "image"   -> normal <Image>, src is a local/remote path
+   type: "youtube" -> src is any youtube.com/youtu.be URL
+   type: "video"   -> src is a direct .mp4/.webm file path/URL
 ========================================================== */
 
-const banners = [
+type Banner =
+  | { type: "image"; src: string; alt: string }
+  | { type: "youtube"; src: string; alt: string }
+  | { type: "video"; src: string; alt: string; poster?: string };
+
+const banners: Banner[] = [
   {
-    src: "/header/laminate.jpg",
-    alt: "Premium laminate and interior materials",
+    type: "youtube",
+    src: "https://youtu.be/sn5J852qphw",
+    alt: "Featured product video",
   },
   {
-    src: "/header/light.jpg",
-    alt: "Modern lighting and interior products",
+    type: "youtube",
+    src: "https://youtu.be/vG-NCOfc2SQ",
+    alt: "Featured product video",
   },
   {
-    src: "/header/ply.jpg",
-    alt: "Premium plywood and interior materials",
-  },
-  {
-    src: "/header/rug.jpg",
-    alt: "Interior rugs and home finishing products",
+    type: "youtube",
+    src: "https://youtu.be/NzBq0JHdpbc",
+    alt: "Featured product video",
   },
 ];
+
+/* ==========================================================
+   YOUTUBE HELPERS
+   Pulls the 11-char video ID out of any common YouTube URL
+   shape (youtu.be/ID, watch?v=ID, embed/ID, shorts/ID).
+========================================================== */
+
+function getYouTubeId(url: string): string | null {
+  const patterns = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+
+  return null;
+}
 
 /* ==========================================================
    AUTO SLIDE SPEED
@@ -64,18 +93,11 @@ export default function Hero() {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  /* ==========================================================
-     AUTOMATIC SLIDER
-  ========================================================== */
-
+  /* keep a live ref of isPaused so the message/ended listeners
+     below (set up once) always see the current value */
+  const isPausedRef = useRef(isPaused);
   useEffect(() => {
-    if (isPaused) return;
-
-    const interval = window.setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % banners.length);
-    }, AUTO_SLIDE_TIME);
-
-    return () => window.clearInterval(interval);
+    isPausedRef.current = isPaused;
   }, [isPaused]);
 
   const nextSlide = () => {
@@ -85,6 +107,59 @@ export default function Hero() {
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   };
+
+  /* ==========================================================
+     AUTOMATIC SLIDER
+     Image slides advance on a fixed timer. Video/YouTube slides
+     do NOT use the timer — they advance only once the media
+     actually finishes (see onEnded below, and the YouTube
+     "message" listener further down).
+  ========================================================== */
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const activeBanner = banners[currentSlide];
+    if (activeBanner.type !== "image") return;
+
+    const interval = window.setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, AUTO_SLIDE_TIME);
+
+    return () => window.clearInterval(interval);
+  }, [isPaused, currentSlide]);
+
+  /* ==========================================================
+     YOUTUBE "VIDEO ENDED" -> ADVANCE SLIDE
+     YouTube's embedded iframe reports player state changes via
+     postMessage once it knows the parent is "listening" (sent
+     on iframe load below). State 0 means the video ended.
+  ========================================================== */
+
+  useEffect(() => {
+    function handleYouTubeMessage(event: MessageEvent) {
+      if (event.origin !== "https://www.youtube.com") return;
+
+      let data: { event?: string; info?: { playerState?: number } };
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      if (
+        data.event === "infoDelivery" &&
+        typeof data.info?.playerState === "number" &&
+        data.info.playerState === 0 &&
+        !isPausedRef.current
+      ) {
+        nextSlide();
+      }
+    }
+
+    window.addEventListener("message", handleYouTubeMessage);
+    return () => window.removeEventListener("message", handleYouTubeMessage);
+  }, []);
 
   /* ==========================================================
      RELATIVE SLIDE POSITION
@@ -118,7 +193,7 @@ export default function Hero() {
           w-screen
           -translate-x-1/2
 
-          pt-[76px]
+          pt-[68px]
 
           sm:pt-[96px]
 
@@ -132,16 +207,16 @@ export default function Hero() {
         <div
           className="
             relative
-            h-[190px]
+            h-[clamp(200px,calc(100dvh_-_132px),320px)]
             w-full
 
-            sm:h-[300px]
+            sm:h-[clamp(260px,calc(100dvh_-_180px),380px)]
 
-            md:h-[360px]
+            md:h-[clamp(300px,calc(100dvh_-_180px),420px)]
 
-            lg:h-[400px]
+            lg:h-[clamp(340px,calc(100dvh_-_108px),460px)]
 
-            xl:h-[430px]
+            xl:h-[clamp(360px,calc(100dvh_-_108px),480px)]
           "
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -191,15 +266,74 @@ export default function Hero() {
                   transform: "translateX(-50%)",
                 }}
               >
-                <Image
-                  src={banner.src}
-                  alt={banner.alt}
-                  fill
-                  priority={index === 0}
-                  sizes="(max-width: 767px) calc(100vw - 16px), 70vw"
-                  className="select-none object-cover object-center"
-                  draggable={false}
-                />
+                {banner.type === "image" && (
+                  <Image
+                    src={banner.src}
+                    alt={banner.alt}
+                    fill
+                    priority={isActive || Math.abs(position) === 1}
+                    sizes="(max-width: 767px) calc(100vw - 16px), 70vw"
+                    className="select-none object-cover object-center"
+                    draggable={false}
+                  />
+                )}
+
+                {banner.type === "youtube" &&
+                  (() => {
+                    const youtubeId = getYouTubeId(banner.src);
+                    if (!youtubeId) return null;
+
+                    /* Only the active slide actually plays —
+                       peeking side slides show a static thumbnail
+                       instead of an autoplaying iframe, for
+                       performance. */
+                    if (isActive) {
+                      return (
+                        <iframe
+                          className="pointer-events-none h-full w-full select-none"
+                          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=0&controls=0&modestbranding=1&showinfo=0&rel=0&playsinline=1&iv_load_policy=3&enablejsapi=1`}
+                          title={banner.alt}
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen={false}
+                          onLoad={(e) => {
+                            /* tell the YouTube player we want state-change
+                               events (play/pause/ended) posted back to us */
+                            (e.target as HTMLIFrameElement).contentWindow?.postMessage(
+                              JSON.stringify({ event: "listening", id: index }),
+                              "*"
+                            );
+                          }}
+                        />
+                      );
+                    }
+
+                    return (
+                      <Image
+                        src={`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`}
+                        alt={banner.alt}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 767px) calc(100vw - 16px), 70vw"
+                        className="select-none object-cover object-center"
+                        draggable={false}
+                      />
+                    );
+                  })()}
+
+                {banner.type === "video" && (
+                  <video
+                    className="h-full w-full select-none object-cover object-center"
+                    src={banner.src}
+                    poster={banner.poster}
+                    autoPlay={isActive}
+                    muted
+                    playsInline
+                    preload={isActive ? "auto" : "none"}
+                    onEnded={() => {
+                      if (isActive && !isPausedRef.current) nextSlide();
+                    }}
+                  />
+                )}
 
                 {/* dim the peeking side slides */}
                 {!isActive && (
@@ -315,66 +449,6 @@ export default function Hero() {
         </div>
 
         {/* ====================================================
-            PILL DOT PAGINATION — below the slider, like the
-            reference screenshot.
-        ==================================================== */}
-
-        <div className="flex h-8 w-full items-center justify-center sm:h-10">
-          <div
-            className="
-              flex
-              items-center
-              gap-1
-
-              rounded-full
-
-              border
-              border-gray-200
-
-              bg-white
-
-              px-2
-              py-1
-
-              shadow-sm
-            "
-          >
-            {banners.map((banner, index) => {
-              const isActive = currentSlide === index;
-
-              return (
-                <button
-                  key={banner.src}
-                  type="button"
-                  onClick={() => setCurrentSlide(index)}
-                  aria-label={`Go to banner ${index + 1}`}
-                  aria-current={isActive ? "true" : undefined}
-                  className="flex h-3 items-center justify-center"
-                >
-                  <span
-                    className={`
-                      block
-                      h-1.5
-
-                      rounded-full
-
-                      transition-all
-                      duration-300
-
-                      ${
-                        isActive
-                          ? "w-7 bg-[rgb(255,170,0)] sm:w-9"
-                          : "w-1.5 bg-gray-300"
-                      }
-                    `}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ====================================================
             EXPRESS DELIVERY — compact strip, always inside
             the first viewport (no extra scroll needed).
         ==================================================== */}
@@ -385,7 +459,10 @@ export default function Hero() {
 
             mx-auto
 
+            mt-2
             mb-3
+
+            sm:mt-3
 
             w-[calc(100%-16px)]
 
