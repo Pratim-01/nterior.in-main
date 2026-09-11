@@ -37,6 +37,19 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ebco-dev-assets.s3.ap-south-1.amazonaws.com",
       },
+      // Amulya Mica product photography (plywood & laminate
+      // images — Shopify serves these under both /cdn/shop/files/
+      // and /cdn/shop/products/, so both are allowed here)
+      {
+        protocol: "https",
+        hostname: "www.amulyamica.com",
+        pathname: "/cdn/shop/**",
+      },
+      {
+        protocol: "https",
+        hostname: "fevicol.in",
+        pathname: "/wp-content/uploads/**",
+      },
       // // Kayapalat product images
       // {
       //   protocol: "https",

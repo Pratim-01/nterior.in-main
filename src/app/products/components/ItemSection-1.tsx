@@ -31,9 +31,9 @@ const plywoodProducts: Product[] = [
   {
     id: 1,
     slug: "marine-plywood",
-    title: "Marine Plywood",
+    title: "E-0 Marine Grade Plywood",
     image:
-      "https://images.unsplash.com/photo-1700973408133-b45276ec8feb?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/PLatinum_Plus_Plywood_1_960x_crop_center.jpg?v=1778051385",
     price: "₹2,199",
     oldPrice: "₹2,799",
     discount: "21% OFF",
@@ -41,9 +41,9 @@ const plywoodProducts: Product[] = [
   {
     id: 2,
     slug: "commercial-plywood",
-    title: "Commercial Plywood",
+    title: "Amulya Elite Plywood",
     image:
-      "https://images.unsplash.com/photo-1702195789139-4897ff9b0083?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/Amulya_Elite_69_960x_crop_center.jpg?v=1777536929",
     price: "₹1,499",
     oldPrice: "₹1,899",
     discount: "21% OFF",
@@ -51,9 +51,9 @@ const plywoodProducts: Product[] = [
   {
     id: 3,
     slug: "mdf-board",
-    title: "MDF Board",
+    title: "GOLD PLUS BWP PLYWOOD",
     image:
-      "https://images.unsplash.com/photo-1611600700192-d87eaeed4f81?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/Amulya_Gold_Plus_69_960x_crop_center.jpg?v=1777536773",
     price: "₹1,099",
     oldPrice: "₹1,399",
     discount: "21% OFF",
@@ -61,9 +61,9 @@ const plywoodProducts: Product[] = [
   {
     id: 4,
     slug: "block-board",
-    title: "Block Board",
+    title: "ULTRA MR PLYWOOD",
     image:
-      "https://images.unsplash.com/photo-1575204015311-0fe377370780?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/ULTRA_MR_960x_crop_center.jpg?v=1778052420",
     price: "₹1,699",
     oldPrice: "₹2,199",
     discount: "23% OFF",
@@ -71,9 +71,9 @@ const plywoodProducts: Product[] = [
   {
     id: 5,
     slug: "waterproof-plywood-sheets",
-    title: "Waterproof Plywood Sheets",
+    title: "GOLD PLYWOOD",
     image:
-      "https://images.unsplash.com/photo-1639890460733-49c80e1e5e5b?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/Amulya_Gold_69_960x_crop_center.jpg?v=1777536284",
     price: "₹2,499",
     oldPrice: "₹3,199",
     discount: "22% OFF",
@@ -145,9 +145,9 @@ const laminateProducts: Product[] = [
   {
     id: 1,
     slug: "premium-decorative-laminates",
-    title: "Premium Decorative Laminates",
+    title: "1002 RL OFF WHITE",
     image:
-      "https://images.unsplash.com/photo-1678794792916-e5cb1217bed1?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/products/1_MM_1002RLOFFWHITE_jpg_640x_crop_center.jpg?v=1679637420",
     price: "₹899",
     oldPrice: "₹1,199",
     discount: "25% OFF",
@@ -155,9 +155,9 @@ const laminateProducts: Product[] = [
   {
     id: 2,
     slug: "natural-wood-finish-laminates",
-    title: "Natural Wood Finish Laminates",
+    title: "8196 SF SMOG",
     image:
-      "https://images.unsplash.com/photo-1519393890420-f28727375fa5?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/products/08_MM_8196SFSMOG_960x_crop_center.jpg?v=1674481494",
     price: "₹999",
     oldPrice: "₹1,299",
     discount: "23% OFF",
@@ -165,9 +165,9 @@ const laminateProducts: Product[] = [
   {
     id: 3,
     slug: "high-gloss-laminate-sheets",
-    title: "High Gloss Laminate Sheets",
+    title: "4180 RE57 Ulem Dark",
     image:
-      "https://images.unsplash.com/photo-1632199495802-18f7d21f323b?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/4180_960x_crop_center.jpg?v=1787836922",
     price: "₹1,099",
     oldPrice: "₹1,399",
     discount: "21% OFF",
@@ -175,9 +175,9 @@ const laminateProducts: Product[] = [
   {
     id: 4,
     slug: "textured-matte-laminates",
-    title: "Textured Matte Laminates",
+    title: "10203 SG LIT",
     image:
-      "https://images.unsplash.com/photo-1639890460733-49c80e1e5e5b?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/10203SGLIT_960x_crop_center.jpg?v=1787739957",
     price: "₹749",
     oldPrice: "₹999",
     discount: "25% OFF",
@@ -185,9 +185,9 @@ const laminateProducts: Product[] = [
   {
     id: 5,
     slug: "heavy-duty-laminate-boards",
-    title: "Heavy Duty Laminate Boards",
+    title: "3436 SF Redwine Oak II",
     image:
-      "https://images.unsplash.com/photo-1611600700192-d87eaeed4f81?q=80&w=1400&auto=format&fit=crop",
+      "https://www.amulyamica.com/cdn/shop/files/3436_960x_crop_center.jpg?v=1787210469",
     price: "₹1,299",
     oldPrice: "₹1,699",
     discount: "24% OFF",
