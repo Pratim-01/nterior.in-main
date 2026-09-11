@@ -52,13 +52,14 @@
 
 import Hero from "./components/Hero";
 import Categories from "./components/BuildingMaterials";
-import EditorsPicks from "./components/Tiles";
+import EditorsPicks from "./components/ItemSection-1";
 import TopBrands from "./components/TopBrands";
 import NewArrivals from "./components/NewArrivals";
 import Stores from "./components/Stores";
 import WhyShopWithUs from "./components/WhyShopWithUs";
 import ContactUs from "./components/ContactUs";
 import NoProductsFound from "./components/NoProductsFound";
+import ItemSection2 from "./components/ItemSection-2";
 
 type ProductsPageProps = {
   searchParams: Promise<{
@@ -104,11 +105,13 @@ export default async function ProductsPage({
 
       <TopBrands />
 
-      <NewArrivals />
+      <ItemSection2 />
+
+      {/* <NewArrivals /> */}
 
       <Stores />
 
-      <ContactUs />
+      {/* <ContactUs /> */}
 
       <WhyShopWithUs />
 

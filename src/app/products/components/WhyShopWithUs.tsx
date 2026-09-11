@@ -142,7 +142,7 @@ export default function WhyShopWithUs() {
                 <div
                     className="
             grid
-            grid-cols-1
+            grid-cols-2
             gap-3
             sm:grid-cols-2
             sm:gap-4

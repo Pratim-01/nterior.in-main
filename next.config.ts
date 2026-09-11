@@ -26,6 +26,17 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "upload.wikimedia.org",
       },
+      // Ebco product photography (partner brand — used in
+      // EbcoShowcase.tsx and the ItemSection-2 hardware tabs)
+      {
+        protocol: "https",
+        hostname: "s3.ap-south-1.amazonaws.com",
+        pathname: "/ebco-dev-assets/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ebco-dev-assets.s3.ap-south-1.amazonaws.com",
+      },
       // // Kayapalat product images
       // {
       //   protocol: "https",

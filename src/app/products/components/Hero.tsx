@@ -193,9 +193,9 @@ export default function Hero() {
           w-screen
           -translate-x-1/2
 
-          pt-[68px]
+          pt-[16px]
 
-          sm:pt-[96px]
+          sm:pt-[20px]
 
           lg:pt-[24px]
         "
@@ -466,7 +466,7 @@ export default function Hero() {
 
             w-[calc(100%-16px)]
 
-            max-w-[1100px]
+            max-w-[850px]
 
             overflow-hidden
 
