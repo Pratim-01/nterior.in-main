@@ -12,12 +12,36 @@ function SkeletonCard() {
   );
 }
 
+interface FeaturedProductsProps {
+  /** Exact `product_details.category` value to fetch, e.g. "Plywood" or
+   *  "Laminates". */
+  category: string;
+  /** Heading shown above the strip, e.g. "Explore Our Range of Plywood". */
+  title: string;
+  /** Where "View All" and the empty/error state's link (if any) should
+   *  point, e.g. "/products/items/plywood-laminates/plywood". */
+  viewAllHref: string;
+  /** Background color class for the section. Defaults to the same soft
+   *  pink used by the original plywood strip; pass a different one so a
+   *  second strip on the same page (e.g. Laminates) is visually distinct
+   *  rather than blending into the one above it. */
+  sectionClassName?: string;
+}
+
 // Uses the exact same ProductCard used by the full listing (src/app/
 // products/listing/ProductCard.tsx) and the exact same /api/products
 // endpoint, just capped to 5 results sorted newest-first — so this strip
 // always looks and behaves identically to the dynamic catalogue below it,
-// with zero duplicated card markup or fetch logic.
-export default function FeaturedProducts() {
+// with zero duplicated card markup or fetch logic. `category`, `title`,
+// and `viewAllHref` are props so the same component can show a "Explore
+// Our Range of Plywood" strip and a "Explore Our Range of Laminates"
+// strip (or any other category) without copy-pasting this file.
+export default function FeaturedProducts({
+  category,
+  title,
+  viewAllHref,
+  sectionClassName = "bg-[#FFF5F5]",
+}: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,18 +53,18 @@ export default function FeaturedProducts() {
         setError("");
 
         const response = await fetch(
-          "/api/products?category=Plywood&sort=newest&pageSize=5"
+          `/api/products?category=${encodeURIComponent(category)}&sort=newest&pageSize=5`
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch plywood products");
+          throw new Error(`Failed to fetch ${category} products`);
         }
 
         const data: ProductsResponse = await response.json();
 
         setProducts(data.products || []);
       } catch (error) {
-        console.error("Plywood products fetch error:", error);
+        console.error(`${category} products fetch error:`, error);
 
         setError("Unable to load products right now.");
       } finally {
@@ -49,10 +73,12 @@ export default function FeaturedProducts() {
     }
 
     fetchProducts();
-  }, []);
+  }, [category]);
 
   return (
-    <section className="w-full bg-[#FFF5F5] px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-16 lg:px-10 lg:pt-8 lg:pb-20">
+    <section
+      className={`w-full ${sectionClassName} px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-16 lg:px-10 lg:pt-8 lg:pb-20`}
+    >
       <div className="mx-auto w-full max-w-[1400px]">
         {/* =====================================================
             SECTION HEADER
@@ -91,7 +117,7 @@ export default function FeaturedProducts() {
                 lg:text-4xl
               "
             >
-              Explore Our Range of Plywood
+              {title}
             </h2>
           </div>
 
@@ -100,7 +126,7 @@ export default function FeaturedProducts() {
           =================================================== */}
 
           <Link
-            href="/products/items/plywood-laminates/plywood"
+            href={viewAllHref}
             className="
               group
               flex
@@ -224,7 +250,7 @@ export default function FeaturedProducts() {
             "
           >
             <p className="text-sm font-medium text-gray-500">
-              No plywood products are available right now.
+              No {category.toLowerCase()} products are available right now.
             </p>
           </div>
         )}

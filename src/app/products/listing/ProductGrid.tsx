@@ -22,7 +22,7 @@ interface ProductGridProps {
 
 function SkeletonCard() {
   return (
-    <div className="h-[380px] animate-pulse rounded-[10px] border border-[#eee] bg-[#f7f7f7]" />
+    <div className="h-[320px] animate-pulse rounded-[10px] border border-[#eee] bg-[#f7f7f7] sm:h-[360px]" />
   );
 }
 
@@ -40,7 +40,7 @@ export default function ProductGrid({
 }: ProductGridProps) {
   if (isLoading && !hasLoadedOnce) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-7 xl:gap-8">
+      <div className="grid grid-cols-2 items-start gap-2.5 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4 lg:gap-5 xl:gap-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -60,7 +60,7 @@ export default function ProductGrid({
 
   return (
     <div
-      className={`grid grid-cols-2 gap-4 transition-opacity duration-150 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-7 xl:gap-8 ${
+      className={`grid grid-cols-2 items-start gap-2.5 transition-opacity duration-150 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4 lg:gap-5 xl:gap-5 ${
         isLoading ? "opacity-60" : "opacity-100"
       }`}
     >

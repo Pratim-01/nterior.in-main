@@ -56,10 +56,9 @@ export default function ProductCard({ product }: { product: Product }) {
         hover:shadow-[0_6px_18px_rgba(0,0,0,0.06)]
       "
     >
-      {/* IMAGE AREA — real fixed height */}
+      {/* IMAGE AREA — mobile unchanged; slightly shorter and no forced min-height on desktop */}
       <div
-        className="relative block h-[220px] min-h-[220px] w-full overflow-hidden bg-[#f7f7f7]"
-        style={{ height: "220px", minHeight: "220px" }}
+        className="relative block h-[200px] w-full overflow-hidden bg-[#f7f7f7] sm:h-[200px]"
       >
         <img
           src={hasImage ? (product.imageUrl as string) : PLACEHOLDER_IMAGE}
@@ -71,49 +70,51 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <span
           className="
-            absolute left-3 top-3 z-10 rounded-full border border-[#dedede]
-            bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase
+            absolute left-2 top-2 z-10 rounded-full border border-[#dedede]
+            bg-white/90 px-2 py-[3px] text-[9px] font-bold uppercase
             tracking-wide text-[#27304a] shadow-[0_1px_3px_rgba(0,0,0,0.08)]
+            sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[10px]
           "
         >
           {product.category}
         </span>
       </div>
 
-      {/* PRODUCT INFORMATION */}
-      <div className="flex min-h-[220px] w-full flex-col px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
+      {/* PRODUCT INFORMATION — mobile unchanged; desktop padding trimmed and forced min-heights removed so the card hugs its content instead of leaving blank space */}
+      <div className="flex w-full flex-col px-2.5 pb-3 pt-2 sm:px-4 sm:pb-4 sm:pt-3.5">
         {product.brand && (
-          <p className="m-0 truncate text-[10px] font-bold uppercase tracking-[0.08em] text-[#CF0006]">
+          <p className="m-0 truncate text-[9px] font-bold uppercase tracking-[0.08em] text-[#CF0006] sm:text-[10px]">
             {product.brand}
           </p>
         )}
 
         <h3
           className="
-            m-0 mt-1.5 line-clamp-2 min-h-[42px] text-[15px] font-semibold
-            leading-[21px] text-[#111827] transition-colors duration-200
+            m-0 mt-1 line-clamp-2 min-h-[34px] text-[13px] font-semibold
+            leading-[17px] text-[#111827] transition-colors duration-200
             group-hover:text-[#CF0006]
+            sm:mt-1 sm:min-h-[40px] sm:text-[15px] sm:leading-[20px]
           "
         >
           {product.productName}
         </h3>
 
         {specLine ? (
-          <p className="m-0 mt-1 text-[12px] leading-[18px] text-[#777]">{specLine}</p>
+          <p className="m-0 mt-0.5 text-[11px] leading-[15px] text-[#777] sm:mt-1 sm:text-[12px] sm:leading-[18px]">
+            {specLine}
+          </p>
         ) : product.shortDescription ? (
-          <p className="m-0 mt-2 line-clamp-2 min-h-[36px] text-[12px] leading-[18px] text-[#777]">
+          <p className="m-0 mt-1 line-clamp-2 text-[11px] leading-[15px] text-[#777] sm:mt-1.5 sm:text-[12px] sm:leading-[18px]">
             {product.shortDescription}
           </p>
-        ) : (
-          <div className="min-h-[18px]" />
-        )}
+        ) : null}
 
         {extraAttributes.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
+          <div className="mt-1.5 flex flex-wrap gap-1 sm:mt-1.5 sm:gap-1">
             {extraAttributes.map(([key, value]) => (
               <span
                 key={key}
-                className="rounded-full bg-[#f7f7f7] px-2 py-0.5 text-[10px] text-[#555]"
+                className="rounded-full bg-[#f7f7f7] px-1.5 py-0.5 text-[9px] text-[#555] sm:px-1.5 sm:text-[10px]"
               >
                 {key}: {String(value)}
               </span>
@@ -121,21 +122,21 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        <div className="mt-auto pt-4">
-          <div className="flex flex-wrap items-baseline gap-2">
-            <span className="text-[19px] font-bold leading-none text-[#CF0006]">
+        <div className="mt-2 sm:mt-2.5">
+          <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+            <span className="text-[15px] font-bold leading-none text-[#CF0006] sm:text-[19px]">
               {formatPrice(product.price)}
             </span>
 
             {hasMrp && (
-              <span className="text-[11px] leading-none text-[#777] line-through">
+              <span className="text-[10px] leading-none text-[#777] line-through sm:text-[11px]">
                 {formatPrice(product.mrp as number)}
               </span>
             )}
           </div>
 
           {product.gstPercentage !== null && (
-            <p className="m-0 mt-1.5 text-[10px] leading-4 text-[#777]">
+            <p className="m-0 mt-1 text-[9px] leading-[13px] text-[#777] sm:mt-1 sm:text-[10px] sm:leading-4">
               {product.gstExclude
                 ? `GST ${product.gstPercentage}% extra`
                 : `Incl. GST ${product.gstPercentage}%`}
