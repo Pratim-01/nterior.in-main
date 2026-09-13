@@ -167,8 +167,33 @@ export default function EbcoShowcase() {
   };
 
   return (
-    <section className="w-full bg-[#FFF5F5] px-4 py-12 sm:px-6 sm:py-16 lg:px-10 lg:py-20">
-      <div className="mx-auto w-full max-w-[1400px]">
+    <section className="relative w-full overflow-hidden bg-[#FFF5F5] px-4 py-12 sm:px-6 sm:py-16 lg:px-10 lg:py-13">
+      {/* WATERMARK — the actual Ebco logo (public/brands/ebco.jpeg) tiled
+          into a small, slightly-tilted repeating pattern that fills the
+          whole section, the way a subtle brand-texture background usually
+          looks. A single CSS background-image tile (rather than dozens of
+          separate <Image> tags) keeps this to one DOM node regardless of
+          how tall the section grows. The wrapper is oversized to -inset-1/4
+          and then rotated, so the rotated edges never show a gap at the
+          section's corners; the outer div's `overflow-hidden` clips
+          anything that spills past the section bounds. aria-hidden +
+          pointer-events-none keep it purely decorative. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
+        <div
+          className="absolute -inset-1/4 grayscale opacity-[0.07]"
+          style={{
+            backgroundImage: "url('/brands/ebco.jpeg')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "90px auto",
+            transform: "rotate(-12deg)",
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto w-full max-w-[1400px]">
         {/* HEADER */}
         <div className="mb-6 flex flex-col items-start gap-4 sm:mb-10 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6">
           <div>
