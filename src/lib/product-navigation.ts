@@ -328,6 +328,8 @@ export const NAV_CATEGORIES: NavCategoryGroup[] = [
                     "Cabinet Handle",
                     "Drawer Lock",
                     "Cabinet Knob",
+                    "Drawer Slides & Hinges",
+                    "Furniture Locks",
                 ],
             },
             {
@@ -343,6 +345,7 @@ export const NAV_CATEGORIES: NavCategoryGroup[] = [
                     "Knobs & Tubular Lock",
                     "Door Stopper",
                     "Door Aldrop/Latch",
+                    "Digital Locks",
                 ],
             },
             {
@@ -364,6 +367,9 @@ export const NAV_CATEGORIES: NavCategoryGroup[] = [
                     "Gate Hook",
                     "Magnetic Catcher",
                     "Modular Accessory",
+                    "General Hardware",
+                    "Joinery & Screws",
+                    "Window, Door & Glass Hardware",
                 ],
             },
             {
@@ -377,6 +383,12 @@ export const NAV_CATEGORIES: NavCategoryGroup[] = [
                 items: [
                     "Digital Safe",
                     "Keyed Safe Box",
+                ],
+            },
+            {
+                title: "Display",
+                items: [
+                    "Retail Display System",
                 ],
             },
         ],

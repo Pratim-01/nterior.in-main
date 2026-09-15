@@ -7,19 +7,23 @@
    landing page. Ebco supplies 7 product lines; each one is a
    *category*, not a single product, so every tile links into
    the existing generic subcategory route
-   (/products/items/hardware/[subcategory]) with an extra
-   ?brand=Ebco query param layered on top.
+   (/products/items/hardware/[subcategory]).
 
    Why that link shape:
    - `[subcategory]/page.tsx` already turns a slug into a
      category via `slugToCategory` (see src/lib/category-slug.ts)
      and locks ProductListing to that category — no new route or
-     page needed for this section.
-   - `brand` is a real filter facet (see src/types/products.ts /
-     FACET_KEYS) that ProductListing reads straight from the URL
-     and never overrides, so `?brand=Ebco` pre-filters to Ebco
-     the moment real products carry that brand value — nothing
-     to wire up later on the frontend side.
+     page needed for this section. The 7 slugs/names here match
+     the real `category` values seeded in `product_details`
+     (see scripts/migrations + the hardware demo data), so every
+     tile lands on an actual product listing today.
+   - `brand` IS a real filter facet (see src/types/products.ts /
+     FACET_KEYS), so once products in the DB actually carry
+     `brand = 'Ebco'`, re-adding `?brand=Ebco` to `categoryHref`
+     below will pre-filter to just Ebco's SKUs within each
+     category — intentionally left off for now since none of the
+     current demo rows have a brand set, which would make every
+     tile show zero results.
 
    IMAGES: placeholders only. Ebco's own product pages
    (ebco.in) render everything client-side through JavaScript,
@@ -84,17 +88,17 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2023/01/IMG_20220913_145904-1.jpg",
   },
   {
-    id: "joinery-fittings-screws",
-    name: "Joinery, Fittings & Screws",
-    slug: "joinery-fittings-screws",
+    id: "joinery-screws",
+    name: "Joinery & Screws",
+    slug: "joinery-screws",
     blurb: "Connectors, fasteners and screws that hold everything together.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/nc/catalog/screw-for-steelfix-and-minifix/webpage-dp/Mfs7i.jpg",
   },
   {
-    id: "retail-display-systems",
-    name: "Retail Display Systems",
-    slug: "retail-display-systems",
+    id: "retail-display-system",
+    name: "Retail Display System",
+    slug: "retail-display-system",
     blurb: "Modular display and shelving hardware for retail fit-outs.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2024/05/dp-img-1.jpg.webp",
@@ -109,10 +113,8 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   },
 ];
 
-const BRAND = "Ebco";
-
 function categoryHref(slug: string) {
-  return `/products/items/hardware/${slug}?brand=${encodeURIComponent(BRAND)}`;
+  return `/products/items/hardware/${slug}`;
 }
 
 export default function EbcoShowcase() {

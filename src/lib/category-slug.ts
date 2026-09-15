@@ -52,12 +52,13 @@ const CATEGORY_OVERRIDES: Record<string, string> = {
   "eng-board": "Engineered Board",
 
   // Ebco brand showcase (src/app/products/items/hardware/components/
-  // EbcoShowcase.tsx) — these 7 category lines aren't in the navbar
-  // taxonomy, so most already round-trip fine through the generic Title
-  // Case fallback below (e.g. "digital-locks" -> "Digital Locks"). Only
-  // the three with a comma or "&" need an explicit override here.
+  // EbcoShowcase.tsx) — these 7 category lines are also now real navbar
+  // leaf items (see product-navigation.ts's Hardware group), so most
+  // round-trip fine on their own. Only the ones where the showcase uses a
+  // shorter/cleaner slug than the auto-generated one (which would spell
+  // out "&" as "-and-") need an explicit override here.
   "drawer-slides-hinges": "Drawer Slides & Hinges",
-  "joinery-fittings-screws": "Joinery, Fittings & Screws",
+  "joinery-screws": "Joinery & Screws",
   "window-door-glass-hardware": "Window, Door & Glass Hardware",
 };
 

@@ -20,9 +20,9 @@ export default function HardwarePage() {
       />
 
       <FeaturedProducts
-        category="Display Systems"
-        title="Explore Our Range of Display Systems"
-        viewAllHref="/products/items/hardware/display-systems"
+        category="Retail Display System"
+        title="Explore Our Range of Retail Display Systems"
+        viewAllHref="/products/items/hardware/retail-display-system"
         sectionClassName="bg-[#FFF5F5]"
       />
 

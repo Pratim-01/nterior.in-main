@@ -38,6 +38,13 @@ function parsePriceParam(raw: string | null): number | null {
  * Next's server-side `request.nextUrl.searchParams` (in /api/products) —
  * this is the single source of truth for what every query param means, so
  * the two call sites can never read a param differently.
+ *
+ * Multi-select facets (category, brand, etc.) are read via `getAll(key)` —
+ * i.e. `?category=A&category=B` — rather than a single comma-joined value.
+ * A comma-joined scheme silently breaks the moment any facet value itself
+ * contains a comma (e.g. a category named "Window, Door & Glass Hardware"
+ * would be split into two bogus values), so repeated keys are the only
+ * encoding that's safe for arbitrary facet text.
  */
 export function parseProductQuery(
   params: URLSearchParams
@@ -45,13 +52,10 @@ export function parseProductQuery(
   const filters = createEmptyFilterState();
 
   FACET_KEYS.forEach((key) => {
-    const raw = params.get(key);
-    filters[key] = raw
-      ? raw
-          .split(",")
-          .map((v) => v.trim())
-          .filter(Boolean)
-      : [];
+    filters[key] = params
+      .getAll(key)
+      .map((v) => v.trim())
+      .filter(Boolean);
   });
 
   const sortRaw = params.get("sort");
@@ -84,7 +88,7 @@ export function parseProductQuery(
  * of `base` (the current URL's params) and dropping default values so the
  * address bar stays clean. This is what makes every filtered/sorted/
  * paginated view shareable and back/forward-button friendly, e.g.:
- * `/products/plywood?brand=Greenply&thickness=18mm&minPrice=1000&maxPrice=5000&sort=price-low&page=2`
+ * `/products/plywood?brand=Greenply&brand=CenturyPly&thickness=18mm&minPrice=1000&maxPrice=5000&sort=price-low&page=2`
  */
 export function buildQueryString(
   query: Partial<ParsedProductQuery>,
@@ -94,9 +98,9 @@ export function buildQueryString(
 
   if (query.filters) {
     FACET_KEYS.forEach((key) => {
+      params.delete(key);
       const values = query.filters![key];
-      if (values && values.length > 0) params.set(key, values.join(","));
-      else params.delete(key);
+      values?.forEach((v) => params.append(key, v));
     });
   }
 

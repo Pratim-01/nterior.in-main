@@ -1,6 +1,6 @@
 import Hero from "./components/Hero";
 import TopCategories from "./components/TopCategories";
-import ProductListing from "../../listing/ProductListing";
+// import ProductListing from "../../listing/ProductListing";
 import { getColumnCategories, getFolderBreadcrumb } from "@/lib/category-taxonomy";
 
 export default function TilesPage() {
@@ -8,11 +8,11 @@ export default function TilesPage() {
     <main className="min-h-screen bg-white">
       <Hero />
       <TopCategories />
-      <ProductListing
+      {/* <ProductListing
         category="Tiles"
         breadcrumb={getFolderBreadcrumb("tiles")}
         categoryOptions={getColumnCategories("tiles", "Tiles")}
-      />
+      /> */}
     </main>
   );
 }
