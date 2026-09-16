@@ -13,9 +13,14 @@ function SkeletonCard() {
 }
 
 interface FeaturedProductsProps {
-  /** Exact `product_details.category` value to fetch, e.g. "Plywood" or
-   *  "Laminates". */
+  /** Exact `product_details.category` value to fetch, e.g. "Cabinet
+   *  Hardware" or "Display". */
   category: string;
+  /** Optional exact `product_details.sub_category` value to narrow further
+   *  within `category`, e.g. "Furniture Locks" within "Cabinet Hardware" or
+   *  "Retail Display System" within "Display". Omit to show every
+   *  subcategory under `category`. */
+  subCategory?: string;
   /** Heading shown above the strip, e.g. "Explore Our Range of Plywood". */
   title: string;
   /** Where "View All" and the empty/error state's link (if any) should
@@ -38,6 +43,7 @@ interface FeaturedProductsProps {
 // strip (or any other category) without copy-pasting this file.
 export default function FeaturedProducts({
   category,
+  subCategory,
   title,
   viewAllHref,
   sectionClassName = "bg-[#FFF5F5]",
@@ -52,19 +58,24 @@ export default function FeaturedProducts({
         setLoading(true);
         setError("");
 
-        const response = await fetch(
-          `/api/products?category=${encodeURIComponent(category)}&sort=newest&pageSize=5`
-        );
+        const params = new URLSearchParams({
+          category,
+          sort: "newest",
+          pageSize: "5",
+        });
+        if (subCategory) params.set("subCategory", subCategory);
+
+        const response = await fetch(`/api/products?${params.toString()}`);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch ${category} products`);
+          throw new Error(`Failed to fetch ${subCategory ?? category} products`);
         }
 
         const data: ProductsResponse = await response.json();
 
         setProducts(data.products || []);
       } catch (error) {
-        console.error(`${category} products fetch error:`, error);
+        console.error(`${subCategory ?? category} products fetch error:`, error);
 
         setError("Unable to load products right now.");
       } finally {
@@ -73,7 +84,7 @@ export default function FeaturedProducts({
     }
 
     fetchProducts();
-  }, [category]);
+  }, [category, subCategory]);
 
   return (
     <section
@@ -250,7 +261,7 @@ export default function FeaturedProducts({
             "
           >
             <p className="text-sm font-medium text-gray-500">
-              No {category.toLowerCase()} products are available right now.
+              No {(subCategory ?? category).toLowerCase()} products are available right now.
             </p>
           </div>
         )}

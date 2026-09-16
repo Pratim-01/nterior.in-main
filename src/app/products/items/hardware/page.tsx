@@ -13,16 +13,22 @@ export default function HardwarePage() {
       <EbcoShowcase />
 
       <FeaturedProducts
-        category="Furniture Locks"
+        category="Cabinet Hardware"
+        subCategory="Furniture Locks"
         title="Explore Our Range of Furniture Locks"
-        viewAllHref="/products/items/hardware/furniture-locks"
+        viewAllHref={`/products/items/hardware/cabinet-hardware?subCategory=${encodeURIComponent(
+          "Furniture Locks"
+        )}`}
         sectionClassName="bg-white"
       />
 
       <FeaturedProducts
-        category="Retail Display System"
+        category="Display"
+        subCategory="Retail Display System"
         title="Explore Our Range of Retail Display Systems"
-        viewAllHref="/products/items/hardware/retail-display-system"
+        viewAllHref={`/products/items/hardware/display?subCategory=${encodeURIComponent(
+          "Retail Display System"
+        )}`}
         sectionClassName="bg-[#FFF5F5]"
       />
 

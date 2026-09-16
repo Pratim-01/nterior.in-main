@@ -303,6 +303,7 @@ function PriceRangeInputs({
 
 const FACET_LABELS: Record<FacetKey, string> = {
   category: "Category",
+  subCategory: "Sub Category",
   brand: "Brand",
   productType: "Product Type",
   size: "Size",
@@ -368,9 +369,9 @@ export default function ProductFilters({
   fullWidth?: boolean;
 }) {
   const hasActiveFilters =
-    (["brand", "productType", "size", "thickness", "grade"] as FacetKey[]).some(
-      (key) => filters[key].length > 0
-    ) ||
+    (
+      ["subCategory", "brand", "productType", "size", "thickness", "grade"] as FacetKey[]
+    ).some((key) => filters[key].length > 0) ||
     minPrice !== null ||
     maxPrice !== null;
 
@@ -392,8 +393,8 @@ export default function ProductFilters({
 
   const showCategory = Boolean(categoryOptions) || !hideCategory;
   const groupOrder: FacetKey[] = showCategory
-    ? ["category", "brand", "productType"]
-    : ["brand", "productType"];
+    ? ["category", "subCategory", "brand", "productType"]
+    : ["subCategory", "brand", "productType"];
 
   const filterGroups = (
     <>

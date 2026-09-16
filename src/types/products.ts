@@ -10,6 +10,7 @@ export interface Product {
   productId: number;
   productName: string;
   category: string;
+  subCategory: string | null;
   brand: string | null;
   productType: "sqft" | "unit" | string;
   size: string | null;
@@ -56,6 +57,7 @@ export const DEFAULT_SORT: SortOption = "newest";
 // adding a facet is a single change made in one place.
 export const FACET_KEYS = [
   "category",
+  "subCategory",
   "brand",
   "productType",
   "size",
@@ -70,6 +72,7 @@ export type FilterState = Record<FacetKey, string[]>;
 export function createEmptyFilterState(): FilterState {
   return {
     category: [],
+    subCategory: [],
     brand: [],
     productType: [],
     size: [],

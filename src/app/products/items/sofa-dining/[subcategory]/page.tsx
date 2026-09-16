@@ -1,6 +1,6 @@
 import ProductListing from "../../../listing/ProductListing";
 import { slugToCategory } from "@/lib/category-slug";
-import { getColumnCategories, getFolderBreadcrumb } from "@/lib/category-taxonomy";
+import { getFolderBreadcrumb } from "@/lib/category-taxonomy";
 
 type PageProps = {
   params: Promise<{
@@ -16,7 +16,6 @@ export default async function SubcategoryPage({ params }: PageProps) {
     <ProductListing
       category={categoryName}
       breadcrumb={getFolderBreadcrumb("sofa-dining", categoryName)}
-      categoryOptions={getColumnCategories("sofa-dining", categoryName)}
     />
   );
 }

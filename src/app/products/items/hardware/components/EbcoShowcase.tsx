@@ -5,18 +5,24 @@
    ----------------------------------------------------------
    "Shop by Ebco" — a partnered-brand section for the Hardware
    landing page. Ebco supplies 7 product lines; each one is a
-   *category*, not a single product, so every tile links into
-   the existing generic subcategory route
-   (/products/items/hardware/[subcategory]).
+   *sub_category*, not a top-level category, so every tile links
+   into its real parent category's generic subcategory route
+   (/products/items/hardware/[subcategory]) with a `?subCategory=`
+   query param pre-selecting that line.
 
    Why that link shape:
-   - `[subcategory]/page.tsx` already turns a slug into a
-     category via `slugToCategory` (see src/lib/category-slug.ts)
-     and locks ProductListing to that category — no new route or
-     page needed for this section. The 7 slugs/names here match
-     the real `category` values seeded in `product_details`
-     (see scripts/migrations + the hardware demo data), so every
-     tile lands on an actual product listing today.
+   - `product_details` has a real `sub_category` column now. Each
+     of these 7 lines lives *within* one parent `category` (e.g.
+     "Digital Locks" is a sub_category of "Door Hardware",
+     "Furniture Locks" of "Cabinet Hardware") — linking straight
+     to `/products/items/hardware/<that-line's-own-slug>` would
+     lock ProductListing's `category` filter to a value that no
+     longer exists in the database and show zero products.
+     `[subcategory]/page.tsx` already turns a slug into the
+     correct parent category via `slugToCategory`, and the
+     `subCategory` query param (a normal facet — see
+     FACET_KEYS in src/types/products.ts) narrows the sidebar
+     down to just that line on load.
    - `brand` IS a real filter facet (see src/types/products.ts /
      FACET_KEYS), so once products in the DB actually carry
      `brand = 'Ebco'`, re-adding `?brand=Ebco` to `categoryHref`
@@ -46,9 +52,11 @@ import { ArrowUpRight } from "lucide-react";
 
 interface EbcoCategory {
   id: string;
+  /** Exact `product_details.sub_category` value this tile represents. */
   name: string;
-  /** Matches /products/items/hardware/[subcategory] */
-  slug: string;
+  /** Slug of the real parent `product_details.category` this sub_category
+   *  lives under — matches /products/items/hardware/[subcategory]. */
+  categorySlug: string;
   blurb: string;
   /** PLACEHOLDER — see file header. Replace with approved Ebco imagery. */
   image: string;
@@ -58,7 +66,7 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "digital-locks",
     name: "Digital Locks",
-    slug: "digital-locks",
+    categorySlug: "door-hardware",
     blurb: "Keyless entry systems for cabinets, drawers and doors.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2026/04/crest-digital-lock-CR04-03-01.jpg",
@@ -66,7 +74,7 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "drawer-slides-hinges",
     name: "Drawer Slides & Hinges",
-    slug: "drawer-slides-hinges",
+    categorySlug: "cabinet-hardware",
     blurb: "Smooth-motion channels and concealed hinges for furniture.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2025/09/heavy-duty-drawer-slide-125-imgs-02.jpg",
@@ -74,7 +82,7 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "furniture-locks",
     name: "Furniture Locks",
-    slug: "furniture-locks",
+    categorySlug: "cabinet-hardware",
     blurb: "Cabinet, drawer and cupboard locks for secure storage.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2025/08/4-digit-combination-lock-with-cover-01.webp",
@@ -82,7 +90,7 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "general-hardware",
     name: "General Hardware",
-    slug: "general-hardware",
+    categorySlug: "other-hardware",
     blurb: "Everyday fittings and accessories for every project.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2023/01/IMG_20220913_145904-1.jpg",
@@ -90,7 +98,7 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "joinery-screws",
     name: "Joinery & Screws",
-    slug: "joinery-screws",
+    categorySlug: "other-hardware",
     blurb: "Connectors, fasteners and screws that hold everything together.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/nc/catalog/screw-for-steelfix-and-minifix/webpage-dp/Mfs7i.jpg",
@@ -98,7 +106,7 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "retail-display-system",
     name: "Retail Display System",
-    slug: "retail-display-system",
+    categorySlug: "display",
     blurb: "Modular display and shelving hardware for retail fit-outs.",
     image:
       "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2024/05/dp-img-1.jpg.webp",
@@ -106,15 +114,17 @@ const EBCO_CATEGORIES: EbcoCategory[] = [
   {
     id: "window-door-glass-hardware",
     name: "Window, Door & Glass Hardware",
-    slug: "window-door-glass-hardware",
+    categorySlug: "other-hardware",
     blurb: "Fittings for windows, doors and glass partitions.",
     image:
       "https://ebco-dev-assets.s3.ap-south-1.amazonaws.com/EBCO-assets/product/03d36ac7-31b4-4b56-a1ff-e85cb923d6e8.jpg",
   },
 ];
 
-function categoryHref(slug: string) {
-  return `/products/items/hardware/${slug}`;
+function categoryHref(category: EbcoCategory) {
+  return `/products/items/hardware/${category.categorySlug}?subCategory=${encodeURIComponent(
+    category.name
+  )}`;
 }
 
 export default function EbcoShowcase() {
@@ -249,7 +259,7 @@ export default function EbcoShowcase() {
                 className="relative min-w-0 overflow-hidden rounded-2xl bg-gray-900"
               >
                 <Link
-                  href={categoryHref(category.slug)}
+                  href={categoryHref(category)}
                   className="absolute inset-0 z-10"
                   aria-label={`Browse ${category.name} by Ebco`}
                 />
@@ -351,7 +361,7 @@ export default function EbcoShowcase() {
             {EBCO_CATEGORIES.map((category) => (
               <Link
                 key={category.id}
-                href={categoryHref(category.slug)}
+                href={categoryHref(category)}
                 aria-label={`Browse ${category.name} by Ebco`}
                 className="relative h-[440px] w-[78%] shrink-0 snap-center overflow-hidden rounded-2xl bg-gray-900 sm:w-[55%]"
               >

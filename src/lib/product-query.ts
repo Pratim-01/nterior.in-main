@@ -24,6 +24,7 @@ import {
 // -----------------------------------------------------------------------
 const FACET_COLUMNS: Record<FacetKey, string> = {
   category: "category",
+  subCategory: "sub_category",   // ← add this line
   brand: "brand",
   productType: "product_type",
   size: "size",

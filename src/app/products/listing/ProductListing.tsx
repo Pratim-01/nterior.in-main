@@ -157,10 +157,9 @@ function ProductListingContent({
   }, [mobileFiltersOpen]);
 
   const activeFilterCount =
-    (["brand", "productType", "size", "thickness", "grade"] as (keyof FilterState)[]).reduce(
-      (sum, key) => sum + filters[key].length,
-      0
-    ) +
+    (
+      ["subCategory", "brand", "productType", "size", "thickness", "grade"] as (keyof FilterState)[]
+    ).reduce((sum, key) => sum + filters[key].length, 0) +
     (category && !categoryOptions ? 0 : filters.category.length) +
     (minPrice !== null ? 1 : 0) +
     (maxPrice !== null ? 1 : 0);
@@ -183,6 +182,7 @@ function ProductListingContent({
       filters: {
         ...filters,
         category: category ? [category] : [],
+        subCategory: [],
         brand: [],
         productType: [],
         size: [],
