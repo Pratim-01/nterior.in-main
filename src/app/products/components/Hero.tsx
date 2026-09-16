@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -93,13 +93,6 @@ export default function Hero() {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  /* keep a live ref of isPaused so the message/ended listeners
-     below (set up once) always see the current value */
-  const isPausedRef = useRef(isPaused);
-  useEffect(() => {
-    isPausedRef.current = isPaused;
-  }, [isPaused]);
-
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
@@ -150,8 +143,7 @@ export default function Hero() {
       if (
         data.event === "infoDelivery" &&
         typeof data.info?.playerState === "number" &&
-        data.info.playerState === 0 &&
-        !isPausedRef.current
+        data.info.playerState === 0
       ) {
         nextSlide();
       }
@@ -330,7 +322,7 @@ export default function Hero() {
                     playsInline
                     preload={isActive ? "auto" : "none"}
                     onEnded={() => {
-                      if (isActive && !isPausedRef.current) nextSlide();
+                      if (isActive) nextSlide();
                     }}
                   />
                 )}

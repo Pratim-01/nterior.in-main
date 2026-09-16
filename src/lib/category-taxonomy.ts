@@ -153,6 +153,32 @@ export function getColumnCategories(
 }
 
 /**
+ * Whether `categoryName` is a genuine navbar *leaf item* (e.g. "Digital
+ * Locks", "Liner Laminates", "Furniture Locks") within `folderSlug`'s
+ * group, as opposed to a column *title* (e.g. "Other Hardware", "Cabinet
+ * Hardware", "Engineered Board") — the broader groupings linked from each
+ * folder's TopCategories.tsx.
+ *
+ * This distinction matters for [subcategory]/page.tsx's one-time
+ * `subCategory` default-select redirect: a leaf item genuinely lives in
+ * `product_details.sub_category` for structured data (see
+ * getColumnCategories' doc comment above), so pre-selecting it is
+ * correct. A column title is a `product_details.category` value with
+ * *several* different sub_category values underneath it — forcing one
+ * particular (nonexistent) sub_category onto it would wrongly collapse
+ * "show me everything under Other Hardware" down to zero/wrong results.
+ */
+export function isLeafItem(folderSlug: string, categoryName: string): boolean {
+  const taxonomy = FOLDER_TAXONOMY[folderSlug];
+  if (!taxonomy) return false;
+
+  const group = NAV_CATEGORIES.find((g) => g.name === taxonomy.groupName);
+  if (!group) return false;
+
+  return group.columns.some((c) => c.items.includes(categoryName));
+}
+
+/**
  * Builds the breadcrumb trail (everything after "Home") for a given
  * `items/<folder>` page.
  *

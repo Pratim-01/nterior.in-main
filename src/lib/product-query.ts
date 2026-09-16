@@ -24,7 +24,7 @@ import {
 // -----------------------------------------------------------------------
 const FACET_COLUMNS: Record<FacetKey, string> = {
   category: "category",
-  subCategory: "sub_category",   // ← add this line
+  subCategory: "sub_category",
   brand: "brand",
   productType: "product_type",
   size: "size",
@@ -82,6 +82,26 @@ function buildWhereClause(
     const values = query.filters[key];
     if (!values || values.length === 0) return;
     const column = FACET_COLUMNS[key];
+
+    // Some navbar leaf items (e.g. "Liner Laminates", "MDF Board",
+    // "Digital Locks", "Retail Display System") are stored in
+    // `sub_category` rather than `category` — the navbar's column *title*
+    // ("Laminates", "Engineered Board", "Door Hardware", "Display") is
+    // what actually lands in `category` for those rows. Older/simpler
+    // products (e.g. "Plywood") only ever set `category`. A single
+    // category-lock value (see [subcategory]/page.tsx) can't know in
+    // advance which column it lives in, so match either — this only
+    // ever adds matches, never removes legitimate ones, so it's safe for
+    // the normal category+subCategory two-facet filtering too.
+    if (key === "category") {
+      const placeholders = values.map(() => "?").join(", ");
+      clauses.push(
+        `(${col("category")} IN (${placeholders}) OR ${col("sub_category")} IN (${placeholders}))`
+      );
+      params.push(...values, ...values);
+      return;
+    }
+
     clauses.push(`${col(column)} IN (${values.map(() => "?").join(", ")})`);
     params.push(...values);
   });
@@ -128,6 +148,7 @@ function mapRow(row: RowDataPacket): Product {
     productId: Number(row.productId),
     productName: row.productName,
     category: row.category,
+    subCategory: row.subCategory ?? null,
     brand: row.brand ?? null,
     productType: row.productType,
     size: row.size ?? null,
@@ -160,6 +181,7 @@ async function fetchProductsPage(
        pd.product_id        AS productId,
        pd.product_name      AS productName,
        pd.category          AS category,
+       pd.sub_category      AS subCategory,
        pd.brand             AS brand,
        pd.product_type      AS productType,
        pd.size              AS size,
