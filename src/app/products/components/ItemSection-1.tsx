@@ -90,7 +90,7 @@ const adhesiveProducts: Product[] = [
     slug: "woodwork-adhesive",
     title: "Woodwork Adhesive",
     image:
-      "https://images.unsplash.com/photo-1587145717234-bc7fae25ed38?q=80&w=1400&auto=format&fit=crop",
+      "https://5.imimg.com/data5/SELLER/Default/2022/11/XY/TE/TS/68703594/fevicol-marine-waterproof-adhesive-1000x1000.jpg",
     price: "₹349",
     oldPrice: "₹449",
     discount: "22% OFF",
@@ -100,7 +100,7 @@ const adhesiveProducts: Product[] = [
     slug: "all-purpose-glue",
     title: "All Purpose Glue",
     image:
-      "https://images.unsplash.com/photo-1536786724684-63545518d243?q=80&w=1400&auto=format&fit=crop",
+      "https://m.media-amazon.com/images/I/414FEgXVV5L._SX679_.jpg",
     price: "₹199",
     oldPrice: "₹259",
     discount: "23% OFF",
@@ -110,7 +110,7 @@ const adhesiveProducts: Product[] = [
     slug: "tile-adhesive",
     title: "Tile Adhesive",
     image:
-      "https://images.unsplash.com/photo-1614162063681-1adc832305b1?q=80&w=1400&auto=format&fit=crop",
+      "https://5.imimg.com/data5/GLADMIN/Default/2023/9/348155759/KL/MB/PR/93888/fevicol-sr-505-synthetic-rubber-adhesive-100-ml.jpg",
     price: "₹549",
     oldPrice: "₹699",
     discount: "21% OFF",
@@ -120,7 +120,7 @@ const adhesiveProducts: Product[] = [
     slug: "synthetic-resin-adhesive",
     title: "Synthetic Resin Adhesive",
     image:
-      "https://images.unsplash.com/photo-1587145717234-bc7fae25ed38?q=80&w=1400&auto=format&fit=crop",
+      "https://m.media-amazon.com/images/I/51KTS1CKa3L._SL1000_.jpg",
     price: "₹279",
     oldPrice: "₹359",
     discount: "22% OFF",
@@ -130,7 +130,7 @@ const adhesiveProducts: Product[] = [
     slug: "waterproof-construction-adhesive",
     title: "Waterproof Construction Adhesive",
     image:
-      "https://images.unsplash.com/photo-1536786724684-63545518d243?q=80&w=1400&auto=format&fit=crop",
+      "https://m.media-amazon.com/images/I/51QdbnswysL._AC_.jpg",
     price: "₹429",
     oldPrice: "₹549",
     discount: "22% OFF",

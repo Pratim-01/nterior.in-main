@@ -47,8 +47,18 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "fevicol.in",
-        pathname: "/wp-content/uploads/**",
+        hostname: "m.media-amazon.com",
+        pathname: "/images/I/**",
+      },
+      {
+        protocol: "https",
+        hostname: "5.imimg.com",
+        pathname: "/data5/SELLER/**",
+      },
+      {
+        protocol: "https",
+        hostname: "5.imimg.com",
+        pathname: "/data5/GLADMIN/**",
       },
       // // Kayapalat product images
       // {
