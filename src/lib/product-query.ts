@@ -9,8 +9,11 @@ import {
   Pagination,
   PriceRange,
   Product,
+  ProductDetailResponse,
+  ProductImage,
   ProductsResponse,
   SortOption,
+  createEmptyFilterState,
 } from "@/types/products";
 
 // -----------------------------------------------------------------------
@@ -297,4 +300,117 @@ export async function fetchProducts(
   ]);
 
   return { products, pagination, facets, priceRange };
+}
+
+/**
+ * Everything the product "buy page" (`/products/:productId`) needs: the
+ * full product row, every image in `product_images` (not just the primary
+ * one the listing grid uses), and a handful of other active products from
+ * the same category for a "You may also like" rail. Returns `null` when
+ * no active product with that id exists, so the route can 404 cleanly.
+ */
+export async function fetchProductById(
+  productId: number
+): Promise<ProductDetailResponse | null> {
+  const [rows] = await kayapalatDb.query<RowDataPacket[]>(
+    `SELECT
+       pd.product_id        AS productId,
+       pd.product_name      AS productName,
+       pd.category          AS category,
+       pd.sub_category      AS subCategory,
+       pd.brand             AS brand,
+       pd.product_type      AS productType,
+       pd.size              AS size,
+       pd.thickness         AS thickness,
+       pd.grade             AS grade,
+       pd.short_description AS shortDescription,
+       pd.about_product     AS aboutProduct,
+       pd.sell_mrp          AS price,
+       pd.mrp               AS mrp,
+       pd.gst_percentage    AS gstPercentage,
+       pd.gst_exclude       AS gstExclude,
+       pd.attributes        AS attributes,
+       pd.showroom_stock        AS showroomStock,
+       pd.showroom_stock_number AS showroomStockNumber,
+       pd.created_at        AS createdAt
+     FROM product_details pd
+     WHERE pd.product_id = ? AND pd.is_active = 1
+     LIMIT 1`,
+    [productId]
+  );
+
+  const row = rows[0];
+  if (!row) return null;
+
+  const [imageRows] = await kayapalatDb.query<RowDataPacket[]>(
+    `SELECT image_url AS imageUrl, image_alt_text AS imageAltText, is_primary AS isPrimary
+     FROM product_images
+     WHERE product_id = ?
+     ORDER BY is_primary DESC`,
+    [productId]
+  );
+
+  const images: ProductImage[] = imageRows
+    .map((img) => ({
+      url: resolveImageUrl(img.imageUrl ?? null),
+      altText: img.imageAltText || row.productName,
+      isPrimary: Boolean(img.isPrimary),
+    }))
+    .filter((img): img is ProductImage => Boolean(img.url));
+
+  const product = {
+    ...mapRow({ ...row, imageUrl: null, imageAltText: null }),
+    imageUrl: images[0]?.url ?? null,
+    imageAltText: images[0]?.altText ?? row.productName,
+    images,
+    aboutProduct: row.aboutProduct || null,
+    showroomStock: Boolean(row.showroomStock),
+    showroomStockNumber: row.showroomStockNumber || null,
+  };
+
+  const where = buildWhereClause(
+    {
+      filters: { ...createEmptyFilterState(), category: [row.category] },
+      minPrice: null,
+      maxPrice: null,
+      sort: "newest",
+      page: 1,
+      pageSize: 8,
+    },
+    { alias: "pd." }
+  );
+
+  const [relatedRows] = await kayapalatDb.query<RowDataPacket[]>(
+    `SELECT
+       pd.product_id        AS productId,
+       pd.product_name      AS productName,
+       pd.category          AS category,
+       pd.sub_category      AS subCategory,
+       pd.brand             AS brand,
+       pd.product_type      AS productType,
+       pd.size              AS size,
+       pd.thickness         AS thickness,
+       pd.grade             AS grade,
+       pd.short_description AS shortDescription,
+       pd.sell_mrp          AS price,
+       pd.mrp               AS mrp,
+       pd.gst_percentage    AS gstPercentage,
+       pd.gst_exclude       AS gstExclude,
+       pd.attributes        AS attributes,
+       pd.created_at        AS createdAt,
+       pi.image_url         AS imageUrl,
+       pi.image_alt_text    AS imageAltText
+     FROM product_details pd
+     LEFT JOIN product_images pi
+       ON pd.product_id = pi.product_id
+       AND pi.is_primary = 1
+     ${where.sql} AND pd.product_id <> ?
+     ORDER BY pd.created_at DESC
+     LIMIT 8`,
+    [...where.params, productId]
+  );
+
+  const relatedProducts: Product[] = relatedRows.map(mapRow);
+
+  return { product, relatedProducts };
 }

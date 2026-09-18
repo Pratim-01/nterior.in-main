@@ -21,6 +21,7 @@ import {
     type NavCategoryColumn as MegaMenuColumn,
 } from "@/lib/product-navigation";
 import { getLeafItemHref } from "@/lib/category-taxonomy";
+import { useCart } from "@/lib/cart-context";
 
 /* =========================================================
    CATEGORY DATA — see src/lib/product-navigation.ts
@@ -215,6 +216,7 @@ function MegaMenuColumnStack({
 
 export default function Navbar() {
     const pathname = usePathname();
+    const { totalItems } = useCart();
 
     const isProduct =
         pathname === "/products" ||
@@ -581,8 +583,8 @@ export default function Navbar() {
                                 <Heart size={20} />
                             </button> */}
 
-                            <button
-                                type="button"
+                            <Link
+                                href="/cart"
                                 aria-label="Cart"
                                 className="
                                     relative
@@ -605,26 +607,28 @@ export default function Navbar() {
                                     size={20}
                                 />
 
-                                <span
-                                    className="
-                                        absolute
-                                        -right-1
-                                        -top-1
-                                        flex
-                                        h-5
-                                        w-5
-                                        items-center
-                                        justify-center
-                                        rounded-full
-                                        bg-[rgb(207,0,6)]
-                                        text-[10px]
-                                        font-bold
-                                        text-white
-                                    "
-                                >
-                                    0
-                                </span>
-                            </button>
+                                {totalItems > 0 && (
+                                    <span
+                                        className="
+                                            absolute
+                                            -right-1
+                                            -top-1
+                                            flex
+                                            h-5
+                                            w-5
+                                            items-center
+                                            justify-center
+                                            rounded-full
+                                            bg-[rgb(207,0,6)]
+                                            text-[10px]
+                                            font-bold
+                                            text-white
+                                        "
+                                    >
+                                        {totalItems > 99 ? "99+" : totalItems}
+                                    </span>
+                                )}
+                            </Link>
                         </div>
                     </div>
 
@@ -1121,8 +1125,8 @@ export default function Navbar() {
                             <Heart size={19} />
                         </button> */}
 
-                        <button
-                            type="button"
+                        <Link
+                            href="/cart"
                             aria-label="Cart"
                             className="
                                 relative
@@ -1139,26 +1143,28 @@ export default function Navbar() {
                         >
                             <ShoppingCart size={19} />
 
-                            <span
-                                className="
-                                    absolute
-                                    -right-0.5
-                                    -top-0.5
-                                    flex
-                                    h-4
-                                    w-4
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    bg-[rgb(207,0,6)]
-                                    text-[9px]
-                                    font-bold
-                                    text-white
-                                "
-                            >
-                                0
-                            </span>
-                        </button>
+                            {totalItems > 0 && (
+                                <span
+                                    className="
+                                        absolute
+                                        -right-0.5
+                                        -top-0.5
+                                        flex
+                                        h-4
+                                        w-4
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-[rgb(207,0,6)]
+                                        text-[9px]
+                                        font-bold
+                                        text-white
+                                    "
+                                >
+                                    {totalItems > 9 ? "9+" : totalItems}
+                                </span>
+                            )}
+                        </Link>
 
                         <button
                             type="button"

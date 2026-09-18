@@ -114,3 +114,39 @@ export interface ProductsResponse {
 export interface ProductsErrorResponse {
   error: string;
 }
+
+// -----------------------------------------------------------------------
+// Single product ("buy page") types. `/api/products/[productId]` returns
+// every field `Product` already has, plus the full image gallery (not just
+// the one primary image the listing grid uses) and a handful of related
+// products from the same category so the page can show "You may also
+// like" without a second round trip from the browser.
+// -----------------------------------------------------------------------
+
+export interface ProductImage {
+  url: string;
+  altText: string;
+  isPrimary: boolean;
+}
+
+export interface ProductDetail extends Product {
+  images: ProductImage[];
+  /** Full long-form write-up (`product_details.about_product`) — distinct
+   *  from the one-line `shortDescription` shown on cards; only fetched for
+   *  the single-product page, not the listing grid. */
+  aboutProduct: string | null;
+  /** Whether this product can also be seen/bought in person at a physical
+   *  showroom (`product_details.showroom_stock`), and which showroom/aisle
+   *  reference to show if so (`showroom_stock_number`). */
+  showroomStock: boolean;
+  showroomStockNumber: string | null;
+}
+
+export interface ProductDetailResponse {
+  product: ProductDetail;
+  relatedProducts: Product[];
+}
+
+export interface ProductDetailErrorResponse {
+  error: string;
+}

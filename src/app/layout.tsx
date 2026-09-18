@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Providers from "./providers";
@@ -42,6 +43,18 @@ export default function RootLayout({
           </main>
           <Footer />
         </Providers>
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            duration: 2200,
+            style: {
+              borderRadius: "8px",
+              background: "#111827",
+              color: "#fff",
+              fontSize: "14px",
+            },
+          }}
+        />
         <Script id="disable-number-wheel" strategy="afterInteractive">
           {`
             document.addEventListener("wheel", function () {
