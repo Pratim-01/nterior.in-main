@@ -218,9 +218,10 @@ export default function Navbar() {
     const pathname = usePathname();
     const { totalItems } = useCart();
 
-    const isProduct =
-        pathname === "/products" ||
-        pathname.startsWith("/products/");
+    const isCrm =
+        pathname === "/crm" ||
+        pathname.startsWith("/crm/");
+    const isProduct = !isCrm;
 
     const [mobileMenu, setMobileMenu] =
         useState(false);

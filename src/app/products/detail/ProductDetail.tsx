@@ -4,14 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
+  ArrowUpRight,
+  BadgeCheck,
   ChevronLeft,
   ChevronRight,
   ImageIcon,
   Minus,
   Plus,
+  RotateCcw,
+  ShieldCheck,
   ShoppingCart,
+  Sparkles,
+  Truck,
 } from "lucide-react";
 import type { ProductDetail as ProductDetailType, Product } from "@/types/products";
 import { categoryToSlug } from "@/lib/category-slug";
@@ -35,22 +42,41 @@ function formatPrice(price: number) {
 }
 
 /* =========================================================
+   DECORATIVE BACKGROUND — soft brand-gradient blobs used
+   behind the page. Purely visual, pointer-events disabled.
+========================================================= */
+
+function AmbientBackground() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+    >
+      <div className="absolute -top-32 -right-24 h-[420px] w-[420px] rounded-full bg-gradient-to-br from-[rgba(255,170,0,0.16)] to-[rgba(207,0,6,0.10)] blur-3xl" />
+      <div className="absolute top-[38%] -left-28 h-[360px] w-[360px] rounded-full bg-gradient-to-tr from-[rgba(255,170,0,0.10)] to-[rgba(207,0,6,0.08)] blur-3xl" />
+      <div className="absolute bottom-[-10%] right-[10%] h-[300px] w-[300px] rounded-full bg-gradient-to-br from-[rgba(255,170,0,0.10)] to-transparent blur-3xl" />
+    </div>
+  );
+}
+
+/* =========================================================
    LOADING SKELETON
 ========================================================= */
 
 function ProductDetailSkeleton() {
   return (
-    <main className="min-h-screen w-full bg-white">
+    <main className="relative min-h-screen w-full overflow-hidden bg-white">
+      <AmbientBackground />
       <div className="mx-auto w-full max-w-[1840px] px-5 pb-16 pt-6 sm:px-7 sm:pt-7 lg:px-9 lg:pt-7 xl:px-10">
-        <div className="mb-7 h-4 w-64 animate-pulse rounded bg-[#f0f0f0]" />
+        <div className="mb-7 h-4 w-64 animate-pulse rounded-full bg-gradient-to-r from-[#f0f0f0] to-[#f7f7f7]" />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-          <div className="aspect-square w-full animate-pulse rounded-[10px] border border-[#eee] bg-[#f7f7f7] lg:aspect-auto lg:h-[560px]" />
+          <div className="aspect-[4/3] w-full animate-pulse rounded-2xl border border-[#f0ece2] bg-gradient-to-br from-[#fff9ef] to-[#f7f7f7] lg:aspect-auto lg:h-[560px]" />
           <div className="flex flex-col gap-4">
-            <div className="h-4 w-24 animate-pulse rounded bg-[#f0f0f0]" />
-            <div className="h-8 w-3/4 animate-pulse rounded bg-[#f0f0f0]" />
-            <div className="h-4 w-1/2 animate-pulse rounded bg-[#f0f0f0]" />
-            <div className="h-10 w-40 animate-pulse rounded bg-[#f0f0f0]" />
-            <div className="h-12 w-full animate-pulse rounded-lg bg-[#f0f0f0]" />
+            <div className="h-4 w-24 animate-pulse rounded-full bg-[#f0f0f0]" />
+            <div className="h-8 w-3/4 animate-pulse rounded-lg bg-[#f0f0f0]" />
+            <div className="h-4 w-1/2 animate-pulse rounded-full bg-[#f0f0f0]" />
+            <div className="h-10 w-40 animate-pulse rounded-lg bg-[#f0f0f0]" />
+            <div className="h-12 w-full animate-pulse rounded-full bg-gradient-to-r from-[#ffe9c2] to-[#f7c9ca]" />
           </div>
         </div>
       </div>
@@ -65,9 +91,13 @@ function ProductDetailSkeleton() {
 function ProductDetailError({ message }: { message: string }) {
   const router = useRouter();
   return (
-    <main className="flex min-h-[70vh] w-full items-center justify-center bg-white px-4">
+    <main className="relative flex min-h-[70vh] w-full items-center justify-center overflow-hidden bg-white px-4">
+      <AmbientBackground />
       <div className="flex w-full max-w-md flex-col items-center text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-[#111827] sm:text-[26px]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(255,170,0)] to-[rgb(207,0,6)] shadow-[0_8px_24px_rgba(207,0,6,0.25)]">
+          <ImageIcon size={26} strokeWidth={1.75} className="text-white" />
+        </div>
+        <h1 className="mt-6 text-2xl font-bold tracking-tight text-[#111827] sm:text-[26px]">
           We couldn&apos;t find this product
         </h1>
         <p className="mx-auto mt-3 max-w-xs text-[15px] leading-relaxed text-[#4b5563]">
@@ -76,14 +106,14 @@ function ProductDetailError({ message }: { message: string }) {
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
           <Link
             href="/products"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[rgb(207,0,6)] px-6 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-[rgb(170,0,5)]"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] px-6 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(207,0,6,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(207,0,6,0.35)]"
           >
             Browse products
           </Link>
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#dedede] bg-white px-6 text-sm font-semibold text-[#374151] transition-colors duration-150 hover:border-[#c7c7c7] hover:bg-[#fafafa]"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[#dedede] bg-white px-6 text-sm font-semibold text-[#374151] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c7c7c7] hover:bg-[#fafafa]"
           >
             <ArrowLeft size={15} />
             Go back
@@ -142,6 +172,7 @@ function Gallery({ product }: { product: ProductDetailType }) {
           {slots.map((_, i) => {
             const img = images[i];
             if (img) {
+              const isActive = i === activeIndex;
               return (
                 <button
                   key={img.url + i}
@@ -151,10 +182,10 @@ function Gallery({ product }: { product: ProductDetailType }) {
                     setImageFailed(false);
                   }}
                   aria-label={`View image ${i + 1}`}
-                  className={`h-[80px] w-[80px] shrink-0 overflow-hidden rounded-[8px] border-2 bg-white transition-colors lg:h-[88px] lg:w-[88px] ${
-                    i === activeIndex
-                      ? "border-[rgb(207,0,6)]"
-                      : "border-[#dedede] hover:border-[#bbb]"
+                  className={`relative h-[80px] w-[80px] shrink-0 overflow-hidden rounded-[10px] bg-white transition-all duration-300 lg:h-[88px] lg:w-[88px] ${
+                    isActive
+                      ? "shadow-[0_4px_14px_rgba(207,0,6,0.25)] ring-2 ring-[rgb(207,0,6)] ring-offset-2"
+                      : "border-2 border-[#dedede] hover:-translate-y-0.5 hover:border-[rgb(255,170,0)] hover:shadow-md"
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -171,7 +202,7 @@ function Gallery({ product }: { product: ProductDetailType }) {
               <div
                 key={`placeholder-${i}`}
                 aria-hidden="true"
-                className="flex h-[80px] w-[80px] shrink-0 items-center justify-center rounded-[8px] border-2 border-dashed border-[#e2e2e2] bg-[#fafafa] lg:h-[88px] lg:w-[88px]"
+                className="flex h-[80px] w-[80px] shrink-0 items-center justify-center rounded-[10px] border-2 border-dashed border-[#e2e2e2] bg-[#fafafa] lg:h-[88px] lg:w-[88px]"
               >
                 <ImageIcon size={20} strokeWidth={1.5} className="text-[#c7c7c7]" />
               </div>
@@ -193,14 +224,23 @@ function Gallery({ product }: { product: ProductDetailType }) {
 
       {/* MAIN IMAGE */}
       <div className="order-1 flex-1 lg:order-2">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[10px] border border-[#dedede] bg-[#f7f7f7] lg:aspect-auto lg:h-[70vh] lg:max-h-[560px] lg:min-h-[380px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mainSrc || PLACEHOLDER_IMAGE}
-            alt={mainAlt}
-            onError={() => setImageFailed(true)}
-            className="h-full w-full object-contain"
-          />
+        <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-[#f0ece2] bg-gradient-to-br from-[#fffaf0] to-[#f7f7f7] shadow-[0_8px_30px_rgba(24,34,53,0.08)] transition-shadow duration-300 hover:shadow-[0_12px_36px_rgba(24,34,53,0.12)] lg:aspect-auto lg:h-[70vh] lg:max-h-[560px] lg:min-h-[380px]">
+          {/* subtle decorative corner glow */}
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-[rgba(255,170,0,0.14)] to-[rgba(207,0,6,0.08)] blur-2xl" />
+
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={mainSrc}
+              src={mainSrc || PLACEHOLDER_IMAGE}
+              alt={mainAlt}
+              onError={() => setImageFailed(true)}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative h-full w-full object-contain"
+            />
+          </AnimatePresence>
         </div>
         <p className="mt-2.5 text-[12px] italic text-[#9ca3af]">*{product.productName}</p>
       </div>
@@ -227,114 +267,174 @@ function RelatedProductCard({ product }: { product: Product }) {
     Date.now() - new Date(product.createdAt as string).getTime() < 1000 * 60 * 60 * 24 * 30;
 
   return (
-    <Link
-      href={`/products/${product.productId}`}
-      className="group block overflow-hidden rounded-[10px] border border-[#eee] bg-white no-underline transition-shadow hover:shadow-[0_6px_18px_rgba(0,0,0,0.06)]"
-    >
-      <div className="relative h-[190px] w-full bg-[#f7f7f7]">
-        {discountPercent > 0 ? (
-          <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[rgb(207,0,6)] px-2 py-0.5 text-[10px] font-bold text-white">
-            -{discountPercent}%
-          </span>
-        ) : isNew ? (
-          <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[#12805c] px-2 py-0.5 text-[10px] font-bold text-white">
-            NEW
-          </span>
-        ) : null}
-
+    <Link href={`/products/${product.productId}`} className="group block no-underline">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-[0_4px_16px_rgba(24,34,53,0.06)] transition-shadow duration-300 group-hover:shadow-[0_16px_32px_rgba(24,34,53,0.14)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={!imageFailed && product.imageUrl ? product.imageUrl : PLACEHOLDER_IMAGE}
           alt={product.imageAltText || product.productName}
           onError={() => setImageFailed(true)}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          className="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]"
         />
+
+        {/* DISCOUNT / NEW TAG */}
+        {discountPercent > 0 ? (
+          <span className="absolute left-3 top-3 rounded-full bg-[rgb(207,0,6)] px-2.5 py-1 text-[10px] font-bold tracking-wide text-white shadow-sm">
+            -{discountPercent}%
+          </span>
+        ) : isNew ? (
+          <span className="absolute left-3 top-3 rounded-full bg-[#12805c] px-2.5 py-1 text-[10px] font-bold tracking-wide text-white shadow-sm">
+            NEW
+          </span>
+        ) : null}
+
+        {/* HOVER SCRIM */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+        {/* QUICK VIEW */}
+        <div className="absolute inset-x-3 bottom-3 flex translate-y-3 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+          <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-gray-900 shadow-md">
+            View Product
+            <ArrowUpRight size={12} strokeWidth={2.5} />
+          </span>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2 p-3.5">
-        <h3 className="m-0 line-clamp-2 min-h-[36px] text-[13px] font-semibold leading-tight text-[#111827] group-hover:text-[rgb(207,0,6)]">
+      {/* DETAILS */}
+      <div className="mt-3 px-0.5">
+        <h3 className="line-clamp-1 text-[13px] font-semibold leading-snug text-gray-900 transition-colors duration-300 group-hover:text-[rgb(207,0,6)] sm:text-sm">
           {product.productName}
         </h3>
 
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-[14px] font-bold text-[#111827]">
+        <div className="mt-1.5 flex items-baseline gap-2">
+          <span className="text-[15px] font-bold text-gray-900 sm:text-base">
             {formatPrice(product.price)}
           </span>
           {hasMrp && (
-            <span className="text-[11px] text-[#9ca3af] line-through">
+            <span className="text-[11px] text-gray-400 line-through sm:text-xs">
               {formatPrice(product.mrp as number)}
             </span>
           )}
         </div>
+
+        {/* ANIMATED UNDERLINE */}
+        <span className="mt-2 block h-[2px] w-0 bg-[rgb(255,170,0)] transition-all duration-500 ease-out group-hover:w-full" />
       </div>
     </Link>
   );
 }
 
 /* =========================================================
-   RELATED PRODUCTS SECTION — a swipeable, dot-indicated
-   carousel on mobile (one card per "page"); a plain grid
-   from the `sm` breakpoint up, where there's room to browse
-   without scrolling sideways.
+   RELATED PRODUCTS SECTION — a single horizontally-scrolling
+   row of compact cards at every breakpoint, with left/right
+   arrow buttons for pointer users and native swipe on touch.
 ========================================================= */
 
 function RelatedProductsSection({ products }: { products: Product[] }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [activePage, setActivePage] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
-  function handleScroll() {
-    const el = scrollerRef.current;
-    if (!el || el.clientWidth === 0) return;
-    setActivePage(Math.round(el.scrollLeft / el.clientWidth));
-  }
-
-  function goToPage(index: number) {
+  function updateArrowState() {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }
+
+  useEffect(() => {
+    updateArrowState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
+
+  function scrollByCards(direction: -1 | 1) {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * (el.clientWidth * 0.8), behavior: "smooth" });
   }
 
   return (
     <div className="mt-16">
-      <h2 className="mb-7 text-center text-[20px] font-bold text-[#111827] sm:text-[22px]">
-        Related Products
-      </h2>
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="flex flex-col items-start gap-2 text-left">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#fff4df] to-[#fff9ef] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-[rgb(207,0,6)]">
+            <Sparkles size={12} />
+            You might also like
+          </span>
+          <h2 className="text-[20px] font-bold text-[#111827] sm:text-[22px]">
+            Related Products
+          </h2>
+          <div className="h-1 w-14 rounded-full bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)]" />
+        </div>
 
-      {/* Mobile: one card per screen, swipeable */}
+        {products.length > 1 && (
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label="Scroll related products left"
+              onClick={() => scrollByCards(-1)}
+              disabled={!canScrollLeft}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-900 shadow-sm transition-all duration-300 hover:border-[rgb(255,170,0)] active:scale-90 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-gray-200 sm:h-10 sm:w-10"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              aria-label="Scroll related products right"
+              onClick={() => scrollByCards(1)}
+              disabled={!canScrollRight}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-900 shadow-sm transition-all duration-300 hover:border-[rgb(255,170,0)] active:scale-90 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-gray-200 sm:h-10 sm:w-10"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Single row at every breakpoint — compact cards, native swipe + arrow buttons */}
       <div
         ref={scrollerRef}
-        onScroll={handleScroll}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1 sm:hidden [&::-webkit-scrollbar]:hidden"
+        onScroll={updateArrowState}
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1 [&::-webkit-scrollbar]:hidden"
       >
         {products.map((p) => (
-          <div key={p.productId} className="w-full shrink-0 snap-center">
+          <div
+            key={p.productId}
+            className="w-[150px] shrink-0 snap-start sm:w-[180px] lg:w-[200px]"
+          >
             <RelatedProductCard product={p} />
           </div>
         ))}
       </div>
+    </div>
+  );
+}
 
-      {products.length > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-1.5 sm:hidden">
-          {products.map((p, i) => (
-            <button
-              key={p.productId}
-              type="button"
-              aria-label={`Go to related product ${i + 1}`}
-              onClick={() => goToPage(i)}
-              className={`h-1.5 rounded-full transition-all ${
-                i === activePage ? "w-5 bg-[rgb(207,0,6)]" : "w-1.5 bg-[#dedede]"
-              }`}
-            />
-          ))}
+/* =========================================================
+   TRUST BADGES — small strip reinforcing purchase confidence,
+   styled after the gradient icon-circle pattern used on the
+   products landing page (Hero's delivery strip).
+========================================================= */
+
+function TrustBadges() {
+  const badges = [
+    { icon: Truck, label: "Fast dispatch" },
+    { icon: ShieldCheck, label: "Secure checkout" },
+    { icon: RotateCcw, label: "Easy replacement" },
+  ];
+
+  return (
+    <div className="mt-6 grid grid-cols-3 gap-2 rounded-2xl border border-orange-100 bg-gradient-to-r from-[#fff9ef] to-white p-3 sm:gap-3 sm:p-3.5">
+      {badges.map(({ icon: Icon, label }) => (
+        <div key={label} className="flex flex-col items-center gap-1.5 text-center sm:flex-row sm:justify-center sm:gap-2">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(255,170,0)] to-[rgb(207,0,6)] text-white shadow-sm">
+            <Icon size={13} strokeWidth={2.25} />
+          </span>
+          <span className="text-[10.5px] font-semibold leading-tight text-[#374151] sm:text-[11.5px]">
+            {label}
+          </span>
         </div>
-      )}
-
-      {/* Tablet/desktop: plain grid, no need to swipe */}
-      <div className="hidden sm:grid sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
-        {products.map((p) => (
-          <RelatedProductCard key={p.productId} product={p} />
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
@@ -407,6 +507,9 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
   const { product, relatedProducts } = data;
   const hasMrp = product.mrp !== null && product.mrp > product.price;
+  const discountPercent = hasMrp
+    ? Math.round((((product.mrp as number) - product.price) / (product.mrp as number)) * 100)
+    : 0;
 
   const unitSuffix = product.productType === "sqft" ? " / sq.ft." : "";
   const quantityLabel = product.productType === "sqft" ? "sq.ft." : "Qty";
@@ -470,7 +573,8 @@ export default function ProductDetail({ productId }: { productId: number }) {
   }
 
   return (
-    <main className="min-h-screen w-full bg-white">
+    <main className="relative min-h-screen w-full overflow-hidden bg-white">
+      <AmbientBackground />
       <div className="mx-auto w-full max-w-[1840px] px-5 pb-16 pt-6 sm:px-7 sm:pt-7 lg:px-9 lg:pt-7 xl:px-10">
         {/* BREADCRUMB */}
         <div className="mb-7">
@@ -488,37 +592,54 @@ export default function ProductDetail({ productId }: { productId: number }) {
 
         {/* GALLERY + BUY BOX */}
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
-          <Gallery product={product} />
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+          >
+            <Gallery product={product} />
+          </motion.div>
 
-          <div className="flex flex-col">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
+            className="flex flex-col"
+          >
             {/* META LINES */}
-            <div className="flex flex-col gap-1 text-[13px]">
+            <div className="flex flex-wrap items-center gap-2 text-[13px]">
               {product.brand && (
-                <p className="m-0">
-                  <span className="font-semibold text-[#111827]">Brand: </span>
-                  <span className="text-[#4b5563]">{product.brand}</span>
-                </p>
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#f7f7f7] px-2.5 py-1 text-[#4b5563]">
+                  <span className="font-semibold text-[#111827]">Brand:</span> {product.brand}
+                </span>
               )}
-              <p className="m-0">
-                <span className="font-semibold text-[#111827]">Category: </span>
-                <span className="text-[#4b5563]">{product.category}</span>
-              </p>
-              <p className="m-0">
-                <span className="font-semibold text-[#111827]">Availability: </span>
-                <span className="text-[#4b5563]">{availabilityText}</span>
-              </p>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#f7f7f7] px-2.5 py-1 text-[#4b5563]">
+                <span className="font-semibold text-[#111827]">Category:</span> {product.category}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#e9f9f0] to-[#f0fdf6] px-2.5 py-1 font-medium text-[#12805c]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#12805c]" />
+                {availabilityText}
+              </span>
             </div>
 
-            <h1 className="mt-3 text-[22px] font-bold uppercase leading-tight tracking-tight text-[#111827] sm:text-[25px] lg:text-[27px]">
-              {product.productName}
-            </h1>
+            <div className="mt-4 flex gap-3">
+              <div className="mt-1 h-auto w-1 shrink-0 rounded-full bg-gradient-to-b from-[rgb(255,170,0)] to-[rgb(207,0,6)]" />
+              <h1 className="text-[22px] font-bold uppercase leading-tight tracking-tight text-[#111827] sm:text-[25px] lg:text-[27px]">
+                {product.productName}
+              </h1>
+            </div>
 
             {/* FEATURE BULLETS */}
             {featureBullets.length > 0 && (
-              <ul className="mt-4 flex flex-col gap-1.5 pl-5 text-[13px] leading-relaxed text-[#4b5563] sm:text-[14px]">
+              <ul className="mt-4 flex flex-col gap-2 text-[13px] leading-relaxed text-[#4b5563] sm:text-[14px]">
                 {featureBullets.map((line) => (
-                  <li key={line} className="list-disc marker:text-[#9ca3af]">
-                    {line}
+                  <li key={line} className="flex items-start gap-2">
+                    <BadgeCheck
+                      size={15}
+                      strokeWidth={2}
+                      className="mt-0.5 shrink-0 text-[rgb(207,0,6)]"
+                    />
+                    <span>{line}</span>
                   </li>
                 ))}
               </ul>
@@ -530,8 +651,9 @@ export default function ProductDetail({ productId }: { productId: number }) {
                 {specChips.map((chip) => (
                   <div
                     key={chip.label}
-                    className="rounded-lg border border-[#dedede] px-4 py-2 text-center"
+                    className="relative overflow-hidden rounded-xl border border-[#eee] bg-gradient-to-b from-white to-[#fafafa] px-4 py-2 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(255,170,0,0.5)] hover:shadow-md"
                   >
+                    <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)]" />
                     <div className="text-[10px] uppercase tracking-wide text-[#9ca3af]">
                       {chip.label}
                     </div>
@@ -547,7 +669,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
                 INR {product.gstExclude ? "(+ GST extra)" : "(incl. of GST)"}
               </p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2.5">
-                <span className="text-[28px] font-bold leading-none text-[#111827] sm:text-[32px]">
+                <span className="bg-gradient-to-r from-[#111827] to-[#374151] bg-clip-text text-[28px] font-bold leading-none text-transparent sm:text-[32px]">
                   {formatPrice(product.price)}
                 </span>
                 {unitSuffix && (
@@ -560,17 +682,22 @@ export default function ProductDetail({ productId }: { productId: number }) {
                     {formatPrice(product.mrp as number)}
                   </span>
                 )}
+                {discountPercent > 0 && (
+                  <span className="rounded-full bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+                    Save {discountPercent}%
+                  </span>
+                )}
               </div>
             </div>
 
             {/* QUANTITY + ACTIONS */}
             <div className="mt-6 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:gap-4">
-              <div className="flex shrink-0 items-center rounded-lg border border-[#dedede]">
+              <div className="flex shrink-0 items-center rounded-full border border-[#dedede] bg-white">
                 <button
                   type="button"
                   aria-label="Decrease quantity"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="flex h-12 w-9 items-center justify-center text-[#374151] transition-colors hover:bg-[#f7f7f7] lg:w-11"
+                  className="flex h-12 w-9 items-center justify-center rounded-l-full text-[#374151] transition-colors hover:bg-[#f7f7f7] lg:w-11"
                 >
                   <Minus size={15} />
                 </button>
@@ -581,7 +708,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
                   type="button"
                   aria-label="Increase quantity"
                   onClick={() => setQuantity((q) => Math.min(999, q + 1))}
-                  className="flex h-12 w-9 items-center justify-center text-[#374151] transition-colors hover:bg-[#f7f7f7] lg:w-11"
+                  className="flex h-12 w-9 items-center justify-center rounded-r-full text-[#374151] transition-colors hover:bg-[#f7f7f7] lg:w-11"
                 >
                   <Plus size={15} />
                 </button>
@@ -590,24 +717,26 @@ export default function ProductDetail({ productId }: { productId: number }) {
               <button
                 type="button"
                 onClick={() => handleAddToCart(true)}
-                className="h-12 min-w-0 flex-1 rounded-lg bg-[rgb(207,0,6)] px-3 text-[14px] font-semibold text-white transition-colors hover:bg-[rgb(170,0,5)] sm:text-[15px] lg:flex-none lg:px-8"
+                className="h-12 min-w-0 flex-1 rounded-full bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)] px-3 text-[14px] font-semibold text-white shadow-[0_4px_14px_rgba(207,0,6,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(207,0,6,0.35)] sm:text-[15px] lg:flex-none lg:px-8"
               >
                 Buy now
               </button>
               <button
                 type="button"
                 onClick={() => handleAddToCart(false)}
-                className="flex h-12 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg border-2 border-[rgb(207,0,6)] bg-white px-3 text-[14px] font-semibold text-[rgb(207,0,6)] transition-colors hover:bg-[#fdf1f1] sm:gap-2 sm:text-[15px] lg:flex-none lg:px-6"
+                className="flex h-12 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full border-2 border-[rgb(207,0,6)] bg-white px-3 text-[14px] font-semibold text-[rgb(207,0,6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-gradient-to-r hover:from-[rgb(255,170,0)] hover:to-[rgb(207,0,6)] hover:text-white hover:shadow-[0_8px_20px_rgba(207,0,6,0.25)] sm:gap-2 sm:text-[15px] lg:flex-none lg:px-6"
               >
                 Add to Cart
               </button>
             </div>
-          </div>
+
+            <TrustBadges />
+          </motion.div>
         </div>
 
         {/* DESCRIPTION / SPECIFICATION TABS */}
         <div className="mx-auto mt-14 max-w-[820px]">
-          <div className="flex justify-center gap-8 border-b border-[#eee]">
+          <div className="relative flex justify-center gap-8 border-b border-[#eee]">
             {(
               [
                 { key: "description", label: "Description" },
@@ -618,40 +747,59 @@ export default function ProductDetail({ productId }: { productId: number }) {
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`-mb-px border-b-2 pb-3 text-[15px] font-semibold transition-colors ${
+                className={`relative -mb-px pb-3 text-[15px] font-semibold transition-colors ${
                   activeTab === tab.key
-                    ? "border-[rgb(207,0,6)] text-[#111827]"
-                    : "border-transparent text-[#9ca3af] hover:text-[#4b5563]"
+                    ? "text-[#111827]"
+                    : "text-[#9ca3af] hover:text-[#4b5563]"
                 }`}
               >
                 {tab.label}
+                {activeTab === tab.key && (
+                  <motion.div
+                    layoutId="productTabIndicator"
+                    className="absolute inset-x-0 -bottom-[1px] h-[2px] rounded-full bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)]"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                )}
               </button>
             ))}
           </div>
 
-          <div className="pt-6">
-            {activeTab === "description" ? (
-              <div className="whitespace-pre-line text-[14px] leading-relaxed text-[#4b5563] sm:text-[15px]">
-                {product.aboutProduct ||
-                  product.shortDescription ||
-                  "No additional details available for this product yet."}
-              </div>
-            ) : specRows.length > 0 ? (
-              <dl className="divide-y divide-[#eee] rounded-[10px] border border-[#eee]">
-                {specRows.map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex items-center justify-between gap-4 px-4 py-2.5 text-[13px]"
-                  >
-                    <dt className="text-[#6b7280]">{row.label}</dt>
-                    <dd className="text-right font-medium text-[#111827]">{row.value}</dd>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="pt-6"
+            >
+              {activeTab === "description" ? (
+                <div className="whitespace-pre-line text-[14px] leading-relaxed text-[#4b5563] sm:text-[15px]">
+                  {product.aboutProduct ||
+                    product.shortDescription ||
+                    "No additional details available for this product yet."}
+                </div>
+              ) : specRows.length > 0 ? (
+                <dl className="relative overflow-hidden rounded-2xl border border-[#eee] shadow-sm">
+                  <div className="h-[3px] bg-gradient-to-r from-[rgb(255,170,0)] to-[rgb(207,0,6)]" />
+                  <div className="divide-y divide-[#eee]">
+                    {specRows.map((row) => (
+                      <div
+                        key={row.label}
+                        className="flex items-center justify-between gap-4 px-4 py-2.5 text-[13px] transition-colors hover:bg-[#fdf9f2]"
+                      >
+                        <dt className="text-[#6b7280]">{row.label}</dt>
+                        <dd className="text-right font-medium text-[#111827]">{row.value}</dd>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </dl>
-            ) : (
-              <p className="text-[14px] text-[#9ca3af]">No specifications listed yet.</p>
-            )}
-          </div>
+                </dl>
+              ) : (
+                <p className="text-[14px] text-[#9ca3af]">No specifications listed yet.</p>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* RELATED PRODUCTS */}
