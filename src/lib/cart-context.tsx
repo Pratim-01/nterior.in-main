@@ -16,6 +16,7 @@ export interface CartItem {
   productId: number;
   productName: string;
   brand: string | null;
+  subCategory: string | null;
   price: number;
   mrp: number | null;
   imageUrl: string | null;
@@ -102,6 +103,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         productId: product.productId,
         productName: product.productName,
         brand: product.brand,
+        subCategory: product.subCategory,
         price: product.price,
         mrp: product.mrp,
         imageUrl: product.imageUrl,
