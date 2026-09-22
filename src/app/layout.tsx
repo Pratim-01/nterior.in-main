@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 export const metadata: Metadata = {
+  // Needed so canonical / Open Graph URLs resolve to absolute URLs.
+  // Set NEXT_PUBLIC_SITE_URL=https://yourdomain.com in production.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Nterior | The Complete CRM for Interior Work Companies",
   description:
     "Manage projects, clients, and invoicing in one place. Start your 2-month free trial today.",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -21,6 +21,7 @@ import {
 import type { ProductDetail as ProductDetailType, Product } from "@/types/products";
 import { categoryToSlug } from "@/lib/category-slug";
 import { useCart } from "@/lib/cart-context";
+import { productPath } from "@/lib/product-slug";
 import Breadcrumb from "../listing/Breadcrumb";
 
 interface ProductDetailData {
@@ -107,9 +108,12 @@ function ProductDetailError({ message }: { message: string }) {
 }
 
 /* =========================================================
-   GALLERY — a tinted "stage" holding the main image, with a
-   horizontal thumbnail row underneath. Always shows at least
-   4 thumbnail slots; unused slots are quiet placeholders.
+   GALLERY — the main image is shown as a rounded card that
+   takes the exact shape of the photo (portrait, landscape or
+   square) and is scaled to fit the available space. Nothing
+   is cropped, there is no tinted or blurred background, and
+   light photos stay defined thanks to a thin border + shadow.
+   A thumbnail row sits underneath (at least 4 slots).
 ========================================================= */
 
 const THUMBNAIL_SLOTS = 4;
@@ -118,29 +122,64 @@ function Gallery({ product }: { product: ProductDetailType }) {
   const images = product.images;
   const [activeIndex, setActiveIndex] = useState(0);
   const [imageFailed, setImageFailed] = useState(false);
+  const [ratios, setRatios] = useState<Record<string, number>>({});
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  const boxRef = useRef<HTMLDivElement>(null);
 
   const active = images[activeIndex];
-  const mainSrc = images.length > 0 && !imageFailed ? active?.url : PLACEHOLDER_IMAGE;
+  const mainSrc =
+    (images.length > 0 && !imageFailed ? active?.url : undefined) || PLACEHOLDER_IMAGE;
   const mainAlt = active?.altText || product.productName;
 
   const slots = Array.from({ length: Math.max(THUMBNAIL_SLOTS, images.length) });
 
+  // Measure the space available for the main image.
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const update = () => setBox({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Remember each photo's shape once it has loaded.
+  const recordRatio = useCallback((src: string, img: HTMLImageElement) => {
+    if (!img.naturalWidth || !img.naturalHeight) return;
+    const r = img.naturalWidth / img.naturalHeight;
+    setRatios((prev) => (prev[src] ? prev : { ...prev, [src]: r }));
+  }, []);
+
+  // Covers images that finished loading before React attached onLoad (cached / server-rendered).
+  const setImageEl = useCallback(
+    (el: HTMLImageElement | null) => {
+      if (el && el.complete) recordRatio(mainSrc, el);
+    },
+    [mainSrc, recordRatio]
+  );
+
+  // Fit the photo's shape inside the available box (scale up or down, never crop).
+  const ratio = ratios[mainSrc];
+  let fitW: number | string = "100%";
+  let fitH: number | string = "100%";
+  if (ratio && box.w > 0 && box.h > 0) {
+    if (box.w / box.h > ratio) {
+      fitH = box.h;
+      fitW = box.h * ratio;
+    } else {
+      fitW = box.w;
+      fitH = box.w / ratio;
+    }
+  }
+
   return (
     <div className="flex flex-col lg:h-full lg:min-h-0">
-      {/* STAGE */}
+      {/* MAIN IMAGE */}
       <div
-        className="relative h-[380px] overflow-hidden rounded-[28px] sm:h-[500px] lg:h-auto lg:min-h-0 lg:flex-1"
-        style={{
-          background:
-            "radial-gradient(70% 60% at 50% 45%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%), linear-gradient(135deg, #fff1d6 0%, #ffe3d0 55%, #fbd6d6 100%)",
-        }}
+        ref={boxRef}
+        className="relative flex h-[380px] items-center justify-center sm:h-[500px] lg:h-auto lg:min-h-0 lg:flex-1"
       >
-        {images.length > 1 && (
-          <span className="absolute bottom-5 right-5 z-10 rounded-full bg-white/85 px-3 py-1 text-[12px] font-semibold text-[#374151] backdrop-blur">
-            {activeIndex + 1} / {images.length}
-          </span>
-        )}
-
         <AnimatePresence mode="wait">
           <motion.div
             key={mainSrc}
@@ -148,25 +187,25 @@ function Gallery({ product }: { product: ProductDetailType }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: EASE }}
-            className="absolute inset-0"
+            style={{ width: fitW, height: fitH }}
+            className={`relative overflow-hidden rounded-[28px] bg-white shadow-[0_12px_40px_rgba(24,34,53,0.14)] ring-1 ring-black/10 ${
+              ratio ? "" : "invisible"
+            }`}
           >
-            {/* Blurred copy of the same photo fills the whole stage, so there are
-                no empty bands whether the image is portrait or landscape. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={mainSrc || PLACEHOLDER_IMAGE}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full scale-125 object-cover opacity-90 blur-2xl"
-            />
-            {/* The full, uncropped product image sits on top, edge to edge. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={mainSrc || PLACEHOLDER_IMAGE}
+              ref={setImageEl}
+              src={mainSrc}
               alt={mainAlt}
+              onLoad={(e) => recordRatio(mainSrc, e.currentTarget)}
               onError={() => setImageFailed(true)}
-              className="relative h-full w-full object-contain"
+              className="h-full w-full object-cover"
             />
+            {images.length > 1 && (
+              <span className="absolute bottom-4 right-4 rounded-full bg-white/90 px-3 py-1 text-[12px] font-semibold text-[#374151] shadow-sm ring-1 ring-black/5">
+                {activeIndex + 1} / {images.length}
+              </span>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -225,14 +264,10 @@ function RelatedProductCard({ product }: { product: Product }) {
     ? Math.round((((product.mrp as number) - product.price) / (product.mrp as number)) * 100)
     : 0;
 
-  const isNew =
-    Boolean(product.createdAt) &&
-    Date.now() - new Date(product.createdAt as string).getTime() < 1000 * 60 * 60 * 24 * 30;
-
   return (
     <Link
-      href={`/products/${product.productId}`}
-      className="group block rounded-2xl bg-white p-2 no-underline shadow-[0_2px_12px_rgba(120,53,15,0.07)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(120,53,15,0.14)]"
+      href={productPath(product)}
+      className="group block rounded-2xl bg-white p-2 no-underline shadow-[0_2px_12px_rgba(120,53,15,0.08)] transition-shadow duration-300 hover:shadow-[0_18px_36px_rgba(120,53,15,0.18)]"
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#f6f1e9]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -240,17 +275,13 @@ function RelatedProductCard({ product }: { product: Product }) {
           src={!imageFailed && product.imageUrl ? product.imageUrl : PLACEHOLDER_IMAGE}
           alt={product.imageAltText || product.productName}
           onError={() => setImageFailed(true)}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
         />
-        {discountPercent > 0 ? (
+        {discountPercent > 0 && (
           <span className="absolute left-2.5 top-2.5 rounded-full bg-[rgb(207,0,6)] px-2.5 py-1 text-[10px] font-bold text-white">
             -{discountPercent}%
           </span>
-        ) : isNew ? (
-          <span className="absolute left-2.5 top-2.5 rounded-full bg-[#12805c] px-2.5 py-1 text-[10px] font-bold text-white">
-            NEW
-          </span>
-        ) : null}
+        )}
       </div>
 
       <div className="px-1.5 pb-2 pt-3">
@@ -273,8 +304,9 @@ function RelatedProductCard({ product }: { product: Product }) {
 }
 
 /* =========================================================
-   RELATED PRODUCTS — full-width tinted band with a scrolling
-   row of cards and arrow buttons.
+   RELATED PRODUCTS — a rounded gradient panel (same look as
+   the About panel above) holding a title, arrow buttons and a
+   scrolling row of white cards.
 ========================================================= */
 
 function RelatedProductsSection({ products }: { products: Product[] }) {
@@ -300,10 +332,18 @@ function RelatedProductsSection({ products }: { products: Product[] }) {
     el.scrollBy({ left: direction * (el.clientWidth * 0.8), behavior: "smooth" });
   }
 
+  const arrowClass =
+    "flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-900 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:ring-[rgb(255,170,0)] active:scale-90 disabled:cursor-not-allowed disabled:opacity-30";
+
   return (
-    <section className="mt-20 bg-gradient-to-b from-[#fff4e2] to-white py-14">
-      <div className={CONTAINER}>
-        <div className="flex items-end justify-between gap-4">
+    <section className={`${CONTAINER} mt-14 pb-16 sm:mt-20`}>
+      <div
+        className="rounded-[28px] px-5 pb-3 pt-7 sm:px-8 sm:pb-4 sm:pt-9 lg:px-9"
+        style={{
+          background: "linear-gradient(135deg, #fff3dc 0%, #ffe9dc 60%, #fce0e0 100%)",
+        }}
+      >
+        <div className="flex items-center justify-between gap-4">
           <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-[28px]">
             You may also like
           </h2>
@@ -315,7 +355,7 @@ function RelatedProductsSection({ products }: { products: Product[] }) {
                 aria-label="Scroll related products left"
                 onClick={() => scrollByCards(-1)}
                 disabled={!canScrollLeft}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-900 shadow-sm ring-1 ring-[#eadfce] transition-all duration-300 hover:ring-[rgb(255,170,0)] active:scale-90 disabled:cursor-not-allowed disabled:opacity-30"
+                className={arrowClass}
               >
                 <ChevronLeft size={18} />
               </button>
@@ -324,7 +364,7 @@ function RelatedProductsSection({ products }: { products: Product[] }) {
                 aria-label="Scroll related products right"
                 onClick={() => scrollByCards(1)}
                 disabled={!canScrollRight}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-900 shadow-sm ring-1 ring-[#eadfce] transition-all duration-300 hover:ring-[rgb(255,170,0)] active:scale-90 disabled:cursor-not-allowed disabled:opacity-30"
+                className={arrowClass}
               >
                 <ChevronRight size={18} />
               </button>
@@ -335,10 +375,13 @@ function RelatedProductsSection({ products }: { products: Product[] }) {
         <div
           ref={scrollerRef}
           onScroll={updateArrowState}
-          className="-mx-1 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-1 pb-4 pt-1 sm:gap-6 [&::-webkit-scrollbar]:hidden"
+          className="-mx-2 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-2 pb-6 pt-2 sm:gap-6 [&::-webkit-scrollbar]:hidden"
         >
           {products.map((p) => (
-            <div key={p.productId} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[18.4%]">
+            <div
+              key={p.productId}
+              className="w-[46%] shrink-0 snap-start sm:w-[calc((100%-48px)/3)] lg:w-[calc((100%-72px)/4)] xl:w-[calc((100%-96px)/5)]"
+            >
               <RelatedProductCard product={p} />
             </div>
           ))}
@@ -415,9 +458,17 @@ const rowVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
 };
 
-export default function ProductDetail({ productId }: { productId: number }) {
-  const [data, setData] = useState<ProductDetailData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export default function ProductDetail({
+  productId,
+  initialData,
+}: {
+  productId: number;
+  initialData?: ProductDetailData;
+}) {
+  // When the server page passes `initialData`, the product is already in the
+  // HTML Google and users receive, so we skip the client-side fetch.
+  const [data, setData] = useState<ProductDetailData | null>(initialData ?? null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -428,6 +479,8 @@ export default function ProductDetail({ productId }: { productId: number }) {
   const router = useRouter();
 
   useEffect(() => {
+    if (initialData && initialData.product.productId === productId) return;
+
     let cancelled = false;
     setIsLoading(true);
     setError(null);
@@ -460,6 +513,7 @@ export default function ProductDetail({ productId }: { productId: number }) {
     return () => {
       cancelled = true;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   // Reset quantity whenever a different product loads.

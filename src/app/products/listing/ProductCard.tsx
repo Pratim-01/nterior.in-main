@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/types/products";
+import { productPath } from "@/lib/product-slug";
 
 export type { Product };
 
@@ -38,7 +39,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link
-      href={`/products/${product.productId}`}
+      href={productPath(product)}
       className="
         group
         block

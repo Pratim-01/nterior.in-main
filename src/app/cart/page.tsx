@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { productPath } from "@/lib/product-slug";
+import { useCallback, useEffect, useState } from "react";
 import {
   AnimatePresence,
   animate,
@@ -59,6 +60,55 @@ function AnimatedPrice({ value }: { value: number }) {
   }, [value, mv, reduce]);
 
   return <>{formatPrice(display)}</>;
+}
+
+/* =========================================================
+   CART ITEM IMAGE — takes the exact shape of the photo
+   (portrait, landscape or square), scaled to fit a fixed
+   square area. No background, no padding, no cropping.
+   The shape is read once the image has loaded.
+========================================================= */
+
+function CartItemImage({ src, alt }: { src: string; alt: string }) {
+  const [ratio, setRatio] = useState<number | null>(null);
+
+  // Covers images already loaded before React attached onLoad (cached / server-rendered).
+  const setEl = useCallback((el: HTMLImageElement | null) => {
+    if (el && el.complete && el.naturalWidth && el.naturalHeight) {
+      setRatio(el.naturalWidth / el.naturalHeight);
+    }
+  }, []);
+
+  // Wide/square photos fill the width, tall photos fill the height; the other side follows the ratio.
+  const fit: React.CSSProperties | undefined = ratio
+    ? {
+        aspectRatio: String(ratio),
+        ...(ratio >= 1
+          ? { width: "100%", height: "auto" }
+          : { height: "100%", width: "auto" }),
+      }
+    : undefined;
+
+  return (
+    <div className="flex h-20 w-20 shrink-0 items-center justify-center sm:h-24 sm:w-24">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={setEl}
+        src={src}
+        alt={alt}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (img.naturalWidth && img.naturalHeight) {
+            setRatio(img.naturalWidth / img.naturalHeight);
+          }
+        }}
+        style={fit}
+        className={`rounded-xl bg-white object-cover shadow-[0_2px_8px_rgba(24,34,53,0.12)] ring-1 ring-black/10 ${
+          ratio ? "" : "invisible h-full w-full"
+        }`}
+      />
+    </div>
+  );
 }
 
 /* =========================================================
@@ -199,15 +249,11 @@ export default function CartPage() {
                       <Trash2 size={14} />
                     </button>
 
-                    <Link
-                      href={`/products/${item.productId}`}
-                      className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#eee] bg-[#fafafa] sm:h-24 sm:w-24"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                    <Link href={productPath(item)} className="shrink-0">
+                      <CartItemImage
+                        key={item.imageUrl || PLACEHOLDER_IMAGE}
                         src={item.imageUrl || PLACEHOLDER_IMAGE}
                         alt={item.productName}
-                        className="h-full w-full object-contain p-1.5"
                       />
                     </Link>
 
@@ -219,7 +265,7 @@ export default function CartPage() {
                       )}
 
                       <Link
-                        href={`/products/${item.productId}`}
+                        href={productPath(item)}
                         className="mt-1.5 line-clamp-2 pr-8 text-[16px] font-semibold leading-tight text-[#111827] hover:text-[rgb(207,0,6)] sm:text-[17px]"
                       >
                         {item.productName}
