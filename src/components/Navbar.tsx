@@ -232,7 +232,41 @@ export default function Navbar() {
     function submitSearch(term: string) {
         const trimmed = term.trim();
         if (!trimmed) return;
-        router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+
+        const params = new URLSearchParams();
+        params.set("q", trimmed);
+
+        // Navigate immediately with the plain search — resolveSearchFilters
+        // (via /api/search/resolve) then layers the matching sub-category/
+        // brand/thickness/grade checkboxes on top a moment later, once the
+        // vocabulary lookup returns. If that call fails or is slow, the
+        // plain `?q=` search below still returns the right products on its
+        // own (see buildSearchClause in src/lib/product-query.ts) — this is
+        // purely a UI precision upgrade, never a requirement for correct
+        // results.
+        router.push(`/search?${params.toString()}`);
+
+        fetch(`/api/search/resolve?q=${encodeURIComponent(trimmed)}`)
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data: { filters?: Record<string, string[]> } | null) => {
+                const filters = data?.filters;
+                if (!filters) return;
+                const hasMatch = Object.values(filters).some((v) => v.length > 0);
+                if (!hasMatch) return;
+
+                const resolvedParams = new URLSearchParams();
+                resolvedParams.set("q", trimmed);
+                (["subCategory", "brand", "category", "thickness", "grade"] as const).forEach(
+                    (key) => {
+                        filters[key]?.forEach((value) => resolvedParams.append(key, value));
+                    }
+                );
+                router.replace(`/search?${resolvedParams.toString()}`, { scroll: false });
+            })
+            .catch(() => {
+                // Network hiccup — the plain `?q=` search already navigated
+                // above, so there's nothing more to do here.
+            });
     }
 
     function handleDesktopSearchSubmit(e: FormEvent<HTMLFormElement>) {
