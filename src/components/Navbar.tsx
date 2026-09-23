@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
     Search,
@@ -216,12 +216,35 @@ function MegaMenuColumnStack({
 
 export default function Navbar() {
     const pathname = usePathname();
+    const router = useRouter();
     const { totalItems } = useCart();
 
     const isCrm =
         pathname === "/crm" ||
         pathname.startsWith("/crm/");
     const isProduct = !isCrm;
+
+    // Desktop and mobile each get their own input so the two never fight
+    // over focus/cursor position, but both submit to the same place.
+    const [desktopSearchTerm, setDesktopSearchTerm] = useState("");
+    const [mobileSearchTerm, setMobileSearchTerm] = useState("");
+
+    function submitSearch(term: string) {
+        const trimmed = term.trim();
+        if (!trimmed) return;
+        router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    }
+
+    function handleDesktopSearchSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        submitSearch(desktopSearchTerm);
+    }
+
+    function handleMobileSearchSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        submitSearch(mobileSearchTerm);
+        setMobileMenu(false);
+    }
 
     const [mobileMenu, setMobileMenu] =
         useState(false);
@@ -486,10 +509,15 @@ export default function Navbar() {
                         {/* SEARCH */}
 
                         <div className="min-w-0">
-                            <div className="relative">
+                            <form
+                                role="search"
+                                onSubmit={handleDesktopSearchSubmit}
+                                className="relative"
+                            >
                                 <Search
                                     size={19}
                                     className="
+                                        pointer-events-none
                                         absolute
                                         left-4
                                         top-1/2
@@ -500,7 +528,10 @@ export default function Navbar() {
 
                                 <input
                                     type="search"
+                                    value={desktopSearchTerm}
+                                    onChange={(e) => setDesktopSearchTerm(e.target.value)}
                                     placeholder="Search furniture, wardrobes, kitchens..."
+                                    aria-label="Search products"
                                     className="
                                         h-12
                                         w-full
@@ -522,7 +553,7 @@ export default function Navbar() {
                                         focus:ring-yellow-200/40
                                     "
                                 />
-                            </div>
+                            </form>
                         </div>
 
                         {/* ACTIONS */}
@@ -1193,10 +1224,15 @@ export default function Navbar() {
                 {/* MOBILE SEARCH */}
 
                 <div className="px-3 pb-3 sm:px-4">
-                    <div className="relative">
+                    <form
+                        role="search"
+                        onSubmit={handleMobileSearchSubmit}
+                        className="relative"
+                    >
                         <Search
                             size={18}
                             className="
+                                pointer-events-none
                                 absolute
                                 left-4
                                 top-1/2
@@ -1207,7 +1243,10 @@ export default function Navbar() {
 
                         <input
                             type="search"
+                            value={mobileSearchTerm}
+                            onChange={(e) => setMobileSearchTerm(e.target.value)}
                             placeholder="Search products..."
+                            aria-label="Search products"
                             className="
                                 h-11
                                 w-full
@@ -1228,7 +1267,7 @@ export default function Navbar() {
                                 focus:ring-yellow-200/40
                             "
                         />
-                    </div>
+                    </form>
                 </div>
             </div>
 

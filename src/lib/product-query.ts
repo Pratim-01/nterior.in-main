@@ -2,6 +2,7 @@ import type { RowDataPacket } from "mysql2/promise";
 import kayapalatDb from "@/lib/kayapalat-db";
 import { ParsedProductQuery } from "@/lib/product-query-params";
 import {
+  DEFAULT_SORT,
   FACET_KEYS,
   FacetKey,
   FacetOption,
@@ -34,6 +35,66 @@ const FACET_COLUMNS: Record<FacetKey, string> = {
   thickness: "thickness",
   grade: "grade",
 };
+
+// -----------------------------------------------------------------------
+// Columns the free-text search box (`?q=`) matches against — every one a
+// real, whitelisted `product_details` column, same rule as FACET_COLUMNS
+// above. `about_product` is the long-form write-up (only present on the
+// single-product page's own query, but harmless to reference everywhere
+// since it's just a column name, never data).
+// -----------------------------------------------------------------------
+const SEARCH_COLUMNS = [
+  "product_name",
+  "brand",
+  "category",
+  "sub_category",
+  "short_description",
+  "about_product",
+  "size",
+  "thickness",
+  "grade",
+] as const;
+
+/**
+ * Builds the search half of the WHERE clause for `query.q`. Splits the
+ * term into words (a search for "century 18mm ply" should match a product
+ * whose name/brand/description contains all three words, not the exact
+ * three-word phrase) and requires every word to appear in *some* searched
+ * column — each word becomes `(col1 REGEXP ? OR col2 REGEXP ? OR ...)`,
+ * AND-ed together. Capped at 6 words so a pathological input can't blow up
+ * the generated SQL.
+ *
+ * Matches on a word-*start* boundary rather than a bare substring — "ply"
+ * matches "Plywood" and "Ply", but NOT "CenturyPly", "Multiply", "Supply".
+ * A plain `LIKE '%ply%'` matches "ply" anywhere, including mid-word inside
+ * a compound brand name like "CenturyPly" — that's what was pulling
+ * unrelated categories (e.g. an MDF board sold under the CenturyPly brand)
+ * into a "ply" search and polluting the Category/Sub Category filters.
+ * Anchoring to the start of a word keeps every genuine match (a product
+ * actually named "Plywood", a description mentioning "plywood") while
+ * dropping incidental mid-word hits. Both sides are lower-cased explicitly
+ * so matching stays case-insensitive regardless of the column's collation.
+ */
+function buildSearchClause(alias: string, q: string): WhereClause {
+  const col = (name: string) => `LOWER(${alias}\`${name}\`)`;
+  const words = q.split(/\s+/).filter(Boolean).slice(0, 6);
+
+  const params: (string | number)[] = [];
+  const wordClauses = words.map((word) => {
+    // Escape regex metacharacters in the user's word so it's matched
+    // literally, then require it to start a "word" — preceded by the
+    // start of the string or a non-alphanumeric character.
+    const escaped = word.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = `(^|[^a-z0-9])${escaped}`;
+    const perColumn = SEARCH_COLUMNS.map((column) => {
+      params.push(pattern);
+      return `${col(column)} REGEXP ?`;
+    });
+    return `(${perColumn.join(" OR ")})`;
+  });
+
+  return { sql: wordClauses.join(" AND "), params };
+}
 
 function sortColumns(alias: string): Record<SortOption, string> {
   const c = (name: string) => `${alias}\`${name}\``;
@@ -120,6 +181,18 @@ function buildWhereClause(
     }
   }
 
+  // Because this same function backs the page query, every facet's option
+  // counts, and the price range, a search term scopes all of them at
+  // once — the filter sidebar on a search-results page only ever shows
+  // brands/sizes/etc. that actually occur within the matching products.
+  if (query.q) {
+    const search = buildSearchClause(alias, query.q);
+    if (search.sql) {
+      clauses.push(search.sql);
+      params.push(...search.params);
+    }
+  }
+
   return { sql: `WHERE ${clauses.join(" AND ")}`, params };
 }
 
@@ -172,11 +245,36 @@ function mapRow(row: RowDataPacket): Product {
   };
 }
 
+/**
+ * When searching, puts the closest matches first: an exact/near match on
+ * the product name outranks one that only matched on, say, its
+ * description, and a brand match ranks just under that. Only kicks in
+ * when the visitor hasn't explicitly picked a sort — choosing "Price: Low
+ * to High" while searching still filters to the search term, it just
+ * stops re-ordering by relevance first (the same way picking a sort
+ * already overrides "Newest").
+ */
+function relevanceOrderClause(
+  alias: string,
+  query: ParsedProductQuery
+): WhereClause {
+  if (!query.q || query.sort !== DEFAULT_SORT) return { sql: "", params: [] };
+  const col = (name: string) => `${alias}\`${name}\``;
+  const like = `%${query.q}%`;
+  return {
+    sql: `(${col("product_name")} LIKE ?) DESC, (${col("category")} LIKE ? OR ${col(
+      "sub_category"
+    )} LIKE ?) DESC, (${col("brand")} LIKE ?) DESC, `,
+    params: [like, like, like, like],
+  };
+}
+
 /** Runs the paginated products query + the matching total count. */
 async function fetchProductsPage(
   query: ParsedProductQuery
 ): Promise<{ products: Product[]; pagination: Pagination }> {
   const where = buildWhereClause(query, { alias: "pd." });
+  const relevance = relevanceOrderClause("pd.", query);
   const offset = (query.page - 1) * query.pageSize;
 
   const [rows] = await kayapalatDb.query<RowDataPacket[]>(
@@ -204,9 +302,9 @@ async function fetchProductsPage(
        ON pd.product_id = pi.product_id
        AND pi.is_primary = 1
      ${where.sql}
-     ORDER BY ${sortColumns("pd.")[query.sort]}
+     ORDER BY ${relevance.sql}${sortColumns("pd.")[query.sort]}
      LIMIT ? OFFSET ?`,
-    [...where.params, query.pageSize, offset]
+    [...where.params, ...relevance.params, query.pageSize, offset]
   );
 
   const [countRows] = await kayapalatDb.query<RowDataPacket[]>(
@@ -376,6 +474,7 @@ export async function fetchProductById(
       sort: "newest",
       page: 1,
       pageSize: 8,
+      q: null,
     },
     { alias: "pd." }
   );

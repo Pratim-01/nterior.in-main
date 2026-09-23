@@ -24,12 +24,28 @@ export interface ParsedProductQuery {
   sort: SortOption;
   page: number;
   pageSize: number;
+  /** Free-text search term (the navbar search box, `?q=`). Trimmed, capped
+   *  at MAX_QUERY_LENGTH, and `null` when absent/blank — matched against
+   *  product name, brand, category/sub-category, and description in
+   *  lib/product-query.ts. Combines with every other filter (a search can
+   *  be narrowed by brand/size/price/etc. same as any other listing). */
+  q: string | null;
 }
+
+/** Long enough for any real product query; keeps a pathological input from
+ *  blowing up the generated WHERE clause (see buildSearchClause). */
+export const MAX_QUERY_LENGTH = 100;
 
 function parsePriceParam(raw: string | null): number | null {
   if (raw === null || raw === "") return null;
   const n = Number(raw);
   return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+function parseSearchParam(raw: string | null): string | null {
+  if (raw === null) return null;
+  const trimmed = raw.trim().slice(0, MAX_QUERY_LENGTH);
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 /**
@@ -80,6 +96,7 @@ export function parseProductQuery(
     sort,
     page,
     pageSize,
+    q: parseSearchParam(params.get("q")),
   };
 }
 
@@ -125,16 +142,22 @@ export function buildQueryString(
     else params.set("sort", query.sort);
   }
 
+  if ("q" in query) {
+    const q = query.q?.trim();
+    if (q) params.set("q", q);
+    else params.delete("q");
+  }
+
   if (query.page !== undefined) {
     if (query.page <= 1) params.delete("page");
     else params.set("page", String(query.page));
   }
 
-  // Filter/sort/price changes invalidate whatever page the user was on.
-  // Callers that only change `page` itself pass nothing else, so this only
-  // fires on real filter/sort/price changes.
+  // Filter/sort/price/search changes invalidate whatever page the user was
+  // on. Callers that only change `page` itself pass nothing else, so this
+  // only fires on real filter/sort/price/search changes.
   if (
-    (query.filters || query.sort || "minPrice" in query || "maxPrice" in query) &&
+    (query.filters || query.sort || "minPrice" in query || "maxPrice" in query || "q" in query) &&
     query.page === undefined
   ) {
     params.delete("page");

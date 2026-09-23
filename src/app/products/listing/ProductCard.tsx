@@ -37,6 +37,17 @@ export default function ProductCard({ product }: { product: Product }) {
     .filter(([, value]) => value !== null && value !== "")
     .slice(0, 4);
 
+  // Only "Plywood & Blockboard" shows its sub-category ("Plywood" /
+  // "Blockboards") on the badge instead of the broader category name —
+  // every other category keeps showing its plain `category` value, same
+  // as before. Scoped this way instead of a general
+  // sub_category-over-category preference so it doesn't change how
+  // Laminates, Hardware, etc. display.
+  const badgeLabel =
+    product.category === "Plywood & Blockboard" && product.subCategory
+      ? product.subCategory
+      : product.category;
+
   return (
     <Link
       href={productPath(product)}
@@ -77,7 +88,7 @@ export default function ProductCard({ product }: { product: Product }) {
             sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[10px]
           "
         >
-          {product.category}
+          {badgeLabel}
         </span>
       </div>
 

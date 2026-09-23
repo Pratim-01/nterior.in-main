@@ -9,7 +9,8 @@ export default function PlywoodLaminatesPage() {
       <TopCategories />
 
       <FeaturedProducts
-        category="Plywood"
+        category="Plywood & Blockboard"
+        subCategory="Plywood"
         title="Explore Our Range of Plywood"
         viewAllHref="/products/items/plywood-laminates/plywood"
         sectionClassName="bg-[#FFF5F5]"

@@ -93,7 +93,7 @@ function ProductListingContent({
   breadcrumb,
   categoryOptions,
 }: ProductListingProps) {
-  const { filters, minPrice, maxPrice, sort, page, pageSize, update } =
+  const { filters, minPrice, maxPrice, sort, page, pageSize, q, update } =
     useProductUrlState();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -129,8 +129,9 @@ function ProductListingContent({
         sort,
         page,
         pageSize,
+        q,
       }),
-    [effectiveFilters, minPrice, maxPrice, sort, page, pageSize]
+    [effectiveFilters, minPrice, maxPrice, sort, page, pageSize, q]
   );
 
   const { data, isLoading, error } = useProducts(queryString);
@@ -209,9 +210,16 @@ function ProductListingContent({
     !categoryOptions ||
     (category ? effectiveFilters.category.length === 1 && effectiveFilters.category[0] === category : false);
 
-  const displayTitle = isDefaultCategorySelection
-    ? title ?? category ?? (filters.category.length === 1 ? filters.category[0] : "All Products")
-    : effectiveFilters.category.join(" & ");
+  // A search term takes over the heading on the catalogue-wide listing
+  // (no fixed `category` prop, e.g. /search) — a category landing page's
+  // own title always wins, since that page's category lock stays active
+  // even if a stray ?q= ends up in its URL.
+  const displayTitle =
+    q && !category
+      ? `Search results for "${q}"`
+      : isDefaultCategorySelection
+      ? title ?? category ?? (filters.category.length === 1 ? filters.category[0] : "All Products")
+      : effectiveFilters.category.join(" & ");
 
   return (
     <main className="min-h-screen w-full bg-white">

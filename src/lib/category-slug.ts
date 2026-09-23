@@ -51,6 +51,20 @@ const TAXONOMY_NAME_BY_SLUG: Record<string, string> = (() => {
 const CATEGORY_OVERRIDES: Record<string, string> = {
   "eng-board": "Engineered Board",
 
+  // "plywood" is the slug used by the Plywood & Laminates landing page's
+  // TopCategories card (see plywood-laminates/components/TopCategories.tsx)
+  // to link to the *column* — "Plywood" and "Blockboards" together — not
+  // to the "Plywood" leaf item alone. Without this override,
+  // TAXONOMY_NAME_BY_SLUG would resolve "plywood" to the leaf item
+  // "Plywood" (since categoryToSlug("Plywood") is also "plywood"), which
+  // would make isLeafItem() true and trigger the one-time
+  // subCategory=Plywood redirect in [subcategory]/page.tsx — narrowing
+  // the page down to Plywood only instead of showing both Plywood and
+  // Blockboards, unlike every other column-title page (e.g.
+  // hardware/other-hardware).
+  // plywood: "Plywood & Blockboard",
+  "plywood-blockboard": "Plywood & Blockboard",
+
   // Ebco brand showcase (src/app/products/items/hardware/components/
   // EbcoShowcase.tsx) — these 7 category lines are also now real navbar
   // leaf items (see product-navigation.ts's Hardware group), so most

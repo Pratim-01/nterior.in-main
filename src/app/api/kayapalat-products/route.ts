@@ -156,15 +156,23 @@ export async function GET(request: NextRequest) {
        TOTAL PRODUCT COUNT FOR CURRENT CATEGORY
     ========================================================= */
 
+    // `category` now also doubles as a sub_category value for rows whose
+    // real `category` column holds a broader grouping (e.g. "Plywood" and
+    // "Blockboards" live under category = "Plywood & Blockboard", with
+    // "Plywood"/"Blockboards" in `sub_category`) — see the matching
+    // comment in src/lib/product-query.ts. Matching either column keeps
+    // this endpoint working for both the old flat values and the new
+    // nested ones, without every caller needing to know which one a
+    // given value lives in.
     const [countRows] =
       await kayapalatDb.query(
         `
           SELECT COUNT(*) AS total
           FROM product_details
           WHERE is_active = 1
-            AND category = ?
+            AND (category = ? OR sub_category = ?)
         `,
-        [category]
+        [category, category]
       );
 
     const totalProducts = Number(
@@ -188,19 +196,23 @@ export async function GET(request: NextRequest) {
        Blockboards → 35
     ========================================================= */
 
+    // Plywood/Blockboards now live in `sub_category` (their shared
+    // `category` is "Plywood & Blockboard"), so the counts have to group
+    // by `sub_category`, not `category` — aliased back to `category` so
+    // the mapping below doesn't need to change.
     const [categoryCountRows] =
       await kayapalatDb.query(
         `
           SELECT
-            category,
+            sub_category AS category,
             COUNT(*) AS total
           FROM product_details
           WHERE is_active = 1
-            AND category IN (
+            AND sub_category IN (
               'Plywood',
               'Blockboards'
             )
-          GROUP BY category
+          GROUP BY sub_category
         `
       );
 
@@ -234,7 +246,7 @@ export async function GET(request: NextRequest) {
           SELECT
             pd.product_id,
             pd.product_name,
-            pd.category,
+            COALESCE(NULLIF(pd.sub_category, ''), pd.category) AS category,
             pd.product_type,
             pd.short_description,
             pd.sell_mrp,
@@ -251,13 +263,14 @@ export async function GET(request: NextRequest) {
             AND pi.is_primary = 1
 
           WHERE pd.is_active = 1
-            AND pd.category = ?
+            AND (pd.category = ? OR pd.sub_category = ?)
 
           ORDER BY ${orderBy}
 
           LIMIT ? OFFSET ?
         `,
         [
+          category,
           category,
           limit,
           offset,

@@ -11,7 +11,7 @@ const categories = [
     image:
       "https://itco-sa.com/img/1710932233categoryImagePlywood.png",
 
-    href: "/products/items/plywood-laminates/plywood",
+    href: "/products/items/plywood-laminates/plywood-blockboard",
   },
   {
     id: 2,

@@ -3,7 +3,6 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { fetchProductById } from "@/lib/product-query";
 import { parseProductParam, productPath } from "@/lib/product-slug";
 import ProductDetail from "@/app/products/detail/ProductDetail";
-import Navbar from "@/app/products/components/Navbar";
 
 // Price/stock change often — always render fresh.
 export const dynamic = "force-dynamic";
@@ -62,17 +61,16 @@ export default async function ProductPage({ params }: Props) {
   };
 
   return (
-    <>
+    <div className="pt-[108px]">
       {/* This route lives outside /products, so it doesn't inherit
-          products/layout.tsx — reproduce the same navbar + top spacing. */}
-      <Navbar />
-      <div className="pt-[108px]">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <ProductDetail key={id} productId={id} initialData={data} />
-      </div>
-    </>
+          products/layout.tsx — but the root layout's own Navbar (see
+          src/app/layout.tsx) already covers every page, this one included,
+          so only the matching top spacing needs reproducing here. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetail key={id} productId={id} initialData={data} />
+    </div>
   );
 }
