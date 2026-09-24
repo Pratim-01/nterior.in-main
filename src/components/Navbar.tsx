@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -211,6 +211,115 @@ function MegaMenuColumnStack({
 }
 
 /* =========================================================
+   SEARCH SUGGESTIONS — debounced autocomplete dropdown, shared
+   between the desktop and mobile search boxes below.
+========================================================= */
+
+function useSearchSuggestions(term: string, enabled: boolean) {
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+
+    useEffect(() => {
+        const trimmed = term.trim();
+        if (!enabled || trimmed.length < 2) {
+            setSuggestions([]);
+            return;
+        }
+
+        let cancelled = false;
+        const timer = setTimeout(() => {
+            fetch(`/api/search/suggest?q=${encodeURIComponent(trimmed)}`)
+                .then((res) => (res.ok ? res.json() : null))
+                .then((data: { suggestions?: string[] } | null) => {
+                    if (!cancelled) setSuggestions(data?.suggestions ?? []);
+                })
+                .catch(() => {
+                    if (!cancelled) setSuggestions([]);
+                });
+        }, 200);
+
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
+    }, [term, enabled]);
+
+    return suggestions;
+}
+
+function SearchSuggestionsDropdown({
+    suggestions,
+    activeIndex,
+    onHover,
+    onSelect,
+}: {
+    suggestions: string[];
+    activeIndex: number;
+    onHover: (index: number) => void;
+    onSelect: (suggestion: string) => void;
+}) {
+    if (suggestions.length === 0) return null;
+
+    return (
+        <ul
+            role="listbox"
+            className="
+                absolute
+                left-0
+                right-0
+                top-full
+                z-50
+                mt-2
+                max-h-80
+                overflow-y-auto
+                rounded-2xl
+                border
+                border-gray-100
+                bg-white
+                py-1.5
+                shadow-xl
+            "
+        >
+            {suggestions.map((suggestion, index) => (
+                <li key={suggestion} role="option" aria-selected={index === activeIndex}>
+                    <button
+                        type="button"
+                        // onMouseDown (not onClick) fires before the input's
+                        // blur, and preventDefault stops focus from moving
+                        // off the input — otherwise blur would close this
+                        // dropdown before the selection ever registers.
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            onSelect(suggestion);
+                        }}
+                        onMouseEnter={() => onHover(index)}
+                        className={`
+                            flex
+                            w-full
+                            items-center
+                            gap-3
+                            px-4
+                            py-2.5
+                            text-left
+                            text-sm
+                            capitalize
+                            text-gray-700
+                            transition
+                            ${index === activeIndex
+                                ? "bg-orange-50 text-gray-900"
+                                : "hover:bg-gray-50"
+                            }
+                        `}
+                    >
+                        <Search size={15} className="shrink-0 text-gray-400" />
+                        <span className="truncate">{suggestion}</span>
+                    </button>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
+/* =========================================================
    NAVBAR
 ========================================================= */
 
@@ -228,6 +337,93 @@ export default function Navbar() {
     // over focus/cursor position, but both submit to the same place.
     const [desktopSearchTerm, setDesktopSearchTerm] = useState("");
     const [mobileSearchTerm, setMobileSearchTerm] = useState("");
+
+    // Always-current mirrors of the two terms above, read inside the
+    // delayed callback in submitSearch (see the comment there) — a plain
+    // closure over desktopSearchTerm/mobileSearchTerm would be frozen to
+    // whatever they were at the moment submitSearch was called, not
+    // whatever the visitor has typed since.
+    const desktopTermRef = useRef("");
+    const mobileTermRef = useRef("");
+
+    // Suggestions dropdown state — one copy per input, same reasons as above.
+    const [desktopFocused, setDesktopFocused] = useState(false);
+    const [mobileFocused, setMobileFocused] = useState(false);
+    const [desktopActiveIndex, setDesktopActiveIndex] = useState(-1);
+    const [mobileActiveIndex, setMobileActiveIndex] = useState(-1);
+
+    // A blur fired right after submitting a search (the browser/router
+    // briefly moving focus around during navigation) shouldn't be treated
+    // the same as the visitor deliberately clicking away — so blur closes
+    // the dropdown on a short delay, cancelled if focus comes straight
+    // back. Selecting a suggestion (onMouseDown + preventDefault) never
+    // triggers a real blur in the first place, so this doesn't affect that.
+    const desktopBlurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const mobileBlurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    function focusSearch(which: "desktop" | "mobile") {
+        const timer = which === "desktop" ? desktopBlurTimer : mobileBlurTimer;
+        if (timer.current) clearTimeout(timer.current);
+        if (which === "desktop") setDesktopFocused(true);
+        else setMobileFocused(true);
+    }
+
+    function blurSearch(which: "desktop" | "mobile") {
+        const timer = setTimeout(() => {
+            if (which === "desktop") setDesktopFocused(false);
+            else setMobileFocused(false);
+        }, 150);
+        if (which === "desktop") desktopBlurTimer.current = timer;
+        else mobileBlurTimer.current = timer;
+    }
+
+    const desktopSuggestions = useSearchSuggestions(desktopSearchTerm, desktopFocused);
+    const mobileSuggestions = useSearchSuggestions(mobileSearchTerm, mobileFocused);
+
+    const showDesktopSuggestions = desktopFocused && desktopSuggestions.length > 0;
+    const showMobileSuggestions = mobileFocused && mobileSuggestions.length > 0;
+
+    function selectSuggestion(which: "desktop" | "mobile", suggestion: string) {
+        if (which === "desktop") {
+            setDesktopSearchTerm(suggestion);
+            desktopTermRef.current = suggestion;
+            setDesktopFocused(false);
+            setDesktopActiveIndex(-1);
+        } else {
+            setMobileSearchTerm(suggestion);
+            mobileTermRef.current = suggestion;
+            setMobileFocused(false);
+            setMobileActiveIndex(-1);
+            setMobileMenu(false);
+        }
+        submitSearch(suggestion);
+    }
+
+    function handleSearchKeyDown(
+        e: KeyboardEvent<HTMLInputElement>,
+        which: "desktop" | "mobile"
+    ) {
+        const suggestions = which === "desktop" ? desktopSuggestions : mobileSuggestions;
+        if (suggestions.length === 0) return;
+
+        const activeIndex = which === "desktop" ? desktopActiveIndex : mobileActiveIndex;
+        const setActiveIndex = which === "desktop" ? setDesktopActiveIndex : setMobileActiveIndex;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setActiveIndex((activeIndex + 1) % suggestions.length);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setActiveIndex((activeIndex - 1 + suggestions.length) % suggestions.length);
+        } else if (e.key === "Enter" && activeIndex >= 0) {
+            e.preventDefault();
+            selectSuggestion(which, suggestions[activeIndex]);
+        } else if (e.key === "Escape") {
+            setActiveIndex(-1);
+            if (which === "desktop") setDesktopFocused(false);
+            else setMobileFocused(false);
+        }
+    }
 
     function submitSearch(term: string) {
         const trimmed = term.trim();
@@ -249,6 +445,18 @@ export default function Navbar() {
         fetch(`/api/search/resolve?q=${encodeURIComponent(trimmed)}`)
             .then((res) => (res.ok ? res.json() : null))
             .then((data: { filters?: Record<string, string[]> } | null) => {
+                // If the visitor has already typed something new into
+                // either box since this search was submitted, applying
+                // filters for the OLD term now would both be wrong and —
+                // since it navigates — could steal focus right out from
+                // under whatever they're typing next. Bail out instead.
+                if (
+                    desktopTermRef.current.trim() !== trimmed &&
+                    mobileTermRef.current.trim() !== trimmed
+                ) {
+                    return;
+                }
+
                 const filters = data?.filters;
                 if (!filters) return;
                 const hasMatch = Object.values(filters).some((v) => v.length > 0);
@@ -563,9 +771,20 @@ export default function Navbar() {
                                 <input
                                     type="search"
                                     value={desktopSearchTerm}
-                                    onChange={(e) => setDesktopSearchTerm(e.target.value)}
-                                    placeholder="Search furniture, wardrobes, kitchens..."
+                                    onChange={(e) => {
+                                        setDesktopSearchTerm(e.target.value);
+                                        desktopTermRef.current = e.target.value;
+                                        setDesktopActiveIndex(-1);
+                                    }}
+                                    onFocus={() => focusSearch("desktop")}
+                                    onBlur={() => blurSearch("desktop")}
+                                    onKeyDown={(e) => handleSearchKeyDown(e, "desktop")}
+                                    placeholder="Search plywood, laminates, doorlocks..."
                                     aria-label="Search products"
+                                    role="combobox"
+                                    aria-expanded={showDesktopSuggestions}
+                                    aria-autocomplete="list"
+                                    autoComplete="off"
                                     className="
                                         h-12
                                         w-full
@@ -587,6 +806,15 @@ export default function Navbar() {
                                         focus:ring-yellow-200/40
                                     "
                                 />
+
+                                {showDesktopSuggestions && (
+                                    <SearchSuggestionsDropdown
+                                        suggestions={desktopSuggestions}
+                                        activeIndex={desktopActiveIndex}
+                                        onHover={setDesktopActiveIndex}
+                                        onSelect={(s) => selectSuggestion("desktop", s)}
+                                    />
+                                )}
                             </form>
                         </div>
 
@@ -1278,9 +1506,20 @@ export default function Navbar() {
                         <input
                             type="search"
                             value={mobileSearchTerm}
-                            onChange={(e) => setMobileSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setMobileSearchTerm(e.target.value);
+                                mobileTermRef.current = e.target.value;
+                                setMobileActiveIndex(-1);
+                            }}
+                            onFocus={() => focusSearch("mobile")}
+                            onBlur={() => blurSearch("mobile")}
+                            onKeyDown={(e) => handleSearchKeyDown(e, "mobile")}
                             placeholder="Search products..."
                             aria-label="Search products"
+                            role="combobox"
+                            aria-expanded={showMobileSuggestions}
+                            aria-autocomplete="list"
+                            autoComplete="off"
                             className="
                                 h-11
                                 w-full
@@ -1301,6 +1540,15 @@ export default function Navbar() {
                                 focus:ring-yellow-200/40
                             "
                         />
+
+                        {showMobileSuggestions && (
+                            <SearchSuggestionsDropdown
+                                suggestions={mobileSuggestions}
+                                activeIndex={mobileActiveIndex}
+                                onHover={setMobileActiveIndex}
+                                onSelect={(s) => selectSuggestion("mobile", s)}
+                            />
+                        )}
                     </form>
                 </div>
             </div>
