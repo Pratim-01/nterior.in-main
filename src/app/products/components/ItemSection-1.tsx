@@ -1,201 +1,69 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import type { Product as ApiProduct, ProductsResponse } from "@/types/products";
+import { productPath } from "@/lib/product-slug";
+
 /* ==========================================================
    PRODUCT TYPE
+   (the shape this section's cards render — mapped from the
+   real `ApiProduct` returned by /api/products)
 ========================================================== */
 
 type Product = {
   id: number;
-  slug: string;
+  href: string;
   title: string;
   image: string;
   price: string;
-  oldPrice: string;
-  discount: string;
+  oldPrice: string | null;
+  discount: string | null;
 };
 
-/* ==========================================================
-   PLYWOOD PRODUCTS
-   (mirrors the Plywood column data used in ItemSection-2 /
-   the plywood-laminates category folder)
-========================================================== */
+const PLACEHOLDER_IMAGE =
+  "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80";
 
-const plywoodProducts: Product[] = [
-  {
-    id: 1,
-    slug: "marine-plywood",
-    title: "E-0 Marine Grade Plywood",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/PLatinum_Plus_Plywood_1_960x_crop_center.jpg?v=1778051385",
-    price: "₹2,199",
-    oldPrice: "₹2,799",
-    discount: "21% OFF",
-  },
-  {
-    id: 2,
-    slug: "commercial-plywood",
-    title: "Amulya Elite Plywood",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/Amulya_Elite_69_960x_crop_center.jpg?v=1777536929",
-    price: "₹1,499",
-    oldPrice: "₹1,899",
-    discount: "21% OFF",
-  },
-  {
-    id: 3,
-    slug: "mdf-board",
-    title: "GOLD PLUS BWP PLYWOOD",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/Amulya_Gold_Plus_69_960x_crop_center.jpg?v=1777536773",
-    price: "₹1,099",
-    oldPrice: "₹1,399",
-    discount: "21% OFF",
-  },
-  {
-    id: 4,
-    slug: "block-board",
-    title: "ULTRA MR PLYWOOD",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/ULTRA_MR_960x_crop_center.jpg?v=1778052420",
-    price: "₹1,699",
-    oldPrice: "₹2,199",
-    discount: "23% OFF",
-  },
-  {
-    id: 5,
-    slug: "waterproof-plywood-sheets",
-    title: "GOLD PLYWOOD",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/Amulya_Gold_69_960x_crop_center.jpg?v=1777536284",
-    price: "₹2,499",
-    oldPrice: "₹3,199",
-    discount: "22% OFF",
-  },
-];
+function formatPrice(value: number) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
-/* ==========================================================
-   ADHESIVE PRODUCTS
-========================================================== */
+/** Maps a real `product_details` row (as returned by /api/products) into
+ *  the local card shape — computing the "X% OFF" badge and struck-through
+ *  MRP only when the product actually has a discounted MRP on file. */
+function mapApiProduct(p: ApiProduct): Product {
+  const hasDiscount = p.mrp !== null && p.mrp > p.price;
+  const discountPct = hasDiscount
+    ? Math.round((1 - p.price / (p.mrp as number)) * 100)
+    : null;
 
-const adhesiveProducts: Product[] = [
-  {
-    id: 1,
-    slug: "woodwork-adhesive",
-    title: "Woodwork Adhesive",
-    image:
-      "https://5.imimg.com/data5/SELLER/Default/2022/11/XY/TE/TS/68703594/fevicol-marine-waterproof-adhesive-1000x1000.jpg",
-    price: "₹349",
-    oldPrice: "₹449",
-    discount: "22% OFF",
-  },
-  {
-    id: 2,
-    slug: "all-purpose-glue",
-    title: "All Purpose Glue",
-    image:
-      "https://m.media-amazon.com/images/I/414FEgXVV5L._SX679_.jpg",
-    price: "₹199",
-    oldPrice: "₹259",
-    discount: "23% OFF",
-  },
-  {
-    id: 3,
-    slug: "tile-adhesive",
-    title: "Tile Adhesive",
-    image:
-      "https://5.imimg.com/data5/GLADMIN/Default/2023/9/348155759/KL/MB/PR/93888/fevicol-sr-505-synthetic-rubber-adhesive-100-ml.jpg",
-    price: "₹549",
-    oldPrice: "₹699",
-    discount: "21% OFF",
-  },
-  {
-    id: 4,
-    slug: "synthetic-resin-adhesive",
-    title: "Synthetic Resin Adhesive",
-    image:
-      "https://m.media-amazon.com/images/I/51KTS1CKa3L._SL1000_.jpg",
-    price: "₹279",
-    oldPrice: "₹359",
-    discount: "22% OFF",
-  },
-  {
-    id: 5,
-    slug: "waterproof-construction-adhesive",
-    title: "Waterproof Construction Adhesive",
-    image:
-      "https://m.media-amazon.com/images/I/51QdbnswysL._AC_.jpg",
-    price: "₹429",
-    oldPrice: "₹549",
-    discount: "22% OFF",
-  },
-];
-
-/* ==========================================================
-   LAMINATES PRODUCTS
-========================================================== */
-
-const laminateProducts: Product[] = [
-  {
-    id: 1,
-    slug: "premium-decorative-laminates",
-    title: "1002 RL OFF WHITE",
-    image:
-      "https://www.amulyamica.com/cdn/shop/products/1_MM_1002RLOFFWHITE_jpg_640x_crop_center.jpg?v=1679637420",
-    price: "₹899",
-    oldPrice: "₹1,199",
-    discount: "25% OFF",
-  },
-  {
-    id: 2,
-    slug: "natural-wood-finish-laminates",
-    title: "8196 SF SMOG",
-    image:
-      "https://www.amulyamica.com/cdn/shop/products/08_MM_8196SFSMOG_960x_crop_center.jpg?v=1674481494",
-    price: "₹999",
-    oldPrice: "₹1,299",
-    discount: "23% OFF",
-  },
-  {
-    id: 3,
-    slug: "high-gloss-laminate-sheets",
-    title: "4180 RE57 Ulem Dark",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/4180_960x_crop_center.jpg?v=1787836922",
-    price: "₹1,099",
-    oldPrice: "₹1,399",
-    discount: "21% OFF",
-  },
-  {
-    id: 4,
-    slug: "textured-matte-laminates",
-    title: "10203 SG LIT",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/10203SGLIT_960x_crop_center.jpg?v=1787739957",
-    price: "₹749",
-    oldPrice: "₹999",
-    discount: "25% OFF",
-  },
-  {
-    id: 5,
-    slug: "heavy-duty-laminate-boards",
-    title: "3436 SF Redwine Oak II",
-    image:
-      "https://www.amulyamica.com/cdn/shop/files/3436_960x_crop_center.jpg?v=1787210469",
-    price: "₹1,299",
-    oldPrice: "₹1,699",
-    discount: "24% OFF",
-  },
-];
+  return {
+    id: p.productId,
+    href: productPath(p),
+    title: p.productName,
+    image: p.imageUrl || PLACEHOLDER_IMAGE,
+    price: formatPrice(p.price),
+    oldPrice: hasDiscount ? formatPrice(p.mrp as number) : null,
+    discount: hasDiscount ? `${discountPct}% OFF` : null,
+  };
+}
 
 /* ==========================================================
    TABS
+
+   Each tab fetches the newest 5 real products from
+   /api/products for its own `category` (and, where the column
+   is itself a leaf item, `subCategory`) — mirroring exactly
+   what landing on the matching /products/items/plywood-laminates/<slug>
+   page shows, capped to 5 and sorted newest-first.
 ========================================================== */
 
 type TabKey = "plywood" | "laminates" | "adhesives";
@@ -203,28 +71,98 @@ type TabKey = "plywood" | "laminates" | "adhesives";
 const tabs: {
   key: TabKey;
   label: string;
-  category: string;
-  products: Product[];
+  /** Exact `product_details.category` value to fetch. */
+  apiCategory: string;
+  /** Where "View All" links to — the real category listing page. */
+  viewAllHref: string;
 }[] = [
   {
     key: "plywood",
     label: "Plywood",
-    category: "plywood-laminates",
-    products: plywoodProducts,
+    apiCategory: "Plywood & Blockboard",
+    viewAllHref: "/products/items/plywood-laminates/plywood-blockboard",
   },
   {
     key: "laminates",
     label: "Laminates",
-    category: "plywood-laminates",
-    products: laminateProducts,
+    apiCategory: "Laminates",
+    viewAllHref: "/products/items/plywood-laminates/laminates",
   },
   {
     key: "adhesives",
     label: "Adhesives",
-    category: "plywood-laminates",
-    products: adhesiveProducts,
+    apiCategory: "Adhesives",
+    viewAllHref: "/products/items/plywood-laminates/adhesives",
   },
 ];
+
+/* ==========================================================
+   DATA FETCHING
+   Fetches all three tabs' newest-5 products once on mount, in
+   parallel, so switching tabs is instant (no per-click fetch).
+========================================================== */
+
+type TabStatus = "loading" | "success" | "error";
+
+function useTabbedProducts() {
+  const [productsByTab, setProductsByTab] = useState<Record<TabKey, Product[]>>(
+    () => {
+      const initial = {} as Record<TabKey, Product[]>;
+      tabs.forEach((t) => {
+        initial[t.key] = [];
+      });
+      return initial;
+    }
+  );
+  const [statusByTab, setStatusByTab] = useState<Record<TabKey, TabStatus>>(
+    () => {
+      const initial = {} as Record<TabKey, TabStatus>;
+      tabs.forEach((t) => {
+        initial[t.key] = "loading";
+      });
+      return initial;
+    }
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    tabs.forEach((tab) => {
+      const params = new URLSearchParams({
+        category: tab.apiCategory,
+        sort: "newest",
+        pageSize: "5",
+      });
+
+      fetch(`/api/products?${params.toString()}`, { cache: "no-store" })
+        .then(async (res) => {
+          if (!res.ok) throw new Error("Failed to load products");
+          return (await res.json()) as ProductsResponse;
+        })
+        .then((data) => {
+          if (cancelled) return;
+          setProductsByTab((prev) => ({
+            ...prev,
+            [tab.key]: (data.products ?? []).map(mapApiProduct),
+          }));
+          setStatusByTab((prev) => ({ ...prev, [tab.key]: "success" }));
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setStatusByTab((prev) => ({ ...prev, [tab.key]: "error" }));
+        });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // `tabs` is a module-level constant, so this only ever needs to run
+    // once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { productsByTab, statusByTab };
+}
 
 /* ==========================================================
    PRODUCT CARD
@@ -232,10 +170,7 @@ const tabs: {
 
 function ProductCard({ product }: { product: Product }) {
   return (
-    <Link
-      href={`/products?category=${encodeURIComponent(product.title)}`}
-      className="group block"
-    >
+    <Link href={product.href} className="group block">
       {/* IMAGE */}
 
       <div
@@ -252,16 +187,16 @@ function ProductCard({ product }: { product: Product }) {
           bg-gray-100
         "
       >
-        <Image
+        <img
           src={product.image}
           alt={product.title}
-          fill
-          sizes="
-            (max-width: 639px) 46vw,
-            (max-width: 1023px) 30vw,
-            19vw
-          "
           className="
+            absolute
+            inset-0
+
+            h-full
+            w-full
+
             object-cover
 
             transition-transform
@@ -274,32 +209,34 @@ function ProductCard({ product }: { product: Product }) {
 
         {/* DISCOUNT TAG */}
 
-        <span
-          className="
-            absolute
-            left-3
-            top-3
+        {product.discount && (
+          <span
+            className="
+              absolute
+              left-3
+              top-3
 
-            rounded-full
+              rounded-full
 
-            bg-white/95
+              bg-white/95
 
-            px-2.5
-            py-1
+              px-2.5
+              py-1
 
-            text-[10px]
-            font-bold
-            tracking-wide
+              text-[10px]
+              font-bold
+              tracking-wide
 
-            text-[rgb(207,0,6)]
+              text-[rgb(207,0,6)]
 
-            shadow-sm
+              shadow-sm
 
-            backdrop-blur-sm
-          "
-        >
-          {product.discount}
-        </span>
+              backdrop-blur-sm
+            "
+          >
+            {product.discount}
+          </span>
+        )}
 
         {/* HOVER SCRIM */}
 
@@ -401,9 +338,11 @@ function ProductCard({ product }: { product: Product }) {
             {product.price}
           </span>
 
-          <span className="text-[11px] text-gray-400 line-through sm:text-xs">
-            {product.oldPrice}
-          </span>
+          {product.oldPrice && (
+            <span className="text-[11px] text-gray-400 line-through sm:text-xs">
+              {product.oldPrice}
+            </span>
+          )}
         </div>
 
         {/* ANIMATED UNDERLINE */}
@@ -440,7 +379,7 @@ function ProductCard({ product }: { product: Product }) {
 function MobilePosterCard({ product }: { product: Product }) {
   return (
     <Link
-      href={`/products?category=${encodeURIComponent(product.title)}`}
+      href={product.href}
       className="
         group
         block
@@ -460,12 +399,10 @@ function MobilePosterCard({ product }: { product: Product }) {
       "
     >
       <div className="relative h-[320px] w-full sm:h-[360px]">
-        <Image
+        <img
           src={product.image}
           alt={product.title}
-          fill
-          sizes="76vw"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
 
         {/* SCRIM */}
@@ -485,30 +422,32 @@ function MobilePosterCard({ product }: { product: Product }) {
 
         {/* DISCOUNT TAG */}
 
-        <span
-          className="
-            absolute
-            left-3
-            top-3
+        {product.discount && (
+          <span
+            className="
+              absolute
+              left-3
+              top-3
 
-            rounded-full
+              rounded-full
 
-            bg-white/95
+              bg-white/95
 
-            px-2.5
-            py-1
+              px-2.5
+              py-1
 
-            text-[10px]
-            font-bold
-            tracking-wide
+              text-[10px]
+              font-bold
+              tracking-wide
 
-            text-[rgb(207,0,6)]
+              text-[rgb(207,0,6)]
 
-            shadow-sm
-          "
-        >
-          {product.discount}
-        </span>
+              shadow-sm
+            "
+          >
+            {product.discount}
+          </span>
+        )}
 
         {/* CONTENT */}
 
@@ -522,9 +461,11 @@ function MobilePosterCard({ product }: { product: Product }) {
               {product.price}
             </span>
 
-            <span className="text-xs text-white/60 line-through">
-              {product.oldPrice}
-            </span>
+            {product.oldPrice && (
+              <span className="text-xs text-white/60 line-through">
+                {product.oldPrice}
+              </span>
+            )}
           </div>
 
           <span
@@ -636,13 +577,35 @@ function MobileCarousel({ products }: { products: Product[] }) {
 }
 
 /* ==========================================================
+   SKELETON GRID
+   Shown while a tab's products are still loading, in the same
+   footprint as the real grid so nothing jumps into place.
+========================================================== */
+
+function SkeletonGrid() {
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div
+          key={index}
+          className="aspect-[4/5] w-full animate-pulse rounded-2xl bg-gray-100"
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ==========================================================
    MAIN COMPONENT
 ========================================================== */
 
 export default function Tiles() {
   const [active, setActive] = useState<TabKey>("plywood");
+  const { productsByTab, statusByTab } = useTabbedProducts();
 
   const activeTab = tabs.find((tab) => tab.key === active) ?? tabs[0];
+  const activeProducts = productsByTab[activeTab.key];
+  const activeStatus = statusByTab[activeTab.key];
 
   return (
     <section className="relative w-full overflow-hidden bg-white py-16 sm:py-20">
@@ -836,39 +799,59 @@ export default function Tiles() {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             >
-              {/* MOBILE — swipeable poster carousel, not a grid */}
+              {activeStatus === "loading" ? (
+                <SkeletonGrid />
+              ) : activeStatus === "error" ? (
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-14 text-center">
+                  <p className="text-sm font-medium text-gray-500">
+                    Unable to load {activeTab.label.toLowerCase()} products right
+                    now.
+                  </p>
+                </div>
+              ) : activeProducts.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-14 text-center">
+                  <p className="text-sm font-medium text-gray-500">
+                    No {activeTab.label.toLowerCase()} products are available
+                    right now.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* MOBILE — swipeable poster carousel, not a grid */}
 
-              <MobileCarousel products={activeTab.products} />
+                  <MobileCarousel products={activeProducts} />
 
-              {/* TABLET / DESKTOP — clean minimal grid */}
+                  {/* TABLET / DESKTOP — clean minimal grid */}
 
-              <div
-                className="
-                  hidden
+                  <div
+                    className="
+                      hidden
 
-                  sm:grid
-                  sm:grid-cols-3
-                  sm:gap-x-6
-                  sm:gap-y-8
+                      sm:grid
+                      sm:grid-cols-3
+                      sm:gap-x-6
+                      sm:gap-y-8
 
-                  lg:grid-cols-5
-                "
-              >
-                {activeTab.products.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.45,
-                      delay: index * 0.06,
-                      ease: "easeOut",
-                    }}
+                      lg:grid-cols-5
+                    "
                   >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-              </div>
+                    {activeProducts.map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.45,
+                          delay: index * 0.06,
+                          ease: "easeOut",
+                        }}
+                      >
+                        <ProductCard product={product} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -879,7 +862,7 @@ export default function Tiles() {
 
         <div className="mt-10 flex justify-center sm:mt-12">
           <Link
-            href={`/products/items/${activeTab.category}`}
+            href={activeTab.viewAllHref}
             className="
               group
               inline-flex

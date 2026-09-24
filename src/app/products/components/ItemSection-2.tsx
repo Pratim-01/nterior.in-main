@@ -1,213 +1,70 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import type { Product as ApiProduct, ProductsResponse } from "@/types/products";
+import { productPath } from "@/lib/product-slug";
+
 /* ==========================================================
    PRODUCT TYPE
+   (the shape this section's cards render — mapped from the
+   real `ApiProduct` returned by /api/products)
 ========================================================== */
 
 type Product = {
   id: number;
-  slug: string;
+  href: string;
   title: string;
   image: string;
   price: string;
-  oldPrice: string;
-  discount: string;
+  oldPrice: string | null;
+  discount: string | null;
 };
 
-/* ==========================================================
-   DIGITAL LOCK PRODUCTS
-   category folder: hardware (Door Hardware column)
-========================================================== */
+const PLACEHOLDER_IMAGE =
+  "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80";
 
-const lockProducts: Product[] = [
-  {
-    id: 1,
-    slug: "smart-digital-door-lock",
-    title: "Smart Digital Door Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2026/04/Sync-pro-digital-lock-SP02-03.jpg",
-    price: "₹6,499",
-    oldPrice: "₹8,499",
-    discount: "24% OFF",
-  },
-  {
-    id: 2,
-    slug: "fingerprint-smart-lock",
-    title: "Fingerprint Smart Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2026/04/Imperia-IM03-img-03.jpg",
-    price: "₹8,999",
-    oldPrice: "₹11,499",
-    discount: "22% OFF",
-  },
-  {
-    id: 3,
-    slug: "keypad-cylindrical-lock",
-    title: "Keypad Cylindrical Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2026/04/Crest-digital-lock-CR02-03-1.jpg",
-    price: "₹3,299",
-    oldPrice: "₹4,199",
-    discount: "21% OFF",
-  },
-  {
-    id: 4,
-    slug: "app-enabled-smart-deadbolt",
-    title: "App-Enabled Smart Deadbolt",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2026/04/Crest-digital-lock-CR01-03.jpg",
-    price: "₹9,999",
-    oldPrice: "₹12,999",
-    discount: "23% OFF",
-  },
-  {
-    id: 5,
-    slug: "rfid-card-door-lock",
-    title: "RFID Card Door Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2026/04/Imperia-digital-lock-IM08-04.jpg",
-    price: "₹5,799",
-    oldPrice: "₹7,299",
-    discount: "20% OFF",
-  },
-];
+function formatPrice(value: number) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
-/* ==========================================================
-   FURNITURE LOCK PRODUCTS
-   category folder: hardware (Furniture Locks column)
+/** Maps a real `product_details` row (as returned by /api/products) into
+ *  the local card shape — computing the "X% OFF" badge and struck-through
+ *  MRP only when the product actually has a discounted MRP on file. */
+function mapApiProduct(p: ApiProduct): Product {
+  const hasDiscount = p.mrp !== null && p.mrp > p.price;
+  const discountPct = hasDiscount
+    ? Math.round((1 - p.price / (p.mrp as number)) * 100)
+    : null;
 
-   Images: Ebco product photography (ebco-dev-assets CDN) is
-   used wherever there's a matching product; the remaining
-   items use the same Unsplash hardware photography already
-   live elsewhere on this site (see
-   items/hardware/components/TopCategories.tsx) until matching
-   Ebco photos for those specific products are available.
-========================================================== */
-
-const furnitureLockProducts: Product[] = [
-  {
-    id: 1,
-    slug: "4-digit-combination-lock",
-    title: "4-Digit Combination Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2025/08/4-digit-combination-lock-with-cover-01.webp",
-    price: "₹349",
-    oldPrice: "₹449",
-    discount: "22% OFF",
-  },
-  {
-    id: 2,
-    slug: "cabinet-cam-lock",
-    title: "Cabinet Cam Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/nc/catalog/esmart-digital-lock-cabinet-5z-numeric/dp-img-001.jpg",
-    price: "₹129",
-    oldPrice: "₹179",
-    discount: "28% OFF",
-  },
-  {
-    id: 3,
-    slug: "drawer-multi-purpose-lock",
-    title: "Drawer Multi-Purpose Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/nc/catalog/esmart-digital-lock-pedestal-1z-rfid/dp-img-001.jpg",
-    price: "₹199",
-    oldPrice: "₹269",
-    discount: "26% OFF",
-  },
-  {
-    id: 4,
-    slug: "sliding-wardrobe-lock",
-    title: "Sliding Wardrobe Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2023/08/IMG-P-WSPL-GW.jpg",
-    price: "₹249",
-    oldPrice: "₹329",
-    discount: "24% OFF",
-  },
-  {
-    id: 5,
-    slug: "push-and-turn-cupboard-lock",
-    title: "Push & Turn Cupboard Lock",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/nc/catalog/wardrobe-lock-3-point-22-mm/dp-img/pro_img-rotated.jpg",
-    price: "₹179",
-    oldPrice: "₹239",
-    discount: "25% OFF",
-  },
-];
-
-/* ==========================================================
-   SLIDES & HINGES PRODUCTS
-   category folder: hardware (Drawer Slides & Hinges column)
-========================================================== */
-
-const slidesHingesProducts: Product[] = [
-  {
-    id: 1,
-    slug: "soft-close-drawer-slides",
-    title: "Soft-Close Drawer Slides",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2025/09/heavy-duty-drawer-slide-125-imgs-02.jpg",
-    price: "₹399",
-    oldPrice: "₹529",
-    discount: "25% OFF",
-  },
-  {
-    id: 2,
-    slug: "concealed-cabinet-hinges",
-    title: "Concealed Cabinet Hinges",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2025/11/short-arm-hinge-with-4-hole-mounting-plate-img-01.jpg",
-    price: "₹89",
-    oldPrice: "₹119",
-    discount: "25% OFF",
-  },
-  {
-    id: 3,
-    slug: "telescopic-ball-bearing-slides",
-    title: "Telescopic Ball-Bearing Slides",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2025/01/STDS1-35-2.jpg",
-    price: "₹549",
-    oldPrice: "₹729",
-    discount: "25% OFF",
-  },
-  {
-    id: 4,
-    slug: "heavy-duty-wardrobe-hinges",
-    title: "Heavy-Duty Wardrobe Hinges",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/nc/catalog/thick-door-hinge-15-35mm-with-4-hole-mounting-plate/25042024/dp-img-1.jpg",
-    price: "₹149",
-    oldPrice: "₹199",
-    discount: "25% OFF",
-  },
-  {
-    id: 5,
-    slug: "push-to-open-drawer-system",
-    title: "Push-to-Open Drawer System",
-    image:
-      "https://s3.ap-south-1.amazonaws.com/ebco-dev-assets/EBCO-assets/2024/04/MG_4332.jpg",
-    price: "₹649",
-    oldPrice: "₹859",
-    discount: "24% OFF",
-  },
-];
+  return {
+    id: p.productId,
+    href: productPath(p),
+    title: p.productName,
+    image: p.imageUrl || PLACEHOLDER_IMAGE,
+    price: formatPrice(p.price),
+    oldPrice: hasDiscount ? formatPrice(p.mrp as number) : null,
+    discount: hasDiscount ? `${discountPct}% OFF` : null,
+  };
+}
 
 /* ==========================================================
    TABS
 
-   All three columns — Digital Locks, Furniture Locks, and
-   Slides & Hinges — live under the Hardware folder in the
-   taxonomy, so every tab routes to the same category slug.
+   Digital Locks and Furniture Locks are genuine navbar leaf
+   items, so — same as landing on
+   /products/items/hardware/digital-locks?subCategory=Digital+Locks —
+   each is fetched by BOTH its exact `category` and matching
+   `subCategory`. Slides & Hinges works the same way. Every tab
+   pulls the newest 5 products, sorted newest-first.
 ========================================================== */
 
 type TabKey = "locks" | "furniture-locks" | "slides-hinges";
@@ -215,28 +72,104 @@ type TabKey = "locks" | "furniture-locks" | "slides-hinges";
 const tabs: {
   key: TabKey;
   label: string;
-  category: string;
-  products: Product[];
+  /** Exact `product_details.category` value to fetch. */
+  apiCategory: string;
+  /** Exact `product_details.sub_category` value to narrow by. */
+  apiSubCategory: string;
+  /** Where "View All" links to — the real category listing page. */
+  viewAllHref: string;
 }[] = [
   {
     key: "locks",
     label: "Digital Locks",
-    category: "hardware",
-    products: lockProducts,
+    apiCategory: "Digital Locks",
+    apiSubCategory: "Digital Locks",
+    viewAllHref: "/products/items/hardware/digital-locks",
   },
   {
     key: "furniture-locks",
     label: "Furniture Locks",
-    category: "hardware",
-    products: furnitureLockProducts,
+    apiCategory: "Furniture Locks",
+    apiSubCategory: "Furniture Locks",
+    viewAllHref: "/products/items/hardware/furniture-locks",
   },
   {
     key: "slides-hinges",
     label: "Slides & Hinges",
-    category: "hardware",
-    products: slidesHingesProducts,
+    apiCategory: "Drawer Slides & Hinges",
+    apiSubCategory: "Drawer Slides & Hinges",
+    viewAllHref: "/products/items/hardware/drawer-slides-hinges",
   },
 ];
+
+/* ==========================================================
+   DATA FETCHING
+   Fetches all three tabs' newest-5 products once on mount, in
+   parallel, so switching tabs is instant (no per-click fetch).
+========================================================== */
+
+type TabStatus = "loading" | "success" | "error";
+
+function useTabbedProducts() {
+  const [productsByTab, setProductsByTab] = useState<Record<TabKey, Product[]>>(
+    () => {
+      const initial = {} as Record<TabKey, Product[]>;
+      tabs.forEach((t) => {
+        initial[t.key] = [];
+      });
+      return initial;
+    }
+  );
+  const [statusByTab, setStatusByTab] = useState<Record<TabKey, TabStatus>>(
+    () => {
+      const initial = {} as Record<TabKey, TabStatus>;
+      tabs.forEach((t) => {
+        initial[t.key] = "loading";
+      });
+      return initial;
+    }
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    tabs.forEach((tab) => {
+      const params = new URLSearchParams({
+        category: tab.apiCategory,
+        subCategory: tab.apiSubCategory,
+        sort: "newest",
+        pageSize: "5",
+      });
+
+      fetch(`/api/products?${params.toString()}`, { cache: "no-store" })
+        .then(async (res) => {
+          if (!res.ok) throw new Error("Failed to load products");
+          return (await res.json()) as ProductsResponse;
+        })
+        .then((data) => {
+          if (cancelled) return;
+          setProductsByTab((prev) => ({
+            ...prev,
+            [tab.key]: (data.products ?? []).map(mapApiProduct),
+          }));
+          setStatusByTab((prev) => ({ ...prev, [tab.key]: "success" }));
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setStatusByTab((prev) => ({ ...prev, [tab.key]: "error" }));
+        });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // `tabs` is a module-level constant, so this only ever needs to run
+    // once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { productsByTab, statusByTab };
+}
 
 /* ==========================================================
    PRODUCT CARD
@@ -244,23 +177,18 @@ const tabs: {
 
 function ProductCard({ product }: { product: Product }) {
   return (
-    <Link
-      href={`/products?category=${encodeURIComponent(product.title)}`}
-      className="group block"
-    >
+    <Link href={product.href} className="group block">
       {/* IMAGE */}
 
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
-        <Image
+        <img
           src={product.image}
           alt={product.title}
-          fill
-          sizes="
-            (max-width: 639px) 46vw,
-            (max-width: 1023px) 30vw,
-            19vw
-          "
           className="
+            absolute
+            inset-0
+            h-full
+            w-full
             object-cover
             transition-transform
             duration-[900ms]
@@ -271,25 +199,27 @@ function ProductCard({ product }: { product: Product }) {
 
         {/* DISCOUNT TAG */}
 
-        <span
-          className="
-            absolute
-            left-3
-            top-3
-            rounded-full
-            bg-white/95
-            px-2.5
-            py-1
-            text-[10px]
-            font-bold
-            tracking-wide
-            text-[rgb(207,0,6)]
-            shadow-sm
-            backdrop-blur-sm
-          "
-        >
-          {product.discount}
-        </span>
+        {product.discount && (
+          <span
+            className="
+              absolute
+              left-3
+              top-3
+              rounded-full
+              bg-white/95
+              px-2.5
+              py-1
+              text-[10px]
+              font-bold
+              tracking-wide
+              text-[rgb(207,0,6)]
+              shadow-sm
+              backdrop-blur-sm
+            "
+          >
+            {product.discount}
+          </span>
+        )}
 
         {/* HOVER SCRIM */}
 
@@ -371,9 +301,11 @@ function ProductCard({ product }: { product: Product }) {
             {product.price}
           </span>
 
-          <span className="text-[11px] text-gray-400 line-through sm:text-xs">
-            {product.oldPrice}
-          </span>
+          {product.oldPrice && (
+            <span className="text-[11px] text-gray-400 line-through sm:text-xs">
+              {product.oldPrice}
+            </span>
+          )}
         </div>
 
         {/* ANIMATED UNDERLINE */}
@@ -406,7 +338,7 @@ function ProductCard({ product }: { product: Product }) {
 function MobilePosterCard({ product }: { product: Product }) {
   return (
     <Link
-      href={`/products?category=${encodeURIComponent(product.title)}`}
+      href={product.href}
       className="
         group
         block
@@ -420,12 +352,10 @@ function MobilePosterCard({ product }: { product: Product }) {
       "
     >
       <div className="relative h-[320px] w-full sm:h-[360px]">
-        <Image
+        <img
           src={product.image}
           alt={product.title}
-          fill
-          sizes="76vw"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
 
         {/* SCRIM */}
@@ -443,24 +373,26 @@ function MobilePosterCard({ product }: { product: Product }) {
 
         {/* DISCOUNT TAG */}
 
-        <span
-          className="
-            absolute
-            left-3
-            top-3
-            rounded-full
-            bg-white/95
-            px-2.5
-            py-1
-            text-[10px]
-            font-bold
-            tracking-wide
-            text-[rgb(207,0,6)]
-            shadow-sm
-          "
-        >
-          {product.discount}
-        </span>
+        {product.discount && (
+          <span
+            className="
+              absolute
+              left-3
+              top-3
+              rounded-full
+              bg-white/95
+              px-2.5
+              py-1
+              text-[10px]
+              font-bold
+              tracking-wide
+              text-[rgb(207,0,6)]
+              shadow-sm
+            "
+          >
+            {product.discount}
+          </span>
+        )}
 
         {/* CONTENT */}
 
@@ -474,9 +406,11 @@ function MobilePosterCard({ product }: { product: Product }) {
               {product.price}
             </span>
 
-            <span className="text-xs text-white/60 line-through">
-              {product.oldPrice}
-            </span>
+            {product.oldPrice && (
+              <span className="text-xs text-white/60 line-through">
+                {product.oldPrice}
+              </span>
+            )}
           </div>
 
           <span
@@ -573,13 +507,35 @@ function MobileCarousel({ products }: { products: Product[] }) {
 }
 
 /* ==========================================================
+   SKELETON GRID
+   Shown while a tab's products are still loading, in the same
+   footprint as the real grid so nothing jumps into place.
+========================================================== */
+
+function SkeletonGrid() {
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div
+          key={index}
+          className="aspect-[4/5] w-full animate-pulse rounded-2xl bg-gray-100"
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ==========================================================
    MAIN COMPONENT
 ========================================================== */
 
 export default function HardwareAndFinishes() {
   const [active, setActive] = useState<TabKey>("locks");
+  const { productsByTab, statusByTab } = useTabbedProducts();
 
   const activeTab = tabs.find((tab) => tab.key === active) ?? tabs[0];
+  const activeProducts = productsByTab[activeTab.key];
+  const activeStatus = statusByTab[activeTab.key];
 
   return (
     <section className="relative w-full overflow-hidden bg-white py-16 sm:py-20">
@@ -745,37 +701,57 @@ export default function HardwareAndFinishes() {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             >
-              {/* MOBILE — swipeable poster carousel, not a grid */}
+              {activeStatus === "loading" ? (
+                <SkeletonGrid />
+              ) : activeStatus === "error" ? (
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-14 text-center">
+                  <p className="text-sm font-medium text-gray-500">
+                    Unable to load {activeTab.label.toLowerCase()} products right
+                    now.
+                  </p>
+                </div>
+              ) : activeProducts.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-14 text-center">
+                  <p className="text-sm font-medium text-gray-500">
+                    No {activeTab.label.toLowerCase()} products are available
+                    right now.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* MOBILE — swipeable poster carousel, not a grid */}
 
-              <MobileCarousel products={activeTab.products} />
+                  <MobileCarousel products={activeProducts} />
 
-              {/* TABLET / DESKTOP — clean minimal grid */}
+                  {/* TABLET / DESKTOP — clean minimal grid */}
 
-              <div
-                className="
-                  hidden
-                  sm:grid
-                  sm:grid-cols-3
-                  sm:gap-x-6
-                  sm:gap-y-8
-                  lg:grid-cols-5
-                "
-              >
-                {activeTab.products.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.45,
-                      delay: index * 0.06,
-                      ease: "easeOut",
-                    }}
+                  <div
+                    className="
+                      hidden
+                      sm:grid
+                      sm:grid-cols-3
+                      sm:gap-x-6
+                      sm:gap-y-8
+                      lg:grid-cols-5
+                    "
                   >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-              </div>
+                    {activeProducts.map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.45,
+                          delay: index * 0.06,
+                          ease: "easeOut",
+                        }}
+                      >
+                        <ProductCard product={product} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -786,7 +762,7 @@ export default function HardwareAndFinishes() {
 
         <div className="mt-10 flex justify-center sm:mt-12">
           <Link
-            href={`/products/items/${activeTab.category}`}
+            href={activeTab.viewAllHref}
             className="
               group
               inline-flex
