@@ -15,6 +15,41 @@ body {
 .animate-scroll {
   animation: scroll 20s linear infinite;
 }
+
+/* ==========================================================
+   AURORA BACKGROUND — soft, slow-drifting brand-color blobs
+   used behind the product listing pages. Purely decorative
+   (aria-hidden), so it's safe to disable for users who prefer
+   reduced motion.
+========================================================== */
+@keyframes aurora-drift-1 {
+  0%, 100% { transform: translate(-4%, -8%) scale(1); }
+  50% { transform: translate(6%, 5%) scale(1.12); }
+}
+@keyframes aurora-drift-2 {
+  0%, 100% { transform: translate(5%, 6%) scale(1); }
+  50% { transform: translate(-7%, -5%) scale(1.08); }
+}
+@keyframes aurora-drift-3 {
+  0%, 100% { transform: translate(-50%, 0%) scale(1); }
+  50% { transform: translate(-56%, 8%) scale(1.06); }
+}
+.aurora-blob-1 {
+  animation: aurora-drift-1 24s ease-in-out infinite;
+}
+.aurora-blob-2 {
+  animation: aurora-drift-2 28s ease-in-out infinite;
+}
+.aurora-blob-3 {
+  animation: aurora-drift-3 32s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob-1,
+  .aurora-blob-2,
+  .aurora-blob-3 {
+    animation: none;
+  }
+}
 /* Hide number input arrows */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {

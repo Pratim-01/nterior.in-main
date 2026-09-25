@@ -72,7 +72,8 @@ export default function SortDropdown() {
             border
             border-[#dedede]
 
-            bg-white
+            bg-white/90
+            backdrop-blur-md
 
             px-5
             pr-11

@@ -59,13 +59,15 @@ export default function ProductCard({ product }: { product: Product }) {
         overflow-hidden
         rounded-[10px]
         border
-        border-[#dedede]
+        border-[#e4e4e4]
         bg-white
         no-underline
+        shadow-[0_1px_3px_rgba(17,24,39,0.04)]
         transition-all
         duration-200
-        hover:border-[#cfcfcf]
-        hover:shadow-[0_6px_18px_rgba(0,0,0,0.06)]
+        hover:-translate-y-[2px]
+        hover:border-[rgb(255,170,0)]/40
+        hover:shadow-[0_14px_28px_-8px_rgba(207,0,6,0.16)]
       "
     >
       {/* IMAGE AREA — mobile unchanged; slightly shorter and no forced min-height on desktop */}

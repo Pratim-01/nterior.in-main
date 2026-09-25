@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { FilterState } from "@/types/products";
 import type { BreadcrumbCrumb } from "@/lib/category-taxonomy";
 import { buildQueryString } from "@/lib/product-query-params";
+import AuroraBackground from "@/components/AuroraBackground";
 import { useProductUrlState } from "./useProductUrlState";
 import { useProducts } from "./useProducts";
 import ProductFilters from "./ProductFilters";
@@ -71,13 +72,14 @@ export default function ProductListing(props: ProductListingProps) {
 
 function ProductListingFallback() {
   return (
-    <main className="min-h-screen w-full bg-white">
+    <main className="relative min-h-screen w-full">
+      <AuroraBackground />
       <div className="mx-auto w-full max-w-[1840px] px-5 pb-16 pt-6 sm:px-7 sm:pt-7 lg:px-9 lg:pt-7 xl:px-10">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-7 xl:gap-8">
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="h-[380px] animate-pulse rounded-[10px] border border-[#eee] bg-[#f7f7f7]"
+              className="h-[380px] animate-pulse rounded-[10px] border border-[#eee] bg-white/60"
             />
           ))}
         </div>
@@ -161,7 +163,7 @@ function ProductListingContent({
     (
       ["subCategory", "brand", "productType", "size", "thickness", "grade"] as (keyof FilterState)[]
     ).reduce((sum, key) => sum + filters[key].length, 0) +
-    (category && !categoryOptions ? 0 : filters.category.length) +
+    (category && !categoryOptions ? 0 : q ? 0 : filters.category.length) +
     (minPrice !== null ? 1 : 0) +
     (maxPrice !== null ? 1 : 0);
 
@@ -201,6 +203,19 @@ function ProductListingContent({
   const totalPages = pagination?.totalPages ?? 1;
   const safeCurrentPage = pagination?.page ?? page;
 
+  // The catalogue-wide `/search` route has no fixed `category` (it needs
+  // to be able to match a term across every category at once), but a
+  // Category filter there does more harm than good: a plain word like
+  // "door" or "light" also happens to be the start of a real category
+  // name, so showing a Category group next to a free-text search
+  // encourages exactly the confusing state this page used to fall into
+  // by itself (see resolveSearchFilters in lib/search-resolve.ts) — a
+  // narrow, easy-to-misread slice of the results instead of everything
+  // that actually matched. Category-locked and column-landing pages
+  // (categoryOptions set) are unaffected — they hide/show the group for
+  // their own, unrelated reasons below.
+  const hideCategoryFilter = Boolean(category) || Boolean(q);
+
   // On a column landing page (categoryOptions set), switching to a
   // sibling category should update the heading to match what's actually
   // showing — the static `title` prop was written for the page's default
@@ -222,7 +237,8 @@ function ProductListingContent({
       : effectiveFilters.category.join(" & ");
 
   return (
-    <main className="min-h-screen w-full bg-white">
+    <main className="relative min-h-screen w-full">
+      <AuroraBackground />
       <div className="mx-auto w-full max-w-[1840px] px-5 pb-16 pt-6 sm:px-7 sm:pt-7 lg:px-9 lg:pt-7 xl:px-10">
         {/* BREADCRUMB */}
         <div className="mb-7">
@@ -264,7 +280,7 @@ function ProductListingContent({
           <button
             type="button"
             onClick={() => setMobileFiltersOpen((v) => !v)}
-            className="flex items-center gap-2 rounded-[8px] border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-medium text-gray-900 shadow-sm"
+            className="flex items-center gap-2 rounded-[8px] border border-gray-200 bg-white/85 px-4 py-2.5 text-[13px] font-medium text-gray-900 shadow-sm backdrop-blur-md"
           >
             <SlidersHorizontal size={15} />
             Filters
@@ -292,7 +308,7 @@ function ProductListingContent({
                 onFilterChange={handleFilterChange}
                 onPriceChange={handlePriceChange}
                 onClearAll={clearAllFilters}
-                hideCategory={Boolean(category)}
+                hideCategory={hideCategoryFilter}
                 categoryOptions={categoryOptions}
               />
             </div>
@@ -331,7 +347,7 @@ function ProductListingContent({
                     onFilterChange={handleFilterChange}
                     onPriceChange={handlePriceChange}
                     onClearAll={clearAllFilters}
-                    hideCategory={Boolean(category)}
+                    hideCategory={hideCategoryFilter}
                     categoryOptions={categoryOptions}
                     fullWidth
                   />

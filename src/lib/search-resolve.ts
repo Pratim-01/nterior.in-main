@@ -126,11 +126,21 @@ export function resolveSearchFilters(
       continue;
     }
 
-    const categoryMatch = vocab.category.find((v) => lower(v).startsWith(w));
-    if (categoryMatch) {
-      add("category", categoryMatch);
-      continue;
-    }
+    // Deliberately NOT matched against `vocab.category`. Category names
+    // are broad, everyday words ("Door Hardware", "Display", "Lighting &
+    // Fans"), so a plain search term like "door lock" would silently
+    // resolve "door" to the whole "Door Hardware" category, lock the
+    // results down to just that category, and yet still list "Cabinet
+    // Hardware"/"Other Hardware" as selectable options in the sidebar
+    // (their own products also match "door"/"lock" via free-text search,
+    // just not the auto-applied category filter) — a visitor never
+    // checked a Category box themselves but the grid looks pre-filtered
+    // by one anyway. Sub-category/brand/thickness/grade are specific
+    // enough that this false-positive risk doesn't apply the same way,
+    // so only the category branch is left out; the free-text search
+    // (buildSearchClause in product-query.ts) still matches on category
+    // name, and the Category filter itself stays visible and fully
+    // usable for the visitor to narrow the results by hand.
   }
 
   return result;

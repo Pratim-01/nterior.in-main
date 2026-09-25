@@ -495,7 +495,7 @@ export default function ProductFilters({
 
   return (
     <aside className="w-[250px] min-w-[250px] max-w-[250px] shrink-0">
-      <div className="w-full overflow-hidden rounded-[8px] border border-gray-200 bg-white">
+      <div className="w-full overflow-hidden rounded-[10px] border border-gray-200/80 bg-white/85 shadow-[0_4px_20px_rgba(17,24,39,0.05)] backdrop-blur-md">
         {/* HEADER */}
         <div className="flex min-h-[56px] items-center justify-between border-b border-gray-100 px-5 py-4">
           <h2 className="text-[13px] font-bold leading-none text-gray-900">Filters</h2>
