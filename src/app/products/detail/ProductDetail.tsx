@@ -259,10 +259,8 @@ function Gallery({ product }: { product: ProductDetailType }) {
 function RelatedProductCard({ product }: { product: Product }) {
   const [imageFailed, setImageFailed] = useState(false);
 
-  const hasMrp = product.mrp !== null && product.mrp > product.price;
-  const discountPercent = hasMrp
-    ? Math.round((((product.mrp as number) - product.price) / (product.mrp as number)) * 100)
-    : 0;
+  const hasMrp = product.mrp !== null;
+  const discountPercent = product.discountPercent;
 
   return (
     <Link
@@ -544,10 +542,8 @@ export default function ProductDetail({
   }
 
   const { product, relatedProducts } = data;
-  const hasMrp = product.mrp !== null && product.mrp > product.price;
-  const discountPercent = hasMrp
-    ? Math.round((((product.mrp as number) - product.price) / (product.mrp as number)) * 100)
-    : 0;
+  const hasMrp = product.mrp !== null;
+  const discountPercent = product.discountPercent;
   const savingsPerUnit = hasMrp ? (product.mrp as number) - product.price : 0;
 
   const unitSuffix = product.productType === "sqft" ? "/ sq.ft." : "";
@@ -696,27 +692,23 @@ export default function ProductDetail({
                   <span className="text-[15px] font-medium text-[#6b7280]">{unitSuffix}</span>
                 )}
                 {hasMrp && (
-                  <span className="text-[17px] text-[#9ca3af] line-through">
+                  <span className="text-[17px] text-[#9ca3af] line-through decoration-[rgb(207,0,6)]">
                     {formatPrice(product.mrp as number)}
                   </span>
                 )}
                 {discountPercent > 0 && (
-                  <span className="self-center rounded-full bg-[rgb(207,0,6)] px-3 py-1 text-[13px] font-bold text-white">
+                  <span className="self-center rounded-full bg-[#12805c] px-3 py-1 text-[13px] font-bold text-white">
                     {discountPercent}% off
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-[13px] text-[#6b7280]">
-                {product.gstExclude ? "GST extra" : "Inclusive of GST"}
-                {savingsPerUnit > 0 && (
-                  <>
-                    {" "}
-                    <span className="font-semibold text-[#047857]">
-                      You save {formatPrice(savingsPerUnit)} {unitSuffix}
-                    </span>
-                  </>
-                )}
-              </p>
+              {savingsPerUnit > 0 && (
+                <p className="mt-2 text-[13px] text-[#6b7280]">
+                  <span className="font-semibold text-[#047857]">
+                    You save {formatPrice(savingsPerUnit)} {unitSuffix}
+                  </span>
+                </p>
+              )}
             </motion.div>
 
             {/* SPEC TILES */}

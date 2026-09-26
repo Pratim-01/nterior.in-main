@@ -1,5 +1,6 @@
 import type { RowDataPacket } from "mysql2/promise";
 import kayapalatDb from "@/lib/kayapalat-db";
+import { bestPriceSql, computePricing } from "@/lib/pricing";
 import { ParsedProductQuery } from "@/lib/product-query-params";
 import {
   DEFAULT_SORT,
@@ -100,8 +101,8 @@ function sortColumns(alias: string): Record<SortOption, string> {
   const c = (name: string) => `${alias}\`${name}\``;
   return {
     newest: `${c("created_at")} DESC, ${c("product_id")} DESC`,
-    "price-low": `${c("sell_mrp")} ASC, ${c("product_id")} ASC`,
-    "price-high": `${c("sell_mrp")} DESC, ${c("product_id")} ASC`,
+    "price-low": `${bestPriceSql(alias)} ASC, ${c("product_id")} ASC`,
+    "price-high": `${bestPriceSql(alias)} DESC, ${c("product_id")} ASC`,
     "name-asc": `${c("product_name")} ASC, ${c("product_id")} ASC`,
     "name-desc": `${c("product_name")} DESC, ${c("product_id")} ASC`,
   };
@@ -172,11 +173,11 @@ function buildWhereClause(
 
   if (includePriceFilter) {
     if (query.minPrice !== null) {
-      clauses.push(`${col("sell_mrp")} >= ?`);
+      clauses.push(`${bestPriceSql(alias)} >= ?`);
       params.push(query.minPrice);
     }
     if (query.maxPrice !== null) {
-      clauses.push(`${col("sell_mrp")} <= ?`);
+      clauses.push(`${bestPriceSql(alias)} <= ?`);
       params.push(query.maxPrice);
     }
   }
@@ -220,6 +221,36 @@ function mapRow(row: RowDataPacket): Product {
     }
   }
 
+  // `row.price` is `sell_mrp` (see the SELECT aliases below) and `row.mrp`
+  // is the raw `mrp` column — both straight from the database. Neither one
+  // is what the storefront is allowed to show as-is:
+  //   - the customer-facing price is the calculated "best price", never
+  //     the raw `sell_mrp`
+  //   - the struck-through "was" price is `sell_mrp`, never the raw `mrp`
+  // See src/lib/pricing.ts for the formula and the reasoning.
+  const gstPercentage =
+    row.gstPercentage !== null && row.gstPercentage !== undefined
+      ? Number(row.gstPercentage)
+      : null;
+  const gstExclude = Boolean(row.gstExclude);
+  const rawMrp = row.mrp !== null && row.mrp !== undefined ? Number(row.mrp) : 0;
+  const sellMrp = Number(row.price) || 0;
+
+  const { bestPrice, displayMrp, discountPercent } = computePricing({
+    mrp: rawMrp,
+    gstPercentage,
+    gstExclude,
+    commissionPercentage:
+      row.commissionPercentage !== null && row.commissionPercentage !== undefined
+        ? Number(row.commissionPercentage)
+        : null,
+    transportationCost:
+      row.transportationCost !== null && row.transportationCost !== undefined
+        ? Number(row.transportationCost)
+        : null,
+    sellMrp,
+  });
+
   return {
     productId: Number(row.productId),
     productName: row.productName,
@@ -231,13 +262,11 @@ function mapRow(row: RowDataPacket): Product {
     thickness: row.thickness ?? null,
     grade: row.grade ?? null,
     shortDescription: row.shortDescription ?? null,
-    price: Number(row.price) || 0,
-    mrp: row.mrp !== null && row.mrp !== undefined ? Number(row.mrp) : null,
-    gstPercentage:
-      row.gstPercentage !== null && row.gstPercentage !== undefined
-        ? Number(row.gstPercentage)
-        : null,
-    gstExclude: Boolean(row.gstExclude),
+    price: bestPrice,
+    mrp: displayMrp > 0 ? displayMrp : null,
+    discountPercent,
+    gstPercentage,
+    gstExclude,
     imageUrl: resolveImageUrl(row.imageUrl ?? null),
     imageAltText: row.imageAltText ?? row.productName,
     attributes,
@@ -293,6 +322,8 @@ async function fetchProductsPage(
        pd.mrp               AS mrp,
        pd.gst_percentage    AS gstPercentage,
        pd.gst_exclude       AS gstExclude,
+       pd.commission_percentage AS commissionPercentage,
+       pd.transportation_cost   AS transportationCost,
        pd.attributes        AS attributes,
        pd.created_at        AS createdAt,
        pi.image_url         AS imageUrl,
@@ -359,13 +390,14 @@ async function fetchFacets(query: ParsedProductQuery): Promise<Facets> {
   return Object.fromEntries(entries) as Facets;
 }
 
-/** Min/max price across the products matching every filter *except* price,
+/** Min/max *best price* (what the customer pays — not the raw `sell_mrp`)
+ *  across the products matching every filter *except* price,
  *  so the price inputs' bounds reflect the rest of the current selection. */
 async function fetchPriceRange(query: ParsedProductQuery): Promise<PriceRange> {
   const where = buildWhereClause(query, { includePriceFilter: false });
 
   const [rows] = await kayapalatDb.query<RowDataPacket[]>(
-    `SELECT MIN(\`sell_mrp\`) AS min, MAX(\`sell_mrp\`) AS max
+    `SELECT MIN(${bestPriceSql()}) AS min, MAX(${bestPriceSql()}) AS max
      FROM product_details
      ${where.sql}`,
     where.params
@@ -427,6 +459,8 @@ export async function fetchProductById(
        pd.mrp               AS mrp,
        pd.gst_percentage    AS gstPercentage,
        pd.gst_exclude       AS gstExclude,
+       pd.commission_percentage AS commissionPercentage,
+       pd.transportation_cost   AS transportationCost,
        pd.attributes        AS attributes,
        pd.showroom_stock        AS showroomStock,
        pd.showroom_stock_number AS showroomStockNumber,
@@ -495,6 +529,8 @@ export async function fetchProductById(
        pd.mrp               AS mrp,
        pd.gst_percentage    AS gstPercentage,
        pd.gst_exclude       AS gstExclude,
+       pd.commission_percentage AS commissionPercentage,
+       pd.transportation_cost   AS transportationCost,
        pd.attributes        AS attributes,
        pd.created_at        AS createdAt,
        pi.image_url         AS imageUrl,

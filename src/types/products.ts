@@ -17,8 +17,24 @@ export interface Product {
   thickness: string | null;
   grade: string | null;
   shortDescription: string | null;
+  /**
+   * The customer-facing price — the calculated "best price" (see
+   * src/lib/pricing.ts), NOT the raw `sell_mrp` database column. Floored to
+   * a whole rupee.
+   */
   price: number;
+  /**
+   * The struck-through "was" price shown next to `price` — this is the
+   * database's `sell_mrp` column, NOT the raw `mrp` column (`mrp` is an
+   * internal cost-basis figure and is never sent to the storefront). `null`
+   * when the product has no cost-basis data to compute a price from.
+   */
   mrp: number | null;
+  /** "% off" of `price` against `mrp`, ceiled to a whole percent. 0 when
+   *  there's no discount to show (`price` at or above `mrp`, or `mrp` is
+   *  `null`). Computed server-side so every screen agrees on the same
+   *  number instead of each component rounding it differently. */
+  discountPercent: number;
   gstPercentage: number | null;
   gstExclude: boolean;
   imageUrl: string | null;

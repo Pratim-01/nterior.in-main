@@ -14,6 +14,7 @@ type Product = {
   mrp: number | string;
   gst_percentage: number | string;
   gst_exclude: number;
+  discount_percent: number;
   image_url: string | null;
   image_alt_text: string | null;
 };
@@ -295,6 +296,7 @@ export default function FeaturedProducts() {
             {products.slice(0, 5).map((product) => {
               const price = Number(product.sell_mrp);
               const mrp = Number(product.mrp);
+              const discountPercent = Number(product.discount_percent) || 0;
 
               return (
                 <Link
@@ -515,7 +517,7 @@ export default function FeaturedProducts() {
                           {formatPrice(price)}
                         </span>
 
-                        {mrp > price && (
+                        {mrp > 0 && (
                           <span
                             className="
                               text-xs
@@ -527,13 +529,21 @@ export default function FeaturedProducts() {
                             {formatPrice(mrp)}
                           </span>
                         )}
+
+                        {discountPercent > 0 && (
+                          <span
+                            className="
+                              text-xs
+                              font-bold
+                              text-[rgb(207,0,6)]
+                              sm:text-sm
+                            "
+                          >
+                            {discountPercent}% off
+                          </span>
+                        )}
                       </div>
 
-                      <p className="mt-1 text-[11px] text-gray-500 sm:text-xs">
-                        {product.gst_exclude
-                          ? `GST ${product.gst_percentage}% extra`
-                          : `Incl. GST ${product.gst_percentage}%`}
-                      </p>
                     </div>
                   </div>
 

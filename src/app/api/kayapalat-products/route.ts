@@ -82,6 +82,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import kayapalatDb from "@/lib/kayapalat-db";
+import { bestPriceSql, computePricing } from "@/lib/pricing";
 
 export async function GET(request: NextRequest) {
   try {
@@ -130,11 +131,11 @@ export async function GET(request: NextRequest) {
 
     switch (sort) {
       case "price-low":
-        orderBy = "pd.sell_mrp ASC";
+        orderBy = `${bestPriceSql("pd.")} ASC`;
         break;
 
       case "price-high":
-        orderBy = "pd.sell_mrp DESC";
+        orderBy = `${bestPriceSql("pd.")} DESC`;
         break;
 
       case "name-asc":
@@ -253,6 +254,8 @@ export async function GET(request: NextRequest) {
             pd.mrp,
             pd.gst_percentage,
             pd.gst_exclude,
+            pd.commission_percentage,
+            pd.transportation_cost,
             pi.image_url,
             pi.image_alt_text
 
@@ -303,6 +306,33 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Same rule as the main /api/products feed (see src/lib/pricing.ts):
+      // `sell_mrp` here stops meaning "the raw sell_mrp column" and becomes
+      // the calculated best price the customer actually pays, while `mrp`
+      // stops meaning "the raw mrp column" and becomes the old `sell_mrp`
+      // value, shown struck-through as the "was" price. The raw `mrp`
+      // column (an internal cost-basis figure) is never sent to the
+      // storefront.
+      const { bestPrice, displayMrp, discountPercent } = computePricing({
+        mrp: Number(product.mrp) || 0,
+        gstPercentage:
+          product.gst_percentage !== null && product.gst_percentage !== undefined
+            ? Number(product.gst_percentage)
+            : null,
+        gstExclude: Boolean(product.gst_exclude),
+        commissionPercentage:
+          product.commission_percentage !== null &&
+          product.commission_percentage !== undefined
+            ? Number(product.commission_percentage)
+            : null,
+        transportationCost:
+          product.transportation_cost !== null &&
+          product.transportation_cost !== undefined
+            ? Number(product.transportation_cost)
+            : null,
+        sellMrp: Number(product.sell_mrp) || 0,
+      });
+
       return {
         product_id:
           product.product_id,
@@ -320,10 +350,13 @@ export async function GET(request: NextRequest) {
           product.short_description,
 
         sell_mrp:
-          product.sell_mrp,
+          bestPrice,
 
         mrp:
-          product.mrp,
+          displayMrp,
+
+        discount_percent:
+          discountPercent,
 
         gst_percentage:
           product.gst_percentage,

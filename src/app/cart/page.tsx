@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { calculateDiscountPercent } from "@/lib/pricing";
 import toast from "react-hot-toast";
 import { productPath } from "@/lib/product-slug";
 import { useCallback, useEffect, useState } from "react";
@@ -226,7 +227,7 @@ export default function CartPage() {
               {items.map((item, index) => {
                 const hasMrp = item.mrp !== null && item.mrp > item.price;
                 const discountPercent = hasMrp
-                  ? Math.round((((item.mrp as number) - item.price) / (item.mrp as number)) * 100)
+                  ? calculateDiscountPercent(item.mrp as number, item.price)
                   : 0;
 
                 return (
@@ -376,7 +377,7 @@ export default function CartPage() {
                 </span>
               </div>
               <p className="mt-1.5 text-[12px] text-[#9ca3af]">
-                GST, delivery, and any transport charges are calculated at checkout.
+                Delivery and any transport charges are calculated at checkout.
               </p>
 
               {/* PROMO CODE */}

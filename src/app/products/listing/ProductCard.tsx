@@ -19,7 +19,7 @@ function formatPrice(price: number) {
 }
 
 // Renders exactly one product. Every field it shows (name, brand,
-// size/thickness/grade, price, MRP, GST, image, and any extra attributes)
+// size/thickness/grade, price, MRP, image, and any extra attributes)
 // comes from the `product` prop — this component never hardcodes anything
 // about a specific brand or category, so the same card works for plywood,
 // tiles, paints, electricals, or any other category in the store.
@@ -27,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const [imageFailed, setImageFailed] = useState(false);
   const hasImage = Boolean(product.imageUrl) && !imageFailed;
 
-  const hasMrp = product.mrp !== null && product.mrp > product.price;
+  const hasMrp = product.mrp !== null;
 
   const specLine = [product.size, product.thickness, product.grade]
     .filter(Boolean)
@@ -92,6 +92,19 @@ export default function ProductCard({ product }: { product: Product }) {
         >
           {badgeLabel}
         </span>
+
+        {product.discountPercent > 0 && (
+          <span
+            className="
+              absolute right-2 top-2 z-10 rounded-full bg-[rgb(207,0,6)]
+              px-2 py-[3px] text-[9px] font-bold text-white
+              shadow-[0_1px_3px_rgba(0,0,0,0.12)]
+              sm:right-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[10px]
+            "
+          >
+            {product.discountPercent}% OFF
+          </span>
+        )}
       </div>
 
       {/* PRODUCT INFORMATION — mobile unchanged; desktop padding trimmed and forced min-heights removed so the card hugs its content instead of leaving blank space */}
@@ -143,19 +156,11 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
 
             {hasMrp && (
-              <span className="text-[10px] leading-none text-[#777] line-through sm:text-[11px]">
+              <span className="text-[10px] leading-none text-[#777] line-through sm:text-[11px] decoration-[rgb(207,0,6)]">
                 {formatPrice(product.mrp as number)}
               </span>
             )}
           </div>
-
-          {product.gstPercentage !== null && (
-            <p className="m-0 mt-1 text-[9px] leading-[13px] text-[#777] sm:mt-1 sm:text-[10px] sm:leading-4">
-              {product.gstExclude
-                ? `GST ${product.gstPercentage}% extra`
-                : `Incl. GST ${product.gstPercentage}%`}
-            </p>
-          )}
         </div>
       </div>
     </Link>

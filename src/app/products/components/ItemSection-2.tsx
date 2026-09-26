@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { calculateDiscountPercent } from "@/lib/pricing";
 import { useEffect, useRef, useState } from "react";
 
 import { ArrowRight, ArrowUpRight } from "lucide-react";
@@ -42,7 +43,7 @@ function formatPrice(value: number) {
 function mapApiProduct(p: ApiProduct): Product {
   const hasDiscount = p.mrp !== null && p.mrp > p.price;
   const discountPct = hasDiscount
-    ? Math.round((1 - p.price / (p.mrp as number)) * 100)
+    ? calculateDiscountPercent(p.mrp as number, p.price)
     : null;
 
   return {
@@ -302,7 +303,7 @@ function ProductCard({ product }: { product: Product }) {
           </span>
 
           {product.oldPrice && (
-            <span className="text-[11px] text-gray-400 line-through sm:text-xs">
+            <span className="text-[11px] text-gray-400 line-through sm:text-xs decoration-[rgb(207,0,6)]">
               {product.oldPrice}
             </span>
           )}
@@ -420,7 +421,7 @@ function MobilePosterCard({ product }: { product: Product }) {
               items-center
               gap-1
               rounded-full
-              bg-[rgb(255,170,0)]
+              bg-[rgb(207,0,6)]
               px-3
               py-1.5
               text-[11px]
