@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 import {
     Search,
@@ -13,6 +14,7 @@ import {
     ChevronRight,
     Menu,
     X,
+    LogOut,
 } from "lucide-react";
 
 import {
@@ -22,6 +24,7 @@ import {
 } from "@/lib/product-navigation";
 import { getLeafItemHref } from "@/lib/category-taxonomy";
 import { useCart } from "@/lib/cart-context";
+import AuthModal from "@/components/AuthModal";
 
 /* =========================================================
    CATEGORY DATA — see src/lib/product-navigation.ts
@@ -488,6 +491,28 @@ export default function Navbar() {
         setMobileMenu(false);
     }
 
+    const { data: session } = useSession();
+    const customerUser =
+        session?.user?.accountType === "customer" ? session.user : null;
+
+    const [authModalOpen, setAuthModalOpen] = useState(false);
+    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const accountMenuRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!accountMenuOpen) return;
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                accountMenuRef.current &&
+                !accountMenuRef.current.contains(event.target as Node)
+            ) {
+                setAccountMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [accountMenuOpen]);
+
     const [mobileMenu, setMobileMenu] =
         useState(false);
 
@@ -828,32 +853,92 @@ export default function Navbar() {
                                 gap-2
                             "
                         >
-                            <button
-                                type="button"
-                                className="
-                                    flex
-                                    h-11
-                                    items-center
-                                    gap-2
-                                    rounded-full
-                                    border
-                                    border-gray-200
-                                    bg-white
-                                    px-5
-                                    text-sm
-                                    font-semibold
-                                    text-gray-700
-                                    transition
-                                    hover:border-[rgb(255,170,0)]
-                                    hover:bg-orange-50
-                                "
-                            >
-                                <User size={18} />
+                            <div className="relative" ref={accountMenuRef}>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        customerUser
+                                            ? setAccountMenuOpen((v) => !v)
+                                            : setAuthModalOpen(true)
+                                    }
+                                    className="
+                                        flex
+                                        h-11
+                                        items-center
+                                        gap-2
+                                        rounded-full
+                                        border
+                                        border-gray-200
+                                        bg-white
+                                        px-5
+                                        text-sm
+                                        font-semibold
+                                        text-gray-700
+                                        transition
+                                        hover:border-[rgb(255,170,0)]
+                                        hover:bg-orange-50
+                                    "
+                                >
+                                    <User size={18} />
 
-                                <span className="hidden xl:inline">
-                                    Login
-                                </span>
-                            </button>
+                                    <span className="hidden xl:inline max-w-[120px] truncate">
+                                        {customerUser
+                                            ? customerUser.name?.split(" ")[0] || "Account"
+                                            : "Login"}
+                                    </span>
+                                </button>
+
+                                {customerUser && accountMenuOpen && (
+                                    <div
+                                        className="
+                                            absolute
+                                            right-0
+                                            top-[calc(100%+8px)]
+                                            z-50
+                                            w-48
+                                            overflow-hidden
+                                            rounded-2xl
+                                            border
+                                            border-gray-100
+                                            bg-white
+                                            shadow-xl
+                                        "
+                                    >
+                                        <div className="px-4 py-3 border-b border-gray-100">
+                                            <p className="text-sm font-semibold text-gray-800 truncate">
+                                                {customerUser.name}
+                                            </p>
+                                            <p className="text-xs text-gray-400 truncate">
+                                                {customerUser.email}
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setAccountMenuOpen(false);
+                                                signOut({ redirect: false });
+                                            }}
+                                            className="
+                                                flex
+                                                w-full
+                                                items-center
+                                                gap-2
+                                                px-4
+                                                py-3
+                                                text-sm
+                                                font-medium
+                                                text-gray-600
+                                                transition
+                                                hover:bg-red-50
+                                                hover:text-[rgb(207,0,6)]
+                                            "
+                                        >
+                                            <LogOut size={16} />
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* <button
                                 type="button"
@@ -1419,6 +1504,29 @@ export default function Navbar() {
                             <Heart size={19} />
                         </button> */}
 
+                        <button
+                            type="button"
+                            aria-label={customerUser ? "Account" : "Login"}
+                            onClick={() =>
+                                customerUser
+                                    ? signOut({ redirect: false })
+                                    : setAuthModalOpen(true)
+                            }
+                            className="
+                                flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-gray-700
+                                transition
+                                hover:bg-gray-100
+                            "
+                        >
+                            {customerUser ? <LogOut size={19} /> : <User size={19} />}
+                        </button>
+
                         <Link
                             href="/cart"
                             aria-label="Cart"
@@ -1913,6 +2021,11 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
+
+            <AuthModal
+                isOpen={authModalOpen}
+                onClose={() => setAuthModalOpen(false)}
+            />
         </>
     );
 }

@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -40,9 +41,59 @@ export const authOptions: NextAuthOptions = {
             phone: user.phone,
             whatsapp: user.whatsapp,
             profile_pic: user.profile_pic,
+            accountType: "staff",
           } as any;
         } catch (error) {
           console.error("Authorization error:", error);
+          return null;
+        }
+      },
+    }),
+    // Storefront customer login — separate provider/table from the CRM
+    // staff login above, kept apart so a customer account can never be
+    // confused with a CRM account (and vice versa).
+    CredentialsProvider({
+      id: "customer",
+      name: "customer",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        try {
+          const [rows] = await executeQuery(
+            `SELECT id, user_id, user_name, email, phone, whatsapp, role, password, account_status
+             FROM users_ecommerce WHERE email = ?`,
+            [credentials.email]
+          );
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          const user = rows[0];
+          if (user.account_status === "Blocked") {
+            return null;
+          }
+          const isValidPassword = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+          if (!isValidPassword) {
+            return null;
+          }
+          return {
+            id: user.user_id,
+            name: user.user_name,
+            email: user.email,
+            role: user.role || "customer",
+            phone: user.phone || "",
+            whatsapp: user.whatsapp || "",
+            accountType: "customer",
+          } as any;
+        } catch (error) {
+          console.error("Customer authorization error:", error);
           return null;
         }
       },
@@ -67,6 +118,7 @@ export const authOptions: NextAuthOptions = {
         token.phone = user.phone;
         token.whatsapp = user.whatsapp;
         token.profile_pic = user.profile_pic;
+        token.accountType = (user as any).accountType;
         console.log('Auth: JWT callback - added user data to token');
       }
       console.log('Auth: JWT callback - token after:', token);
@@ -83,6 +135,7 @@ export const authOptions: NextAuthOptions = {
         session.user.whatsapp = token.whatsapp as string;
         session.user.image = token.profile_pic as string;
         session.user.profile_pic = token.profile_pic as string;
+        session.user.accountType = token.accountType as "staff" | "customer" | undefined;
         console.log('Auth: Session callback - updated session user:', { id: session.user.id, role: session.user.role });
       }
       console.log('Auth: Session callback - session after:', session);

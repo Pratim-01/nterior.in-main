@@ -11,6 +11,10 @@ declare module "next-auth" {
       phone: string;
       whatsapp: string;
       profile_pic?: string;
+      // "staff" = CRM users (users_kp_db), "customer" = storefront
+      // shoppers (users_ecommerce). Used to tell the two account
+      // systems apart wherever a session is read.
+      accountType?: "staff" | "customer";
     };
     token?: string;
   }
@@ -23,6 +27,7 @@ declare module "next-auth" {
     phone: string;
     whatsapp: string;
     profile_pic?: string;
+    accountType?: "staff" | "customer";
   }
 }
 declare module "next-auth/jwt" {
@@ -32,5 +37,6 @@ declare module "next-auth/jwt" {
     phone: string;
     whatsapp: string;
     profile_pic?: string;
+    accountType?: "staff" | "customer";
   }
 }
